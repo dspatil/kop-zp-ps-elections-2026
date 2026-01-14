@@ -7,8 +7,47 @@ import styles from './page.module.css';
 
 type TabType = 'schedule' | 'eligibility' | 'reservations';
 
+// Voter data type (will be populated with real data later)
+interface VoterData {
+  total: number;
+  male: number;
+  female: number;
+  ageGroups: {
+    '18-25': number;
+    '26-35': number;
+    '36-50': number;
+    '50+': number;
+  };
+  pollingStations: number;
+  booths: number;
+}
+
+// Sample voter data (replace with real data later)
+const getSampleVoterData = (seatId: string): VoterData => {
+  // Generate sample data (will be replaced with real data)
+  const base = parseInt(seatId.split('-')[0] || '1', 10);
+  const total = 35000 + (base * 1234);
+  const male = Math.floor(total * 0.52);
+  const female = total - male;
+  
+  return {
+    total,
+    male,
+    female,
+    ageGroups: {
+      '18-25': Math.floor(total * 0.18),
+      '26-35': Math.floor(total * 0.28),
+      '36-50': Math.floor(total * 0.35),
+      '50+': Math.floor(total * 0.19),
+    },
+    pollingStations: Math.floor(base / 3) + 8,
+    booths: Math.floor(base / 2) + 25,
+  };
+};
+
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>('schedule');
+  const [selectedSeat, setSelectedSeat] = useState<SeatReservation | null>(null);
   
   const [filters, setFilters] = useState<{
     electionType?: ElectionType;
@@ -67,15 +106,76 @@ export default function Home() {
     return colors[category];
   };
 
-  // Election Schedule - Official dates
-  const electionSchedule = [
-    { event: 'Nomination Start', eventMr: 'अर्ज सुरू', date: '16 Jan', dateMr: '१६ जाने', status: 'active' },
-    { event: 'Nomination End', eventMr: 'अर्ज शेवट', date: '21 Jan', dateMr: '२१ जाने', status: 'upcoming' },
-    { event: 'Scrutiny', eventMr: 'छाननी', date: '22 Jan', dateMr: '२२ जाने', status: 'upcoming' },
-    { event: 'Withdrawal', eventMr: 'माघार', date: '27 Jan', dateMr: '२७ जाने', status: 'upcoming' },
-    { event: 'Polling', eventMr: 'मतदान', date: '5 Feb', dateMr: '५ फेब्रु', status: 'upcoming' },
-    { event: 'Counting', eventMr: 'मतमोजणी', date: '7 Feb', dateMr: '७ फेब्रु', status: 'upcoming' },
-  ];
+  // Election Schedule - Official dates with dynamic status
+  const getScheduleStatus = (startDate: Date, endDate?: Date): 'completed' | 'active' | 'upcoming' => {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0); // Reset time to start of day
+    
+    if (endDate) {
+      // For events with date ranges
+      if (now >= startDate && now <= endDate) return 'active';
+      if (now > endDate) return 'completed';
+      return 'upcoming';
+    } else {
+      // For single-day events
+      if (now.getTime() === startDate.getTime()) return 'active';
+      if (now > startDate) return 'completed';
+      return 'upcoming';
+    }
+  };
+
+  const electionSchedule = useMemo(() => {
+    const schedule = [
+      { 
+        event: 'Nomination Start', 
+        eventMr: 'अर्ज सुरू', 
+        date: '16 Jan', 
+        dateMr: '१६ जाने', 
+        startDate: new Date(2026, 0, 16),
+        endDate: new Date(2026, 0, 21) 
+      },
+      { 
+        event: 'Nomination End', 
+        eventMr: 'अर्ज शेवट', 
+        date: '21 Jan', 
+        dateMr: '२१ जाने', 
+        startDate: new Date(2026, 0, 21) 
+      },
+      { 
+        event: 'Scrutiny', 
+        eventMr: 'छाननी', 
+        date: '22 Jan', 
+        dateMr: '२२ जाने', 
+        startDate: new Date(2026, 0, 22) 
+      },
+      { 
+        event: 'Withdrawal', 
+        eventMr: 'माघार', 
+        date: '27 Jan', 
+        dateMr: '२७ जाने', 
+        startDate: new Date(2026, 0, 27) 
+      },
+      { 
+        event: 'Polling', 
+        eventMr: 'मतदान', 
+        date: '5 Feb', 
+        dateMr: '५ फेब्रु', 
+        startDate: new Date(2026, 1, 5) 
+      },
+      { 
+        event: 'Counting', 
+        eventMr: 'मतमोजणी', 
+        date: '7 Feb', 
+        dateMr: '७ फेब्रु', 
+        startDate: new Date(2026, 1, 7) 
+      },
+    ];
+    
+    return schedule.map(item => ({
+      ...item,
+      status: getScheduleStatus(item.startDate, item.endDate)
+    }));
+  }, []);
 
   // Eligibility state
   const [eligibilityFilters, setEligibilityFilters] = useState<{
@@ -167,7 +267,13 @@ export default function Home() {
                     <span className={styles.eventMr}>{item.eventMr}</span>
                   </div>
                   {item.status === 'active' && (
-                    <span className={styles.activeBadge}>NOW</span>
+                    <span className={styles.activeBadge}>IN PROGRESS / सुरू</span>
+                  )}
+                  {item.status === 'completed' && (
+                    <span className={styles.completedBadge}>✓ COMPLETED / पूर्ण</span>
+                  )}
+                  {item.status === 'upcoming' && (
+                    <span className={styles.upcomingBadge}>UPCOMING / आगामी</span>
                   )}
                 </div>
               ))}
@@ -369,7 +475,14 @@ export default function Home() {
             ) : (
               <div className={styles.seatsGrid}>
                 {filteredReservations.map((seat) => (
-                  <div key={seat.id} className={styles.seatCard}>
+                  <div 
+                    key={seat.id} 
+                    className={styles.seatCard}
+                    onClick={() => setSelectedSeat(seat)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && setSelectedSeat(seat)}
+                  >
                     <div className={styles.seatHeader}>
                       <span 
                         className={styles.categoryBadge}
@@ -412,6 +525,94 @@ export default function Home() {
         </span>
       </a>
 
+      {/* Voter Analytics Modal */}
+      {selectedSeat && (
+        <div className={styles.modalOverlay} onClick={() => setSelectedSeat(null)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <button className={styles.modalClose} onClick={() => setSelectedSeat(null)}>
+              ✕
+            </button>
+            
+            <div className={styles.modalHeader}>
+              <h2 className={styles.modalTitle}>
+                📍 {selectedSeat.seatNumber}
+              </h2>
+              <p className={styles.modalSubtitle}>
+                {selectedSeat.electionType === 'Zilla Parishad' ? '🏛️ Zilla Parishad' : '🏘️ Panchayat Samiti'}
+                {selectedSeat.taluka && ` | ${selectedSeat.taluka} Taluka`}
+              </p>
+              <div className={styles.modalBadges}>
+                <span 
+                  className={styles.modalBadge}
+                  style={{ background: getCategoryColor(selectedSeat.category) }}
+                >
+                  {selectedSeat.category}
+                </span>
+                {selectedSeat.isWomenReserved && (
+                  <span className={styles.modalBadgeWomen}>Women Reserved</span>
+                )}
+              </div>
+              
+              {/* Eligibility Info Banner */}
+              <div className={styles.eligibilityBanner}>
+                <div className={styles.bannerIcon}>🎯</div>
+                <div className={styles.bannerContent}>
+                  <div className={styles.bannerTitle}>Who Can Contest / कोण उमेदवारी भरू शकतो</div>
+                  <div className={styles.bannerText}>
+                    {selectedSeat.category === 'General' && !selectedSeat.isWomenReserved && (
+                      <span>✅ All categories | सर्व वर्गातील उमेदवार</span>
+                    )}
+                    {selectedSeat.category === 'General' && selectedSeat.isWomenReserved && (
+                      <span>✅ Women from all categories | सर्व वर्गातील महिला उमेदवार</span>
+                    )}
+                    {selectedSeat.category === 'SC' && !selectedSeat.isWomenReserved && (
+                      <span>✅ Only SC category | केवळ अनुसूचित जाती वर्गातील उमेदवार</span>
+                    )}
+                    {selectedSeat.category === 'SC' && selectedSeat.isWomenReserved && (
+                      <span>✅ Only SC Women | केवळ अनुसूचित जाती वर्गातील महिला उमेदवार</span>
+                    )}
+                    {selectedSeat.category === 'ST' && !selectedSeat.isWomenReserved && (
+                      <span>✅ Only ST category | केवळ अनुसूचित जमाती वर्गातील उमेदवार</span>
+                    )}
+                    {selectedSeat.category === 'ST' && selectedSeat.isWomenReserved && (
+                      <span>✅ Only ST Women | केवळ अनुसूचित जमाती वर्गातील महिला उमेदवार</span>
+                    )}
+                    {selectedSeat.category === 'OBC' && !selectedSeat.isWomenReserved && (
+                      <span>✅ Only OBC category | केवळ मागासवर्ग उमेदवार</span>
+                    )}
+                    {selectedSeat.category === 'OBC' && selectedSeat.isWomenReserved && (
+                      <span>✅ Only OBC Women | केवळ मागासवर्ग महिला उमेदवार</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.modalBody}>
+              {/* Coming Soon Section */}
+              <div className={styles.comingSoonSection}>
+                <div className={styles.comingSoonIcon}>📊</div>
+                <h3 className={styles.comingSoonTitle}>Voter Analytics Coming Soon!</h3>
+                <p className={styles.comingSoonText}>
+                  We're working on bringing you detailed voter statistics including:
+                </p>
+                <ul className={styles.comingSoonList}>
+                  <li>✅ Total voter count</li>
+                  <li>✅ Gender-wise distribution</li>
+                  <li>✅ Age group analytics</li>
+                  <li>✅ Visual charts & insights</li>
+                </ul>
+                <p className={styles.comingSoonNote}>
+                  Data will be updated once official statistics are released by the Election Commission.
+                  <br />
+                  <strong>Stay tuned!</strong> 🚀
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Footer */}
       <footer className={styles.footer}>
         <div className={styles.footerDisclaimer}>
@@ -422,7 +623,7 @@ export default function Home() {
             for any decisions made based on this information.
           </p>
         </div>
-        <p className={styles.copyright}>© {new Date().getFullYear()} Deepak Shivaji Patil. All rights reserved.</p>
+        <p className={styles.copyright}>© {new Date().getFullYear()} dspatil. All rights reserved.</p>
         <p className={styles.madeWith}>Made with ❤️ for Kolhapur 🇮🇳</p>
       </footer>
     </div>
