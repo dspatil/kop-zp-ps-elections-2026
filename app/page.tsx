@@ -122,7 +122,7 @@ export default function Home() {
           className={`${styles.tab} ${activeTab === 'schedule' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('schedule')}
         >
-          <span className={styles.tabIcon}>📅</span>
+          <span className={styles.tabIcon}>🗓</span>
           <span className={styles.tabLabel}>Schedule</span>
           <span className={styles.tabLabelMr}>वेळापत्रक</span>
         </button>
@@ -359,22 +359,31 @@ export default function Home() {
         )}
       </main>
 
+      {/* Floating Feedback Button */}
+      <a 
+        href="mailto:inbox.dpatil@gmail.com?subject=Kolhapur Elections App - Suggestion&body=Hi Deepak,%0D%0A%0D%0AMy suggestion/feature request:%0D%0A%0D%0A" 
+        className={styles.floatingFeedback}
+        title="Share your ideas!"
+      >
+        <span className={styles.feedbackIcon}>💡</span>
+        <span className={styles.feedbackText}>
+          <span className={styles.feedbackLine1}>Got an idea?</span>
+          <span className={styles.feedbackLine2}>Request a feature!</span>
+        </span>
+      </a>
+
       {/* Footer */}
       <footer className={styles.footer}>
         <div className={styles.footerDisclaimer}>
-          <strong>⚠️ Disclaimer / अस्वीकरण:</strong>
+          <strong>⚠️ Disclaimer:</strong>
           <p>
             This is an unofficial informational tool. Data sourced from official government notifications. 
             Always verify with official documents before taking any action. The developer is not responsible 
             for any decisions made based on this information.
           </p>
-          <p>
-            हे एक अनधिकृत माहिती साधन आहे. अधिकृत शासकीय अधिसूचनांमधून डेटा घेतला आहे. 
-            कोणतीही कृती करण्यापूर्वी अधिकृत कागदपत्रांसह पडताळणी करा. 
-            या माहितीच्या आधारे घेतलेल्या निर्णयांसाठी विकासक जबाबदार नाही.
-          </p>
         </div>
-        <p className={styles.copyright}>© {new Date().getFullYear()} Deepak Shivaji Patil. All rights reserved. | सर्व हक्क राखीव.</p>
+        <p className={styles.copyright}>© {new Date().getFullYear()} Deepak Shivaji Patil. All rights reserved.</p>
+        <p className={styles.madeWith}>Made with ❤️ for Kolhapur 🇮🇳</p>
       </footer>
     </div>
   );

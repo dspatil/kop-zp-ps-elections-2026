@@ -6,6 +6,8 @@
   font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 /* Header */
@@ -299,12 +301,22 @@
   border-radius: 8px;
   margin-bottom: 1rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .filterRow {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: 0.5rem;
+  min-width: 0;
+}
+
+@media (min-width: 480px) {
+  .filterRow {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (min-width: 768px) {
@@ -316,6 +328,9 @@
 .filters .select {
   padding: 0.625rem;
   font-size: 0.85rem;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .clearButton {
@@ -437,6 +452,84 @@
   margin-top: auto;
 }
 
+/* Floating Feedback Button */
+.floatingFeedback {
+  position: fixed;
+  right: -5px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: linear-gradient(135deg, #FF9933 0%, #e88a2a 100%);
+  color: white;
+  padding: 0.75rem 1.25rem 0.75rem 0.75rem;
+  border-radius: 30px 0 0 30px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  box-shadow: -4px 4px 15px rgba(0, 0, 0, 0.25);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.floatingFeedback:hover {
+  right: 0;
+  padding-right: 1.5rem;
+  box-shadow: -6px 6px 20px rgba(0, 0, 0, 0.35);
+  background: linear-gradient(135deg, #138808 0%, #0d6b06 100%);
+}
+
+.feedbackIcon {
+  font-size: 1.5rem;
+  animation: bounce 2s infinite;
+}
+
+.feedbackText {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.feedbackLine1 {
+  font-size: 0.7rem;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+.feedbackLine2 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+/* Mobile: Show as floating circle */
+@media (max-width: 480px) {
+  .floatingFeedback {
+    top: auto;
+    bottom: 20px;
+    right: 15px;
+    border-radius: 50%;
+    padding: 1rem;
+    transform: none;
+    width: 55px;
+    height: 55px;
+    justify-content: center;
+  }
+  
+  .feedbackText {
+    display: none;
+  }
+  
+  .feedbackIcon {
+    font-size: 1.5rem;
+    margin: 0;
+  }
+}
+
 .footerDisclaimer {
   max-width: 800px;
   margin: 0 auto 1rem;
@@ -466,6 +559,12 @@
   font-size: 0.8rem;
   font-weight: 600;
   margin: 0;
+}
+
+.madeWith {
+  color: #cbd5e0;
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
 }
 
 /* Print Button */
