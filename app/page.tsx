@@ -5,7 +5,7 @@ import { SeatReservation, ReservationCategory, ElectionType } from '@/types/rese
 import { getAllReservations, filterReservations, getMetadata } from '@/data/sample-data';
 import styles from './page.module.css';
 
-type TabType = 'schedule' | 'eligibility' | 'reservations';
+type TabType = 'schedule' | 'eligibility' | 'reservations' | 'nomination' | 'guide';
 
 // Voter data type (will be populated with real data later)
 interface VoterData {
@@ -48,6 +48,7 @@ const getSampleVoterData = (seatId: string): VoterData => {
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>('schedule');
   const [selectedSeat, setSelectedSeat] = useState<SeatReservation | null>(null);
+  const [villageSearch, setVillageSearch] = useState('');
   
   const [filters, setFilters] = useState<{
     electionType?: ElectionType;
@@ -242,6 +243,14 @@ export default function Home() {
           <span className={styles.tabLabel}>Candidate Eligibility</span>
           <span className={styles.tabLabelMr}>उमेदवार पात्रता</span>
         </button>
+        <button 
+          className={`${styles.tab} ${activeTab === 'nomination' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('nomination')}
+        >
+          <span className={styles.tabIcon}>📝</span>
+          <span className={styles.tabLabel}>Nomination</span>
+          <span className={styles.tabLabelMr}>उमेदवारी</span>
+        </button>
       </nav>
 
       {/* Tab Content */}
@@ -395,14 +404,143 @@ export default function Home() {
         {/* Reservations Tab */}
         {activeTab === 'reservations' && (
           <div className={styles.reservationsTab}>
+            {/* Village Search */}
+            <div className={styles.villageSearchBox}>
+              <div className={styles.searchHeader}>
+                <span className={styles.searchIcon}>🔍</span>
+                <h3>Find Your Constituency / तुमचा मतदारसंघ शोधा</h3>
+              </div>
+              <div className={styles.searchInputWrapper}>
+                <input
+                  type="text"
+                  placeholder="गावाचे नाव टाका / Enter village name (भडगांव, महागांव, कागल...)"
+                  value={villageSearch}
+                  onChange={(e) => setVillageSearch(e.target.value)}
+                  className={styles.villageSearchInput}
+                />
+                {villageSearch && (
+                  <button 
+                    className={styles.clearSearch}
+                    onClick={() => setVillageSearch('')}
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+              {villageSearch && (() => {
+                const searchTerm = villageSearch.toLowerCase();
+                const searchResults = allReservations.filter(seat => 
+                  seat.seatNumber.toLowerCase().includes(searchTerm) ||
+                  (seat.taluka && seat.taluka.toLowerCase().includes(searchTerm)) ||
+                  (seat.divisionName && seat.divisionName.toLowerCase().includes(searchTerm))
+                );
+                return (
+                <div className={styles.searchResults}>
+                  {searchResults.length === 0 ? (
+                    <p className={styles.noSearchResults}>
+                      No results found / कोणताही परिणाम नाही
+                      <br />
+                      <small>Search in Marathi (e.g., भडगांव, कागल) for best results</small>
+                    </p>
+                  ) : (
+                    <div className={styles.searchResultsList}>
+                      <p className={styles.searchResultsCount}>
+                        Found {searchResults.length} matching seat{searchResults.length > 1 ? 's' : ''}:
+                      </p>
+                      {searchResults.slice(0, 10).map((seat) => (
+                        <div 
+                          key={seat.id} 
+                          className={styles.searchResultItem}
+                          onClick={() => {
+                            setSelectedSeat(seat);
+                            setVillageSearch('');
+                          }}
+                        >
+                          <div className={styles.searchResultMain}>
+                            <span className={styles.searchResultType}>
+                              {seat.electionType === 'Zilla Parishad' ? '🏛️ ZP' : '🏘️ PS'}
+                            </span>
+                            <span className={styles.searchResultName}>{seat.seatNumber}</span>
+                          </div>
+                          <div className={styles.searchResultMeta}>
+                            <span 
+                              className={styles.searchResultCategory}
+                              style={{ background: getCategoryColor(seat.category) }}
+                            >
+                              {seat.category}
+                            </span>
+                            {seat.isWomenReserved && (
+                              <span className={styles.searchResultWomen}>Women</span>
+                            )}
+                            {seat.taluka && (
+                              <span className={styles.searchResultTaluka}>{seat.taluka}</span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                      {searchResults.length > 10 && (
+                        <p className={styles.moreResults}>
+                          + {searchResults.length - 10} more results. Use filters below to narrow down.
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+                );
+              })()}
+            </div>
+
             <div className={styles.filterHeader}>
               <h2 className={styles.sectionTitle}>जागानिहाय आरक्षण / Seat-wise Reservations</h2>
-              <button 
-                className={styles.printButton}
-                onClick={() => window.print()}
-              >
-                🖨️ Print / प्रिंट
-              </button>
+              <div className={styles.actionButtons}>
+                <button 
+                  className={styles.shareButton}
+                  onClick={() => {
+                    const text = `🗳️ *कोल्हापूर जि.प. व पं.स. निवडणूक 2026*
+
+📋 *Nomination भरणाऱ्यांनी हे नक्की पहा!*
+आरक्षणाबाबत खूप स्पष्ट माहिती आहे.
+
+✅ ZP & PS आरक्षण यादी
+✅ तालुकानिहाय माहिती  
+✅ उमेदवार पात्रता तपासा
+✅ निवडणूक वेळापत्रक
+
+👉 https://kop-elections-2026.dspatil.in/
+
+_Forward करा - प्रत्येक उमेदवाराला उपयोगी!_ 🙏
+
+#KolhapurElections2026 #ZPElection #कोल्हापूर`;
+                    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+                  }}
+                >
+                  📲 Share / शेअर
+                </button>
+                <button 
+                  className={styles.exportButton}
+                  onClick={() => {
+                    const csvContent = "data:text/csv;charset=utf-8," 
+                      + "Seat,Election Type,Taluka,Category,Women Reserved\n"
+                      + filteredReservations.map(s => 
+                          `"${s.seatNumber}","${s.electionType}","${s.taluka || ''}","${s.category}","${s.isWomenReserved ? 'Yes' : 'No'}"`
+                        ).join("\n");
+                    const link = document.createElement("a");
+                    link.setAttribute("href", encodeURI(csvContent));
+                    link.setAttribute("download", "kolhapur_reservations.csv");
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }}
+                >
+                  📥 Export CSV
+                </button>
+                <button 
+                  className={styles.printButton}
+                  onClick={() => window.print()}
+                >
+                  🖨️ Print
+                </button>
+              </div>
             </div>
             
             {/* Filters */}
@@ -510,6 +648,100 @@ export default function Home() {
             )}
           </div>
         )}
+
+        {/* Nomination Tab */}
+        {activeTab === 'nomination' && (
+          <div className={styles.nominationTab}>
+            <h2 className={styles.sectionTitle}>📝 Nomination Checklist / उमेदवारी चेकलिस्ट</h2>
+            
+            <div className={styles.nominationAlert}>
+              <span className={styles.alertIcon}>⚠️</span>
+              <div>
+                <strong>Nomination Period: 16 Jan - 21 Jan 2026</strong>
+                <p>अर्ज दाखल करण्याचा कालावधी: १६ जाने - २१ जाने २०२६</p>
+              </div>
+            </div>
+
+            <div className={styles.checklistSection}>
+              <h3 className={styles.checklistTitle}>📋 Required Documents / आवश्यक कागदपत्रे</h3>
+              <div className={styles.checklistGrid}>
+                <div className={styles.checklistItem}>
+                  <span className={styles.checkIcon}>📄</span>
+                  <div>
+                    <strong>Form 2A (Nomination Form)</strong>
+                    <p>नामनिर्देशन अर्ज फॉर्म २-अ</p>
+                  </div>
+                </div>
+                <div className={styles.checklistItem}>
+                  <span className={styles.checkIcon}>📜</span>
+                  <div>
+                    <strong>Affidavit on ₹100 Stamp Paper</strong>
+                    <p>₹१०० च्या स्टॅम्प पेपरवर प्रतिज्ञापत्र</p>
+                  </div>
+                </div>
+                <div className={styles.checklistItem}>
+                  <span className={styles.checkIcon}>🪪</span>
+                  <div>
+                    <strong>Voter ID Card (EPIC)</strong>
+                    <p>मतदार ओळखपत्र (त्याच मतदारसंघातील)</p>
+                  </div>
+                </div>
+                <div className={styles.checklistItem}>
+                  <span className={styles.checkIcon}>🎂</span>
+                  <div>
+                    <strong>Age Proof (21+ years)</strong>
+                    <p>वयाचा पुरावा (२१+ वर्षे) - आधार/जन्म दाखला</p>
+                  </div>
+                </div>
+                <div className={styles.checklistItem}>
+                  <span className={styles.checkIcon}>📸</span>
+                  <div>
+                    <strong>2 Passport Size Photos</strong>
+                    <p>२ पासपोर्ट आकाराचे फोटो</p>
+                  </div>
+                </div>
+                <div className={styles.checklistItem}>
+                  <span className={styles.checkIcon}>💰</span>
+                  <div>
+                    <strong>Security Deposit</strong>
+                    <p>अनामत रक्कम (वर्गानुसार)</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.checklistSection}>
+              <h3 className={styles.checklistTitle}>📋 For Reserved Categories / आरक्षित प्रवर्गासाठी</h3>
+              <div className={styles.checklistGrid}>
+                <div className={styles.checklistItem}>
+                  <span className={styles.checkIcon}>📃</span>
+                  <div>
+                    <strong>Caste Certificate</strong>
+                    <p>जात प्रमाणपत्र (SC/ST/OBC साठी)</p>
+                  </div>
+                </div>
+                <div className={styles.checklistItem}>
+                  <span className={styles.checkIcon}>✅</span>
+                  <div>
+                    <strong>Caste Validity Certificate</strong>
+                    <p>जात वैधता प्रमाणपत्र (SC/ST साठी अनिवार्य)</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.nominationNote}>
+              <strong>📍 Where to Submit / अर्ज कुठे दाखल करावा:</strong>
+              <p>Office of the Returning Officer, Tahsildar Office / तहसीलदार कार्यालय</p>
+              <p className={styles.verifyNote}>
+                ⚠️ Please verify exact requirements from the official notification issued by the State Election Commission.
+                <br />
+                कृपया राज्य निवडणूक आयोगाच्या अधिकृत अधिसूचनेवरून अचूक आवश्यकता तपासा.
+              </p>
+            </div>
+          </div>
+        )}
+
       </main>
 
       {/* Floating Feedback Button */}
