@@ -28,7 +28,7 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/DeepakPatil22/kop-zp-ps-elections-2026.git
+git clone https://github.com/dspatil/kop-zp-ps-elections-2026.git
 cd kop-zp-ps-elections-2026
 
 # Install dependencies
