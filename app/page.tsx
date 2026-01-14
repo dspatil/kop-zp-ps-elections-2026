@@ -361,7 +361,20 @@ export default function Home() {
 
       {/* Footer */}
       <footer className={styles.footer}>
-        <p>© {new Date().getFullYear()} Deepak Shivaji Patil. All rights reserved. | सर्व हक्क राखीव.</p>
+        <div className={styles.footerDisclaimer}>
+          <strong>⚠️ Disclaimer / अस्वीकरण:</strong>
+          <p>
+            This is an unofficial informational tool. Data sourced from official government notifications. 
+            Always verify with official documents before taking any action. The developer is not responsible 
+            for any decisions made based on this information.
+          </p>
+          <p>
+            हे एक अनधिकृत माहिती साधन आहे. अधिकृत शासकीय अधिसूचनांमधून डेटा घेतला आहे. 
+            कोणतीही कृती करण्यापूर्वी अधिकृत कागदपत्रांसह पडताळणी करा. 
+            या माहितीच्या आधारे घेतलेल्या निर्णयांसाठी विकासक जबाबदार नाही.
+          </p>
+        </div>
+        <p className={styles.copyright}>© {new Date().getFullYear()} Deepak Shivaji Patil. All rights reserved. | सर्व हक्क राखीव.</p>
       </footer>
     </div>
   );

@@ -432,12 +432,36 @@
 /* Footer */
 .footer {
   background: #1a365d;
-  padding: 1rem;
+  padding: 1.5rem 1rem;
   text-align: center;
   margin-top: auto;
 }
 
-.footer p {
+.footerDisclaimer {
+  max-width: 800px;
+  margin: 0 auto 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  border-left: 4px solid #FF9933;
+}
+
+.footerDisclaimer strong {
+  color: #fcd34d;
+  font-size: 0.85rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.footerDisclaimer p {
+  color: #cbd5e0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  margin: 0.5rem 0;
+  text-align: left;
+}
+
+.copyright {
   color: #FF9933;
   font-size: 0.8rem;
   font-weight: 600;
