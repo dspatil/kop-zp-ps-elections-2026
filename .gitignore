@@ -1,0 +1,51 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+.next/
+out/
+build/
+dist/
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local env files
+.env*.local
+.env
+
+# Vercel
+.vercel
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Testing (dev only)
+coverage/
+jest.config.js
+
+# Source data files (keep locally, don't upload to repo)
+# These are used for data conversion but not needed in production
+*.pdf
+election_reservation_kop-ALL-OCR.pdf
+election_reservation_kop-ALL-text.pdf
+
+# Source JSON files (used for data extraction, not needed in production)
+# The processed data is in data/reservations.json
+kolhapur_election_reservation_details_*.json
+
+# Misc
+*.log
+Thumbs.db

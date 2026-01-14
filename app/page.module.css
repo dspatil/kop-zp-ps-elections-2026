@@ -1,0 +1,608 @@
+/* 🇮🇳 Kolhapur Election Portal - Clean Tabbed UI */
+
+.container {
+  min-height: 100vh;
+  background: #f5f7fa;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+  padding: 1.25rem 1rem;
+  text-align: center;
+  border-bottom: 4px solid;
+  border-image: linear-gradient(90deg, #FF9933 33%, #FFFFFF 33%, #FFFFFF 66%, #138808 66%) 1;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.marathiTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #FF9933;
+  margin-top: 0.25rem;
+}
+
+.disclaimer {
+  font-size: 0.75rem;
+  color: #fcd34d;
+  margin-top: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .title {
+    font-size: 1.75rem;
+  }
+  .marathiTitle {
+    font-size: 1.5rem;
+  }
+}
+
+/* Tab Navigation */
+.tabNav {
+  display: flex;
+  background: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.tab {
+  flex: 1;
+  padding: 0.75rem 0.5rem;
+  border: none;
+  background: #ffffff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  background: #f8fafc;
+}
+
+.activeTab {
+  border-bottom-color: #FF9933;
+  background: #fffaf0;
+}
+
+.tabIcon {
+  font-size: 1.25rem;
+}
+
+.tabLabel {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.tabLabelMr {
+  font-size: 0.65rem;
+  color: #718096;
+}
+
+.activeTab .tabLabel {
+  color: #1a365d;
+}
+
+.activeTab .tabLabelMr {
+  color: #FF9933;
+}
+
+/* Tab Content */
+.tabContent {
+  flex: 1;
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a365d;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+/* Schedule Tab */
+.scheduleTab {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.scheduleList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.scheduleItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.875rem 1rem;
+  background: #ffffff;
+  border-radius: 8px;
+  border-left: 4px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.scheduleItem.active {
+  border-left-color: #FF9933;
+  background: #fffaf0;
+}
+
+.scheduleItem.completed {
+  border-left-color: #38a169;
+  background: #f0fff4;
+}
+
+.scheduleDate {
+  min-width: 60px;
+  text-align: center;
+}
+
+.dateEn {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1a365d;
+}
+
+.dateMr {
+  display: block;
+  font-size: 0.7rem;
+  color: #718096;
+}
+
+.scheduleEvent {
+  flex: 1;
+}
+
+.eventEn {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.eventMr {
+  display: block;
+  font-size: 0.8rem;
+  color: #718096;
+}
+
+.activeBadge {
+  background: #FF9933;
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.importantNote {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: #fff5f5;
+  border-radius: 8px;
+  border-left: 4px solid #e53e3e;
+  font-size: 0.85rem;
+  color: #742a2a;
+}
+
+.importantNote strong {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.importantNote ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.importantNote li {
+  margin-bottom: 0.25rem;
+}
+
+/* Eligibility Tab */
+.eligibilityTab {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.eligibilityForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.formGroup label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.select {
+  padding: 0.75rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.select:focus {
+  outline: none;
+  border-color: #FF9933;
+}
+
+.eligibilityResult {
+  background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  color: white;
+}
+
+.resultNumber {
+  font-size: 4rem;
+  font-weight: 800;
+  line-height: 1;
+  color: #48bb78;
+}
+
+.resultLabel {
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  opacity: 0.9;
+}
+
+.resultBreakdown {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 1rem;
+  font-size: 1rem;
+}
+
+/* Reservations Tab */
+.reservationsTab {
+  width: 100%;
+}
+
+.filters {
+  background: #ffffff;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.filterRow {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .filterRow {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.filters .select {
+  padding: 0.625rem;
+  font-size: 0.85rem;
+}
+
+.clearButton {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #e53e3e;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.statsBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: #1a365d;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.statItem {
+  font-size: 0.8rem;
+  color: #e2e8f0;
+  font-weight: 500;
+}
+
+/* Seats Grid */
+.seatsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .seatsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .seatsGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.seatCard {
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border-left: 3px solid #138808;
+}
+
+.seatHeader {
+  display: flex;
+  gap: 0.375rem;
+  padding: 0.5rem;
+  background: #f8fafc;
+  flex-wrap: wrap;
+}
+
+.categoryBadge {
+  color: white;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.womenBadge {
+  background: #d53f8c;
+  color: white;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+.seatBody {
+  padding: 0.625rem;
+}
+
+.seatType {
+  font-size: 0.7rem;
+  color: #718096;
+  margin-bottom: 0.25rem;
+}
+
+.seatTaluka {
+  font-size: 0.75rem;
+  color: #4a5568;
+  font-weight: 600;
+}
+
+.seatName {
+  font-size: 0.85rem;
+  color: #1a365d;
+  font-weight: 600;
+  margin-top: 0.25rem;
+}
+
+.noResults {
+  text-align: center;
+  padding: 2rem;
+  color: #718096;
+  background: #ffffff;
+  border-radius: 8px;
+}
+
+/* Footer */
+.footer {
+  background: #1a365d;
+  padding: 1rem;
+  text-align: center;
+  margin-top: auto;
+}
+
+.footer p {
+  color: #FF9933;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Print Button */
+.printButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background: #138808;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.printButton:hover {
+  background: #0d6b06;
+}
+
+.filterHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  /* Hide non-printable elements */
+  .tabNav,
+  .filters,
+  .clearButton,
+  .printButton,
+  .footer,
+  .eligibilityTab,
+  .scheduleTab {
+    display: none !important;
+  }
+
+  /* Reset page layout */
+  .container {
+    background: white !important;
+    min-height: auto !important;
+  }
+
+  .header {
+    background: white !important;
+    border-bottom: 2px solid #1a365d !important;
+    padding: 0.5rem !important;
+    border-image: none !important;
+  }
+
+  .title {
+    color: #1a365d !important;
+    font-size: 1.25rem !important;
+  }
+
+  .marathiTitle {
+    color: #FF9933 !important;
+    font-size: 1rem !important;
+  }
+
+  .disclaimer {
+    color: #666 !important;
+    font-size: 0.7rem !important;
+  }
+
+  /* Tab content */
+  .tabContent {
+    padding: 0.5rem !important;
+    max-width: 100% !important;
+  }
+
+  .sectionTitle {
+    font-size: 1rem !important;
+    margin-bottom: 0.5rem !important;
+    page-break-after: avoid;
+  }
+
+  /* Stats bar for print */
+  .statsBar {
+    background: #f0f0f0 !important;
+    color: #1a365d !important;
+    padding: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
+    page-break-after: avoid;
+  }
+
+  .statItem {
+    color: #1a365d !important;
+    font-size: 0.7rem !important;
+  }
+
+  /* Seats grid for print - compact table-like layout */
+  .seatsGrid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.375rem !important;
+    page-break-inside: auto;
+  }
+
+  .seatCard {
+    border: 1px solid #ccc !important;
+    border-radius: 4px !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+    border-left-width: 3px !important;
+  }
+
+  .seatHeader {
+    padding: 0.25rem 0.375rem !important;
+    background: #f8f8f8 !important;
+  }
+
+  .categoryBadge {
+    font-size: 0.55rem !important;
+    padding: 0.1rem 0.3rem !important;
+  }
+
+  .womenBadge {
+    font-size: 0.55rem !important;
+    padding: 0.1rem 0.3rem !important;
+  }
+
+  .seatBody {
+    padding: 0.375rem !important;
+  }
+
+  .seatType {
+    font-size: 0.6rem !important;
+  }
+
+  .seatTaluka {
+    font-size: 0.65rem !important;
+  }
+
+  .seatName {
+    font-size: 0.7rem !important;
+  }
+
+  /* Page setup */
+  @page {
+    margin: 0.5in;
+    size: A4 portrait;
+  }
+
+  /* Print title */
+  .printTitle {
+    display: block !important;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #1a365d;
+  }
+}
+
+/* Hide print-only elements on screen */
+.printTitle {
+  display: none;
+}

@@ -1,0 +1,25 @@
+{
+  "name": "kolhapur-election-reservations",
+  "version": "1.0.0",
+  "description": "Public read-only web application for Zilla Parishad and Panchayat Samiti election reservations in Kolhapur district",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "convert-data": "node scripts/convert-json-data.js"
+  },
+  "dependencies": {
+    "@vercel/analytics": "^1.1.1",
+    "next": "^14.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "typescript": "^5.0.0"
+  }
+}
