@@ -290,6 +290,68 @@
   font-size: 1rem;
 }
 
+/* Eligible Seats List */
+.eligibleSeatsList {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.seatsListTitle {
+  font-size: 1.1rem;
+  color: #1a365d;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #FF9933;
+}
+
+.seatsGroup {
+  margin-bottom: 1.25rem;
+}
+
+.seatsGroup:last-child {
+  margin-bottom: 0;
+}
+
+.seatsGroupTitle {
+  font-size: 0.95rem;
+  color: #2c5282;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.seatsChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.seatChip {
+  background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
+  border: 1px solid #cbd5e0;
+  border-radius: 20px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  color: #2d3748;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: all 0.2s ease;
+}
+
+.seatChip:hover {
+  background: linear-gradient(135deg, #FF9933 0%, #e88a2a 100%);
+  color: white;
+  border-color: #FF9933;
+}
+
+.seatChip small {
+  font-size: 0.7rem;
+  opacity: 0.8;
+}
+
 /* Reservations Tab */
 .reservationsTab {
   width: 100%;

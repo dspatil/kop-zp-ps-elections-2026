@@ -139,8 +139,8 @@ export default function Home() {
           onClick={() => setActiveTab('eligibility')}
         >
           <span className={styles.tabIcon}>🎯</span>
-          <span className={styles.tabLabel}>Eligibility</span>
-          <span className={styles.tabLabelMr}>पात्रता</span>
+          <span className={styles.tabLabel}>Candidate Eligibility</span>
+          <span className={styles.tabLabelMr}>उमेदवार पात्रता</span>
         </button>
       </nav>
 
@@ -234,14 +234,54 @@ export default function Home() {
             </div>
             
             {(eligibilityFilters.gender || eligibilityFilters.category) && (
-              <div className={styles.eligibilityResult}>
-                <div className={styles.resultNumber}>{eligibleSeats.length}</div>
-                <div className={styles.resultLabel}>Seats you can contest / तुम्ही लढवू शकता अशा जागा</div>
-                <div className={styles.resultBreakdown}>
-                  <span>🏛️ ZP / जि.प.: {eligibleSeats.filter(s => s.electionType === 'Zilla Parishad').length}</span>
-                  <span>🏘️ PS / पं.स.: {eligibleSeats.filter(s => s.electionType === 'Panchayat Samiti').length}</span>
+              <>
+                <div className={styles.eligibilityResult}>
+                  <div className={styles.resultNumber}>{eligibleSeats.length}</div>
+                  <div className={styles.resultLabel}>Seats you can contest / तुम्ही लढवू शकता अशा जागा</div>
+                  <div className={styles.resultBreakdown}>
+                    <span>🏛️ ZP / जि.प.: {eligibleSeats.filter(s => s.electionType === 'Zilla Parishad').length}</span>
+                    <span>🏘️ PS / पं.स.: {eligibleSeats.filter(s => s.electionType === 'Panchayat Samiti').length}</span>
+                  </div>
                 </div>
-              </div>
+                
+                {eligibleSeats.length > 0 && (
+                  <div className={styles.eligibleSeatsList}>
+                    <h3 className={styles.seatsListTitle}>📍 Your Eligible Seats / तुमच्या पात्र जागा:</h3>
+                    
+                    {eligibleSeats.filter(s => s.electionType === 'Zilla Parishad').length > 0 && (
+                      <div className={styles.seatsGroup}>
+                        <h4 className={styles.seatsGroupTitle}>🏛️ Zilla Parishad / जिल्हा परिषद</h4>
+                        <div className={styles.seatsChips}>
+                          {eligibleSeats
+                            .filter(s => s.electionType === 'Zilla Parishad')
+                            .map((seat, idx) => (
+                              <span key={idx} className={styles.seatChip}>
+                                {seat.seatNumber}
+                                {seat.taluka && <small> ({seat.taluka})</small>}
+                              </span>
+                            ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {eligibleSeats.filter(s => s.electionType === 'Panchayat Samiti').length > 0 && (
+                      <div className={styles.seatsGroup}>
+                        <h4 className={styles.seatsGroupTitle}>🏘️ Panchayat Samiti / पंचायत समिती</h4>
+                        <div className={styles.seatsChips}>
+                          {eligibleSeats
+                            .filter(s => s.electionType === 'Panchayat Samiti')
+                            .map((seat, idx) => (
+                              <span key={idx} className={styles.seatChip}>
+                                {seat.seatNumber}
+                                {seat.panchayatSamiti && <small> ({seat.panchayatSamiti})</small>}
+                              </span>
+                            ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}
