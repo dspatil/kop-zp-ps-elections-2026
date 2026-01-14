@@ -273,7 +273,7 @@ export default function Home() {
                             .map((seat, idx) => (
                               <span key={idx} className={styles.seatChip}>
                                 {seat.seatNumber}
-                                {seat.panchayatSamiti && <small> ({seat.panchayatSamiti})</small>}
+                                {seat.divisionName && <small> ({seat.divisionName})</small>}
                               </span>
                             ))}
                         </div>
