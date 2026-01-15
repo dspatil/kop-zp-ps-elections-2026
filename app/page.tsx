@@ -64,6 +64,7 @@ export default function Home() {
     taluka?: string;
   }>({});
 
+
   const allReservations = getAllReservations();
   const metadata = getMetadata();
   
@@ -677,23 +678,47 @@ _Forward करा - प्रत्येक उमेदवाराला उ
               </div>
             </div>
 
+            {/* Official Forms - Must Have for Nomination */}
             <div className={styles.checklistSection}>
-              <h3 className={styles.checklistTitle}>📋 Required Documents / आवश्यक कागदपत्रे</h3>
+              <h3 className={styles.checklistTitle}>📋 Must-Have Forms for Nomination / नामांकनासाठी आवश्यक अर्ज</h3>
+              <div className={styles.officialFormsList}>
+                <div className={styles.formItem}>
+                  <span className={styles.formNumber}>1</span>
+                  <div>
+                    <strong>Nomination Form / नामनिर्देशन पत्र</strong>
+                    <p>Form 2-A (ZP) / Form 2-B (PS) - नमुना २-अ (जि.प.) / २-ब (पं.स.)</p>
+                    <p className={styles.formTip}>📍 Available at Tahsildar Office / तहसीलदार कार्यालयात उपलब्ध</p>
+                  </div>
+                </div>
+                <div className={styles.formItem}>
+                  <span className={styles.formNumber}>2</span>
+                  <div>
+                    <strong>Affidavit (₹100 Stamp Paper)</strong>
+                    <p>गुन्हेगारी पार्श्वभूमी, मत्ता व दायित्व शपथपत्र (₹१०० स्टॅम्प पेपर)</p>
+                    <p className={styles.formTip}>📍 Criminal record, assets & liabilities declaration</p>
+                  </div>
+                </div>
+                <div className={styles.formItem}>
+                  <span className={styles.formNumber}>3</span>
+                  <div>
+                    <strong>Toilet Usage Declaration / शौचालय वापर प्रमाणपत्र</strong>
+                    <p>Self-declaration or certificate from CEO/designated officer</p>
+                    <a 
+                      href="https://mahasec.maharashtra.gov.in/Upload/PDF/SEC%20Letter%20Dtd%20160724.pdf" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className={styles.formLink}
+                    >
+                      📄 View Official Format / अधिकृत नमुना पहा
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.checklistSection}>
+              <h3 className={styles.checklistTitle}>📎 Required Documents / आवश्यक कागदपत्रे</h3>
               <div className={styles.checklistGrid}>
-                <div className={styles.checklistItem}>
-                  <span className={styles.checkIcon}>📄</span>
-                  <div>
-                    <strong>Form 2A (Nomination Form)</strong>
-                    <p>नामनिर्देशन अर्ज फॉर्म २-अ</p>
-                  </div>
-                </div>
-                <div className={styles.checklistItem}>
-                  <span className={styles.checkIcon}>📜</span>
-                  <div>
-                    <strong>Affidavit on ₹100 Stamp Paper</strong>
-                    <p>₹१०० च्या स्टॅम्प पेपरवर प्रतिज्ञापत्र</p>
-                  </div>
-                </div>
                 <div className={styles.checklistItem}>
                   <span className={styles.checkIcon}>🪪</span>
                   <div>
@@ -705,23 +730,89 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                   <span className={styles.checkIcon}>🎂</span>
                   <div>
                     <strong>Age Proof (21+ years)</strong>
-                    <p>वयाचा पुरावा (२१+ वर्षे) - आधार/जन्म दाखला</p>
+                    <p>वयाचा पुरावा (२१+ वर्षे)</p>
                   </div>
                 </div>
                 <div className={styles.checklistItem}>
                   <span className={styles.checkIcon}>📸</span>
                   <div>
-                    <strong>2 Passport Size Photos</strong>
-                    <p>२ पासपोर्ट आकाराचे फोटो</p>
+                    <strong>Passport Size Photos</strong>
+                    <p>पासपोर्ट आकाराचे फोटो</p>
                   </div>
                 </div>
-                <div className={styles.checklistItem}>
-                  <span className={styles.checkIcon}>💰</span>
-                  <div>
-                    <strong>Security Deposit</strong>
-                    <p>अनामत रक्कम (वर्गानुसार)</p>
+              </div>
+            </div>
+
+            {/* Security Deposit / Fees */}
+            <div className={styles.checklistSection}>
+              <h3 className={styles.checklistTitle}>💰 Security Deposit / अनामत रक्कम</h3>
+              <div className={styles.feesTable}>
+                <div className={styles.feeRow}>
+                  <div className={styles.feeCategory}>
+                    <strong>Zilla Parishad / जिल्हा परिषद</strong>
+                  </div>
+                  <div className={styles.feeAmounts}>
+                    <div className={styles.feeItem}>
+                      <span className={styles.feeLabel}>General / सर्वसाधारण:</span>
+                      <span className={styles.feeAmount}>₹1,000</span>
+                    </div>
+                    <div className={styles.feeItem}>
+                      <span className={styles.feeLabel}>SC/ST:</span>
+                      <span className={styles.feeAmount}>₹500</span>
+                    </div>
                   </div>
                 </div>
+                <div className={styles.feeRow}>
+                  <div className={styles.feeCategory}>
+                    <strong>Panchayat Samiti / पंचायत समिती</strong>
+                  </div>
+                  <div className={styles.feeAmounts}>
+                    <div className={styles.feeItem}>
+                      <span className={styles.feeLabel}>General / सर्वसाधारण:</span>
+                      <span className={styles.feeAmount}>₹700</span>
+                    </div>
+                    <div className={styles.feeItem}>
+                      <span className={styles.feeLabel}>SC/ST:</span>
+                      <span className={styles.feeAmount}>₹350</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p className={styles.feeNote}>* Deposit refunded if candidate gets more than 1/6th of valid votes polled</p>
+            </div>
+
+            {/* Election Expenditure Limit */}
+            <div className={styles.checklistSection}>
+              <h3 className={styles.checklistTitle}>📊 Election Expenditure Limit / निवडणूक खर्चाची मर्यादा</h3>
+              <div className={styles.expenditureInfo}>
+                <p className={styles.expenditureNote}>
+                  Kolhapur has 68 ZP divisions (61-70 category) / कोल्हापूर जिल्ह्यात ६८ जि.प. विभाग आहेत
+                </p>
+                <div className={styles.expenditureTable}>
+                  <div className={styles.expenditureRow}>
+                    <div className={styles.expenditureCategory}>
+                      <span className={styles.expenditureIcon}>🏛️</span>
+                      <strong>Zilla Parishad / जिल्हा परिषद</strong>
+                    </div>
+                    <div className={styles.expenditureAmount}>
+                      <span className={styles.amountValue}>₹7,50,000</span>
+                      <span className={styles.amountLabel}>(साडेसात लाख)</span>
+                    </div>
+                  </div>
+                  <div className={styles.expenditureRow}>
+                    <div className={styles.expenditureCategory}>
+                      <span className={styles.expenditureIcon}>🏘️</span>
+                      <strong>Panchayat Samiti / पंचायत समिती</strong>
+                    </div>
+                    <div className={styles.expenditureAmount}>
+                      <span className={styles.amountValue}>₹5,25,000</span>
+                      <span className={styles.amountLabel}>(सव्वापाच लाख)</span>
+                    </div>
+                  </div>
+                </div>
+                <p className={styles.expenditureWarning}>
+                  ⚠️ Candidates must maintain expenditure within this limit / उमेदवाराने या मर्यादेतच खर्च करावा
+                </p>
               </div>
             </div>
 
@@ -745,13 +836,50 @@ _Forward करा - प्रत्येक उमेदवाराला उ
               </div>
             </div>
 
+            {/* Contact Info */}
+            <div className={styles.contactSection}>
+              <h3 className={styles.checklistTitle}>📞 Contact / संपर्क</h3>
+              <div className={styles.contactGrid}>
+                <div className={styles.contactItem}>
+                  <span className={styles.contactIcon}>🏛️</span>
+                  <div>
+                    <strong>Returning Officer</strong>
+                    <p>Tahsildar Office / तहसीलदार कार्यालय, संबंधित तालुका</p>
+                  </div>
+                </div>
+                <div className={styles.contactItem}>
+                  <span className={styles.contactIcon}>📧</span>
+                  <div>
+                    <strong>State Election Commission</strong>
+                    <p>sec.zpps@mah.gov.in</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.handbookSection}>
+              <div className={styles.handbookCard}>
+                <span className={styles.handbookIcon}>📚</span>
+                <div>
+                  <strong>Official Handbook / अधिकृत माहितीपुस्तिका</strong>
+                  <p>राजकीय पक्ष व उमेदवारांसाठी महत्वाच्या सूचना (SEC Maharashtra)</p>
+                  <a 
+                    href="https://mahasec.maharashtra.gov.in/Upload/PDF/NEW%20ZPPS%20%20Political%20Party%20&%20Candidate%20Handbook%2010012026.pdf" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className={styles.handbookLink}
+                  >
+                    📥 Download Official Handbook PDF
+                  </a>
+                </div>
+              </div>
+            </div>
+
             <div className={styles.nominationNote}>
-              <strong>📍 Where to Submit / अर्ज कुठे दाखल करावा:</strong>
-              <p>Office of the Returning Officer, Tahsildar Office / तहसीलदार कार्यालय</p>
               <p className={styles.verifyNote}>
-                ⚠️ Please verify exact requirements from the official notification issued by the State Election Commission.
+                ⚠️ Verify exact requirements with your local Returning Officer.
                 <br />
-                कृपया राज्य निवडणूक आयोगाच्या अधिकृत अधिसूचनेवरून अचूक आवश्यकता तपासा.
+                कृपया स्थानिक निवडणूक निर्णय अधिकाऱ्यांकडून अचूक आवश्यकता तपासा.
               </p>
             </div>
           </div>
@@ -1086,6 +1214,8 @@ _Forward करा - प्रत्येक उमेदवाराला उ
             for any decisions made based on this information.
           </p>
         </div>
+        
+        
         <p className={styles.copyright}>© {new Date().getFullYear()} dspatil. All rights reserved.</p>
         <p className={styles.madeWith}>Made with ❤️ for Kolhapur 🇮🇳</p>
       </footer>

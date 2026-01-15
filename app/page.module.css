@@ -741,6 +741,7 @@
   margin-top: auto;
 }
 
+
 /* Floating Feedback Button */
 .floatingFeedback {
   position: fixed;
@@ -1007,6 +1008,289 @@
   margin: 0;
 }
 
+/* Official Forms List */
+.officialFormsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.formItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f7fafc;
+  border-radius: 8px;
+  border-left: 3px solid #FF9933;
+}
+
+.formNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: #FF9933;
+  color: white;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.formItem strong {
+  display: block;
+  color: #2d3748;
+  margin-bottom: 0.25rem;
+}
+
+.formItem p {
+  font-size: 0.85rem;
+  color: #718096;
+  margin: 0;
+}
+
+.formTip {
+  margin-top: 0.25rem !important;
+  font-size: 0.8rem !important;
+  color: #4a5568 !important;
+  font-style: italic;
+}
+
+.formLink {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: #1a365d;
+  text-decoration: none;
+  padding: 0.25rem 0.5rem;
+  background: #e2e8f0;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.formLink:hover {
+  background: #FF9933;
+  color: white;
+}
+
+/* Contact Section */
+.contactSection {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.contactGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.contactItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: #f0f7ff;
+  border-radius: 8px;
+  border-left: 3px solid #1a365d;
+}
+
+.contactIcon {
+  font-size: 1.5rem;
+}
+
+.contactItem strong {
+  display: block;
+  color: #2d3748;
+  margin-bottom: 0.25rem;
+}
+
+.contactItem p {
+  font-size: 0.85rem;
+  color: #4a5568;
+  margin: 0;
+  word-break: break-all;
+}
+
+/* Fees Table */
+.feesTable {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.feeRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f7fafc;
+  border-radius: 8px;
+  border-left: 3px solid #138808;
+}
+
+.feeCategory {
+  flex: 1;
+  min-width: 180px;
+}
+
+.feeCategory strong {
+  color: #1a365d;
+}
+
+.feeAmounts {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.feeItem {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.feeLabel {
+  font-size: 0.9rem;
+  color: #4a5568;
+}
+
+.feeAmount {
+  font-weight: 700;
+  color: #138808;
+  font-size: 1.1rem;
+}
+
+.feeNote {
+  font-size: 0.8rem;
+  color: #718096;
+  margin-top: 0.75rem;
+  font-style: italic;
+}
+
+/* Expenditure Limit Section */
+.expenditureInfo {
+  background: #f0fff4;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.expenditureNote {
+  font-size: 0.9rem;
+  color: #2d3748;
+  margin: 0 0 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px dashed #9ae6b4;
+}
+
+.expenditureTable {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.expenditureRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  border-left: 4px solid #138808;
+}
+
+.expenditureCategory {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.expenditureIcon {
+  font-size: 1.25rem;
+}
+
+.expenditureCategory strong {
+  color: #1a365d;
+}
+
+.expenditureAmount {
+  text-align: right;
+}
+
+.amountValue {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #138808;
+}
+
+.amountLabel {
+  font-size: 0.8rem;
+  color: #718096;
+}
+
+.expenditureWarning {
+  font-size: 0.85rem;
+  color: #c53030;
+  margin: 1rem 0 0;
+  padding-top: 0.75rem;
+  border-top: 1px dashed #9ae6b4;
+}
+
+/* Handbook Section */
+.handbookSection {
+  margin-bottom: 1.5rem;
+}
+
+.handbookCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+  border-radius: 12px;
+  color: white;
+}
+
+.handbookIcon {
+  font-size: 2.5rem;
+}
+
+.handbookCard strong {
+  display: block;
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+.handbookCard p {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin: 0 0 0.75rem;
+}
+
+.handbookLink {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: #FF9933;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+
+.handbookLink:hover {
+  background: #e88a2a;
+}
+
 .nominationNote {
   background: #fef3c7;
   border-left: 4px solid #f59e0b;
@@ -1027,9 +1311,6 @@
 
 .verifyNote {
   font-size: 0.85rem;
-  margin-top: 1rem !important;
-  padding-top: 1rem;
-  border-top: 1px solid #fcd34d;
   line-height: 1.6;
 }
 
