@@ -3,9 +3,10 @@
 import { useState, useMemo } from 'react';
 import { SeatReservation, ReservationCategory, ElectionType } from '@/types/reservation';
 import { getAllReservations, filterReservations, getMetadata } from '@/data/sample-data';
+import wardCompositionData from '@/data/ward-composition.json';
 import styles from './page.module.css';
 
-type TabType = 'schedule' | 'eligibility' | 'reservations' | 'nomination' | 'guide';
+type TabType = 'schedule' | 'eligibility' | 'reservations' | 'nomination' | 'wardmap';
 
 // Voter data type (will be populated with real data later)
 interface VoterData {
@@ -49,6 +50,12 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>('schedule');
   const [selectedSeat, setSelectedSeat] = useState<SeatReservation | null>(null);
   const [villageSearch, setVillageSearch] = useState('');
+  
+  // Ward Map state
+  const [wardMapType, setWardMapType] = useState<'zp' | 'ps'>('zp');
+  const [selectedTaluka, setSelectedTaluka] = useState<string>('');
+  const [expandedDivisions, setExpandedDivisions] = useState<Set<number>>(new Set());
+  const [expandedWards, setExpandedWards] = useState<Set<string>>(new Set());
   
   const [filters, setFilters] = useState<{
     electionType?: ElectionType;
@@ -250,6 +257,14 @@ export default function Home() {
           <span className={styles.tabIcon}>📝</span>
           <span className={styles.tabLabel}>Nomination</span>
           <span className={styles.tabLabelMr}>उमेदवारी</span>
+        </button>
+        <button 
+          className={`${styles.tab} ${activeTab === 'wardmap' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('wardmap')}
+        >
+          <span className={styles.tabIcon}>🗺️</span>
+          <span className={styles.tabLabel}>Ward Map</span>
+          <span className={styles.tabLabelMr}>प्रभाग रचना</span>
         </button>
       </nav>
 
@@ -738,6 +753,222 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                 <br />
                 कृपया राज्य निवडणूक आयोगाच्या अधिकृत अधिसूचनेवरून अचूक आवश्यकता तपासा.
               </p>
+            </div>
+          </div>
+        )}
+
+        {/* Ward Map Tab */}
+        {activeTab === 'wardmap' && (
+          <div className={styles.wardMapTab}>
+            <h2 className={styles.sectionTitle}>🗺️ Ward Composition / प्रभाग रचना</h2>
+            <p className={styles.wardMapDesc}>
+              Explore constituencies and see all villages in each division/ward.
+              <br />
+              <span className={styles.descMr}>प्रत्येक विभाग/गणातील सर्व गावे पहा.</span>
+            </p>
+            
+            {/* Type Toggle */}
+            <div className={styles.wardMapToggle}>
+              <button 
+                className={`${styles.toggleBtn} ${wardMapType === 'zp' ? styles.toggleActive : ''}`}
+                onClick={() => { setWardMapType('zp'); setSelectedTaluka(''); setExpandedDivisions(new Set()); }}
+              >
+                🏛️ Zilla Parishad ({wardCompositionData.zp.totalDivisions} Divisions)
+              </button>
+              <button 
+                className={`${styles.toggleBtn} ${wardMapType === 'ps' ? styles.toggleActive : ''}`}
+                onClick={() => { setWardMapType('ps'); setSelectedTaluka(''); setExpandedDivisions(new Set()); setExpandedWards(new Set()); }}
+              >
+                🏘️ Panchayat Samiti ({wardCompositionData.ps.totalWards} Wards)
+              </button>
+            </div>
+
+            {/* ZP View */}
+            {wardMapType === 'zp' && (
+              <div className={styles.wardMapContent}>
+                {/* Taluka Filter for ZP */}
+                <div className={styles.wardMapFilter}>
+                  <label>Filter by Taluka / तालुका निवडा:</label>
+                  <select 
+                    value={selectedTaluka} 
+                    onChange={(e) => setSelectedTaluka(e.target.value)}
+                    className={styles.select}
+                  >
+                    <option value="">All Talukas / सर्व तालुके ({wardCompositionData.zp.totalDivisions})</option>
+                    {Array.from(new Set(wardCompositionData.zp.divisions.map(d => d.taluka))).sort((a, b) => a.localeCompare(b, 'mr')).map(taluka => {
+                      const count = wardCompositionData.zp.divisions.filter(d => d.taluka === taluka).length;
+                      return <option key={taluka} value={taluka}>{taluka} ({count})</option>;
+                    })}
+                  </select>
+                </div>
+
+                {/* ZP Divisions List */}
+                <div className={styles.divisionsList}>
+                  {wardCompositionData.zp.divisions
+                    .filter(div => !selectedTaluka || div.taluka === selectedTaluka)
+                    .map(division => (
+                      <div key={division.number} className={styles.divisionItem}>
+                        <div 
+                          className={styles.divisionHeader}
+                          onClick={() => {
+                            const newExpanded = new Set(expandedDivisions);
+                            if (newExpanded.has(division.number)) {
+                              newExpanded.delete(division.number);
+                            } else {
+                              newExpanded.add(division.number);
+                            }
+                            setExpandedDivisions(newExpanded);
+                          }}
+                        >
+                          <span className={styles.expandIcon}>
+                            {expandedDivisions.has(division.number) ? '▼' : '▶'}
+                          </span>
+                          <div className={styles.divisionInfo}>
+                            <span className={styles.divisionNumber}>{division.number}.</span>
+                            <span className={styles.divisionName}>{division.name}</span>
+                            <span className={styles.divisionTaluka}>({division.taluka})</span>
+                          </div>
+                          <span className={styles.villageCount}>
+                            {division.villages.length} villages
+                          </span>
+                        </div>
+                        
+                        {expandedDivisions.has(division.number) && (
+                          <div className={styles.villagesList}>
+                            <div className={styles.villagesGrid}>
+                              {division.villages.map((village, idx) => (
+                                <span key={idx} className={styles.villageChip}>{village}</span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+
+            {/* PS View */}
+            {wardMapType === 'ps' && (
+              <div className={styles.wardMapContent}>
+                {/* Taluka Filter for PS */}
+                <div className={styles.wardMapFilter}>
+                  <label>Select Taluka / तालुका निवडा:</label>
+                  <select 
+                    value={selectedTaluka} 
+                    onChange={(e) => { setSelectedTaluka(e.target.value); setExpandedDivisions(new Set()); setExpandedWards(new Set()); }}
+                    className={styles.select}
+                  >
+                    <option value="">Choose a Taluka... / तालुका निवडा...</option>
+                    {wardCompositionData.ps.talukas.map(t => {
+                      const wardCount = t.divisions.reduce((sum, d) => sum + d.wards.length, 0);
+                      return <option key={t.taluka} value={t.taluka}>{t.taluka} ({wardCount} wards)</option>;
+                    })}
+                  </select>
+                </div>
+
+                {/* PS Divisions & Wards */}
+                {selectedTaluka ? (
+                  <div className={styles.divisionsList}>
+                    {wardCompositionData.ps.talukas
+                      .find(t => t.taluka === selectedTaluka)?.divisions
+                      .map(division => (
+                        <div key={division.number} className={styles.divisionItem}>
+                          <div 
+                            className={styles.divisionHeader}
+                            onClick={() => {
+                              const newExpanded = new Set(expandedDivisions);
+                              if (newExpanded.has(division.number)) {
+                                newExpanded.delete(division.number);
+                              } else {
+                                newExpanded.add(division.number);
+                              }
+                              setExpandedDivisions(newExpanded);
+                            }}
+                          >
+                            <span className={styles.expandIcon}>
+                              {expandedDivisions.has(division.number) ? '▼' : '▶'}
+                            </span>
+                            <div className={styles.divisionInfo}>
+                              <span className={styles.divisionNumber}>{division.number}.</span>
+                              <span className={styles.divisionName}>{division.name}</span>
+                            </div>
+                            <span className={styles.villageCount}>
+                              {division.wards.length} wards
+                            </span>
+                          </div>
+                          
+                          {expandedDivisions.has(division.number) && (
+                            <div className={styles.wardsList}>
+                              {division.wards.map(ward => {
+                                const wardKey = `${division.number}-${ward.number}`;
+                                return (
+                                  <div key={ward.number} className={styles.wardItem}>
+                                    <div 
+                                      className={styles.wardHeader}
+                                      onClick={() => {
+                                        const newExpanded = new Set(expandedWards);
+                                        if (newExpanded.has(wardKey)) {
+                                          newExpanded.delete(wardKey);
+                                        } else {
+                                          newExpanded.add(wardKey);
+                                        }
+                                        setExpandedWards(newExpanded);
+                                      }}
+                                    >
+                                      <span className={styles.expandIcon}>
+                                        {expandedWards.has(wardKey) ? '▼' : '▶'}
+                                      </span>
+                                      <div className={styles.wardInfo}>
+                                        <span className={styles.wardNumber}>{ward.number}.</span>
+                                        <span className={styles.wardName}>{ward.name}</span>
+                                      </div>
+                                      <span className={styles.villageCount}>
+                                        {ward.villages.length} villages
+                                      </span>
+                                    </div>
+                                    
+                                    {expandedWards.has(wardKey) && (
+                                      <div className={styles.villagesList}>
+                                        <div className={styles.villagesGrid}>
+                                          {ward.villages.map((village, idx) => (
+                                            <span key={idx} className={styles.villageChip}>{village}</span>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                  </div>
+                ) : (
+                  <div className={styles.selectTalukaPrompt}>
+                    <span className={styles.promptIcon}>👆</span>
+                    <p>Please select a Taluka to view PS wards</p>
+                    <p className={styles.promptMr}>पंचायत समिती गण पाहण्यासाठी तालुका निवडा</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Summary Stats */}
+            <div className={styles.wardMapStats}>
+              <div className={styles.statBox}>
+                <span className={styles.statNumber}>{wardCompositionData.zp.totalDivisions}</span>
+                <span className={styles.statLabel}>ZP Divisions</span>
+              </div>
+              <div className={styles.statBox}>
+                <span className={styles.statNumber}>{wardCompositionData.ps.totalWards}</span>
+                <span className={styles.statLabel}>PS Wards</span>
+              </div>
+              <div className={styles.statBox}>
+                <span className={styles.statNumber}>{Object.keys(wardCompositionData.villageIndex).length}</span>
+                <span className={styles.statLabel}>Villages Indexed</span>
+              </div>
             </div>
           </div>
         )}

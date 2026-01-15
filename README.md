@@ -3,7 +3,7 @@
 🗳️ **Official Reservation Information Portal** for Zilla Parishad and Panchayat Samiti Elections in Kolhapur District, Maharashtra.
 
 ## 🌐 Live Demo
-[View Live App](https://kop-zp-ps-elections-2026.vercel.app)
+[View Live App](https://kop-elections-2026.dspatil.in)
 
 ## ✨ Features
 
@@ -101,7 +101,7 @@ This application displays official reservation information only for reference pu
 
 ## 📝 License
 
-© 2026 Deepak Shivaji Patil. All rights reserved.
+© 2026 dspatil. All rights reserved.
 
 ---
 

@@ -2027,3 +2027,300 @@
   }
 }
 
+/* ===== WARD MAP TAB ===== */
+
+.wardMapTab {
+  padding: 1rem;
+}
+
+.wardMapDesc {
+  color: #4a5568;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.descMr {
+  color: #718096;
+  font-size: 0.85rem;
+}
+
+.wardMapToggle {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.toggleBtn {
+  flex: 1;
+  min-width: 150px;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #4a5568;
+}
+
+.toggleBtn:hover {
+  border-color: #FF9933;
+  background: #fffaf0;
+}
+
+.toggleActive {
+  border-color: #FF9933;
+  background: linear-gradient(135deg, #fffaf0 0%, #fff5e6 100%);
+  color: #1a365d;
+  box-shadow: 0 2px 4px rgba(255, 153, 51, 0.2);
+}
+
+.wardMapContent {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.wardMapFilter {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.wardMapFilter label {
+  font-weight: 600;
+  color: #2d3748;
+  font-size: 0.9rem;
+}
+
+.wardMapFilter .select {
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Division List */
+.divisionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.divisionItem {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.divisionHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.divisionHeader:hover {
+  background: #f0f4f8;
+}
+
+.expandIcon {
+  font-size: 0.75rem;
+  color: #718096;
+  width: 16px;
+}
+
+.divisionInfo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.divisionNumber {
+  font-weight: 700;
+  color: #FF9933;
+}
+
+.divisionName {
+  font-weight: 600;
+  color: #1a365d;
+}
+
+.divisionTaluka {
+  font-size: 0.8rem;
+  color: #718096;
+  background: #e2e8f0;
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
+}
+
+.villageCount {
+  font-size: 0.75rem;
+  color: #718096;
+  background: #edf2f7;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+/* Wards List (for PS) */
+.wardsList {
+  padding: 0.5rem 0.5rem 0.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+}
+
+.wardItem {
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.wardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: #fafafa;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.wardHeader:hover {
+  background: #f0f0f0;
+}
+
+.wardInfo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.wardNumber {
+  font-weight: 600;
+  color: #138808;
+  font-size: 0.85rem;
+}
+
+.wardName {
+  font-weight: 500;
+  color: #2d3748;
+  font-size: 0.9rem;
+}
+
+/* Villages List */
+.villagesList {
+  padding: 0.75rem 1rem;
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+}
+
+.villagesGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.villageChip {
+  background: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
+  color: #2d3748;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  border: 1px solid #cbd5e0;
+}
+
+.villageChip:hover {
+  background: linear-gradient(135deg, #fff5e6 0%, #ffecd2 100%);
+  border-color: #FF9933;
+}
+
+/* Select Taluka Prompt */
+.selectTalukaPrompt {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #718096;
+}
+
+.promptIcon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.promptMr {
+  color: #a0aec0;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+/* Ward Map Stats */
+.wardMapStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.statBox {
+  background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+  border-radius: 12px;
+  padding: 1.25rem;
+  text-align: center;
+  color: #ffffff;
+}
+
+.statNumber {
+  display: block;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #FF9933;
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  color: #a0aec0;
+  margin-top: 0.25rem;
+}
+
+/* Mobile responsiveness for Ward Map */
+@media (max-width: 768px) {
+  .wardMapToggle {
+    flex-direction: column;
+  }
+  
+  .toggleBtn {
+    min-width: 100%;
+  }
+  
+  .wardMapStats {
+    grid-template-columns: 1fr;
+  }
+  
+  .divisionInfo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+  
+  .wardsList {
+    padding-left: 1rem;
+  }
+  
+  .villageChip {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+}
+

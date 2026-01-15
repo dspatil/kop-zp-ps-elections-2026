@@ -46,6 +46,10 @@ election_reservation_kop-ALL-text.pdf
 # The processed data is in data/reservations.json
 kolhapur_election_reservation_details_*.json
 
+# Ward composition data from Gemini (source data, not needed in production)
+ward_composition_ZP_and_PS/*-gemini.json
+ward_composition_ZP_and_PS/*.pdf
+
 # Misc
 *.log
 Thumbs.db
