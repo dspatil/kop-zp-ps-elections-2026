@@ -55,6 +55,15 @@ export default function Home() {
   const [wardMapType, setWardMapType] = useState<'zp' | 'ps'>('zp');
   const [selectedTaluka, setSelectedTaluka] = useState<string>('');
   const [expandedDivisions, setExpandedDivisions] = useState<Set<number>>(new Set());
+  
+  // Map modal state
+  const [mapModal, setMapModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    taluka: string;
+    villages: string[];
+    currentVillage: string;
+  }>({ isOpen: false, title: '', taluka: '', villages: [], currentVillage: '' });
   const [expandedWards, setExpandedWards] = useState<Set<string>>(new Set());
   
   const [filters, setFilters] = useState<{
@@ -890,9 +899,9 @@ _Forward करा - प्रत्येक उमेदवाराला उ
           <div className={styles.wardMapTab}>
             <h2 className={styles.sectionTitle}>🗺️ Ward Composition / प्रभाग रचना</h2>
             <p className={styles.wardMapDesc}>
-              Explore constituencies and see all villages in each division/ward.
+              Explore constituencies and see all villages in each division/ward. Click 📍 Map to view location.
               <br />
-              <span className={styles.descMr}>प्रत्येक विभाग/गणातील सर्व गावे पहा.</span>
+              <span className={styles.descMr}>प्रत्येक विभाग/गणातील सर्व गावे पहा. 📍 Map वर क्लिक करा.</span>
             </p>
             
             {/* Type Toggle */}
@@ -956,9 +965,26 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                             <span className={styles.divisionName}>{division.name}</span>
                             <span className={styles.divisionTaluka}>({division.taluka})</span>
                           </div>
-                          <span className={styles.villageCount}>
-                            {division.villages.length} villages
-                          </span>
+                          <div className={styles.divisionActions}>
+                            <span className={styles.villageCount}>
+                              {division.villages.length} villages
+                            </span>
+                            <button 
+                              className={styles.viewMapBtn}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setMapModal({
+                                  isOpen: true,
+                                  title: division.name,
+                                  taluka: division.taluka,
+                                  villages: division.villages,
+                                  currentVillage: division.villages[0]
+                                });
+                              }}
+                            >
+                              📍 Map
+                            </button>
+                          </div>
                         </div>
                         
                         {expandedDivisions.has(division.number) && (
@@ -1021,9 +1047,27 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                               <span className={styles.divisionNumber}>{division.number}.</span>
                               <span className={styles.divisionName}>{division.name}</span>
                             </div>
-                            <span className={styles.villageCount}>
-                              {division.wards.length} wards
-                            </span>
+                            <div className={styles.divisionActions}>
+                              <span className={styles.villageCount}>
+                                {division.wards.length} wards
+                              </span>
+                              <button 
+                                className={styles.viewMapBtn}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const allVillages = division.wards.flatMap(w => w.villages);
+                                  setMapModal({
+                                    isOpen: true,
+                                    title: division.name,
+                                    taluka: selectedTaluka,
+                                    villages: allVillages,
+                                    currentVillage: allVillages[0]
+                                  });
+                                }}
+                              >
+                                📍 Map
+                              </button>
+                            </div>
                           </div>
                           
                           {expandedDivisions.has(division.number) && (
@@ -1044,16 +1088,33 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                                         setExpandedWards(newExpanded);
                                       }}
                                     >
-                                      <span className={styles.expandIcon}>
-                                        {expandedWards.has(wardKey) ? '▼' : '▶'}
-                                      </span>
+<span className={styles.expandIcon}>
+                                      {expandedWards.has(wardKey) ? '▼' : '▶'}
+                                    </span>
                                       <div className={styles.wardInfo}>
                                         <span className={styles.wardNumber}>{ward.number}.</span>
                                         <span className={styles.wardName}>{ward.name}</span>
                                       </div>
-                                      <span className={styles.villageCount}>
-                                        {ward.villages.length} villages
-                                      </span>
+                                      <div className={styles.divisionActions}>
+                                        <span className={styles.villageCount}>
+                                          {ward.villages.length} villages
+                                        </span>
+                                        <button 
+                                          className={styles.viewMapBtn}
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setMapModal({
+                                              isOpen: true,
+                                              title: ward.name,
+                                              taluka: selectedTaluka,
+                                              villages: ward.villages,
+                                              currentVillage: ward.villages[0]
+                                            });
+                                          }}
+                                        >
+                                          📍 Map
+                                        </button>
+                                      </div>
                                     </div>
                                     
                                     {expandedWards.has(wardKey) && (
@@ -1219,6 +1280,50 @@ _Forward करा - प्रत्येक उमेदवाराला उ
         <p className={styles.copyright}>© {new Date().getFullYear()} dspatil. All rights reserved.</p>
         <p className={styles.madeWith}>Made with ❤️ for Kolhapur 🇮🇳</p>
       </footer>
+
+      {/* Map Modal */}
+      {mapModal.isOpen && (
+        <div className={styles.mapModalOverlay} onClick={() => setMapModal({ ...mapModal, isOpen: false })}>
+          <div className={styles.mapModalContent} onClick={(e) => e.stopPropagation()}>
+            <button 
+              className={styles.mapModalClose}
+              onClick={() => setMapModal({ ...mapModal, isOpen: false })}
+            >
+              ✕
+            </button>
+            <div className={styles.mapModalHeader}>
+              <h3>📍 {mapModal.title}</h3>
+              <p>Viewing: <strong>{mapModal.currentVillage}</strong> ({mapModal.taluka})</p>
+            </div>
+            <div className={styles.mapModalBody}>
+              <iframe
+                key={mapModal.currentVillage}
+                src={`https://www.google.com/maps?q=${encodeURIComponent(mapModal.currentVillage + ' ' + mapModal.taluka + ' Kolhapur')}&output=embed`}
+                width="100%"
+                height="350"
+                style={{ border: 0, borderRadius: '8px' }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+              <div className={styles.mapVillagesList}>
+                <h4>🏘️ Click village to view on map ({mapModal.villages.length}):</h4>
+                <div className={styles.mapVillagesGrid}>
+                  {mapModal.villages.map((village, idx) => (
+                    <button 
+                      key={idx}
+                      className={`${styles.mapVillageChip} ${mapModal.currentVillage === village ? styles.mapVillageActive : ''}`}
+                      onClick={() => setMapModal({ ...mapModal, currentVillage: village })}
+                    >
+                      {village}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

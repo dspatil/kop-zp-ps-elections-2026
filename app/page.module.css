@@ -2314,9 +2314,36 @@
   padding: 1rem;
 }
 
+.wardMapHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.mapDemoBtn {
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.mapDemoBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.3);
+}
+
 .wardMapDesc {
   color: #4a5568;
-  margin-bottom: 1.5rem;
+  margin: 0;
   font-size: 0.95rem;
 }
 
@@ -2442,6 +2469,13 @@
   border-radius: 4px;
 }
 
+.divisionActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
 .villageCount {
   font-size: 0.75rem;
   color: #718096;
@@ -2449,6 +2483,147 @@
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   white-space: nowrap;
+}
+
+.viewMapBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.7rem;
+  color: #1a365d;
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  padding: 0.3rem 0.6rem;
+  border-radius: 20px;
+  border: 1px solid #81c784;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.25s ease;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.viewMapBtn:hover {
+  background: linear-gradient(135deg, #138808 0%, #0d6b06 100%);
+  color: white;
+  border-color: #138808;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(19, 136, 8, 0.3);
+}
+
+/* Map Modal */
+.mapModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.mapModalContent {
+  background: white;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.mapModalClose {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: #f0f0f0;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.mapModalClose:hover {
+  background: #e0e0e0;
+}
+
+.mapModalHeader {
+  padding: 1rem 1.5rem;
+  border-bottom: 3px solid;
+  border-image: linear-gradient(90deg, #FF9933 33%, #FFFFFF 33%, #FFFFFF 66%, #138808 66%) 1;
+}
+
+.mapModalHeader h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #1a365d;
+}
+
+.mapModalHeader p {
+  margin: 0.25rem 0 0;
+  color: #718096;
+  font-size: 0.9rem;
+}
+
+.mapModalBody {
+  padding: 1rem;
+}
+
+.mapVillagesList {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.mapVillagesList h4 {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  color: #1a365d;
+}
+
+.mapVillagesGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.mapVillageChip {
+  display: inline-block;
+  padding: 0.4rem 0.85rem;
+  background: #f7fafc;
+  color: #4a5568;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mapVillageChip:hover {
+  background: #edf2f7;
+  border-color: #FF9933;
+  color: #1a365d;
+}
+
+.mapVillageActive {
+  background: linear-gradient(135deg, #138808 0%, #0d6b06 100%);
+  color: white;
+  border-color: #138808;
+  font-weight: 600;
+}
+
+.mapVillageActive:hover {
+  background: linear-gradient(135deg, #138808 0%, #0d6b06 100%);
+  color: white;
 }
 
 /* Wards List (for PS) */
