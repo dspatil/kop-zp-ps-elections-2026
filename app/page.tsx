@@ -4,9 +4,148 @@ import { useState, useMemo } from 'react';
 import { SeatReservation, ReservationCategory, ElectionType } from '@/types/reservation';
 import { getAllReservations, filterReservations, getMetadata } from '@/data/sample-data';
 import wardCompositionData from '@/data/ward-composition.json';
+import voterStatsData from '@/data/voter-stats-merged.json';
+import epicIndexOptimized from '@/data/epic-index-optimized.json';
 import styles from './page.module.css';
 
-type TabType = 'schedule' | 'eligibility' | 'reservations' | 'nomination' | 'wardmap';
+// Helper to search EPIC in optimized nested structure
+function searchEpicInOptimized(epic: string): { found: boolean; division?: string; ward?: string; taluka?: string } | null {
+  const data = epicIndexOptimized as any;
+  
+  for (const [talukaName, talukaData] of Object.entries(data.talukas || {})) {
+    const taluka = talukaData as any;
+    for (const [, divData] of Object.entries(taluka.divisions || {})) {
+      const division = divData as any;
+      for (const [, wardData] of Object.entries(division.wards || {})) {
+        const ward = wardData as any;
+        if (ward.epics && ward.epics.includes(epic)) {
+          return {
+            found: true,
+            division: division.name,
+            ward: ward.name,
+            taluka: talukaName
+          };
+        }
+      }
+    }
+  }
+  return null;
+}
+
+// Type for ward-level stats
+interface WardStatsType {
+  wardNumber: number;
+  wardName: string;
+  total: number;
+  male: number;
+  female: number;
+  other?: number;
+  malePercent?: number;
+  femalePercent?: number;
+  ageGroups?: Record<string, number>;
+  firstTimeVoters?: number;
+}
+
+// Type for division-level voter stats
+interface DivisionStatsType {
+  divisionNumber: number;
+  divisionName: string;
+  taluka: string;
+  total: number;
+  male: number;
+  female: number;
+  other?: number;
+  malePercent: number;
+  femalePercent: number;
+  ageGroups?: Record<string, number>;
+  firstTimeVoters?: number;
+  wards?: Record<string, WardStatsType>;
+}
+
+// Return type for voter stats
+interface VoterStatsResult {
+  type: 'division' | 'ward';
+  name: string;
+  taluka: string;
+  total: number;
+  male: number;
+  female: number;
+  other?: number;
+  malePercent: number;
+  femalePercent: number;
+  malePercentExact?: number;  // Exact with decimals
+  femalePercentExact?: number; // Exact with decimals
+  ageGroups?: Record<string, number>;
+  firstTimeVoters?: number;
+  wardsList?: string[];
+}
+
+// Helper to get voter stats for a division or ward
+function getVoterStats(seatNumber: string, electionType: string): VoterStatsResult | null {
+  // Extract number from seat (e.g., "60-कसबा नुल" -> 60 or "119-हसूरचंपू" -> 119)
+  const match = seatNumber.match(/^(\d+)/);
+  if (!match) return null;
+  const num = parseInt(match[1]);
+
+  const byDivision = voterStatsData.byDivision as Record<string, DivisionStatsType>;
+
+  if (electionType === 'Zilla Parishad') {
+    // ZP: Use division-level stats
+    const divData = byDivision[num.toString()];
+    if (!divData) return null;
+    
+    // Calculate exact percentages
+    const malePercentExact = (divData.male / divData.total) * 100;
+    const femalePercentExact = (divData.female / divData.total) * 100;
+    
+    return {
+      type: 'division',
+      name: divData.divisionName,
+      taluka: divData.taluka,
+      total: divData.total,
+      male: divData.male,
+      female: divData.female,
+      other: divData.other,
+      malePercent: divData.malePercent,
+      femalePercent: divData.femalePercent,
+      malePercentExact: parseFloat(malePercentExact.toFixed(1)),
+      femalePercentExact: parseFloat(femalePercentExact.toFixed(1)),
+      ageGroups: divData.ageGroups,
+      firstTimeVoters: divData.firstTimeVoters,
+      wardsList: divData.wards ? Object.values(divData.wards).map(w => w.wardName) : []
+    };
+  } else {
+    // PS: Find ward-level stats
+    for (const divData of Object.values(byDivision)) {
+      if (divData.wards && divData.wards[num.toString()]) {
+        const wardData = divData.wards[num.toString()];
+        
+        // Calculate exact percentages
+        const malePercentExact = (wardData.male / wardData.total) * 100;
+        const femalePercentExact = (wardData.female / wardData.total) * 100;
+        
+        return {
+          type: 'ward',
+          name: wardData.wardName,
+          taluka: divData.taluka,
+          total: wardData.total,
+          male: wardData.male,
+          female: wardData.female,
+          other: wardData.other,
+          malePercent: wardData.malePercent || Math.round((wardData.male / wardData.total) * 100),
+          femalePercent: wardData.femalePercent || Math.round((wardData.female / wardData.total) * 100),
+          malePercentExact: parseFloat(malePercentExact.toFixed(1)),
+          femalePercentExact: parseFloat(femalePercentExact.toFixed(1)),
+          ageGroups: wardData.ageGroups,
+          firstTimeVoters: wardData.firstTimeVoters
+        };
+      }
+    }
+    return null;
+  }
+}
+
+type TabType = 'schedule' | 'eligibility' | 'reservations' | 'nomination' | 'wardmap' | 'voterlookup';
 
 // Voter data type (will be populated with real data later)
 interface VoterData {
@@ -50,6 +189,8 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>('schedule');
   const [selectedSeat, setSelectedSeat] = useState<SeatReservation | null>(null);
   const [villageSearch, setVillageSearch] = useState('');
+  const [epicSearch, setEpicSearch] = useState('');
+  const [epicResult, setEpicResult] = useState<{found: boolean; division?: string; ward?: string; taluka?: string} | null>(null);
   
   // Ward Map state
   const [wardMapType, setWardMapType] = useState<'zp' | 'ps'>('zp');
@@ -275,6 +416,14 @@ export default function Home() {
           <span className={styles.tabIcon}>🗺️</span>
           <span className={styles.tabLabel}>Ward Map</span>
           <span className={styles.tabLabelMr}>प्रभाग रचना</span>
+        </button>
+        <button 
+          className={`${styles.tab} ${activeTab === 'voterlookup' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('voterlookup')}
+        >
+          <span className={styles.tabIcon}>🪪</span>
+          <span className={styles.tabLabel}>Voter Lookup</span>
+          <span className={styles.tabLabelMr}>मतदार शोध</span>
         </button>
       </nav>
 
@@ -1162,6 +1311,109 @@ _Forward करा - प्रत्येक उमेदवाराला उ
           </div>
         )}
 
+        {/* Voter Lookup Tab */}
+        {activeTab === 'voterlookup' && (
+          <div className={styles.voterLookupTab}>
+            <h2 className={styles.sectionTitle}>🪪 Voter Lookup / मतदार शोध</h2>
+            
+            <div className={styles.voterLookupMainBox}>
+              <p className={styles.voterLookupIntro}>
+                Find your ZP Division and PS Ward using your EPIC (Voter ID) number.
+                <br />
+                तुमचा EPIC (मतदार ओळखपत्र) क्रमांक वापरून तुमचा जि.प. विभाग आणि पं.स. गण शोधा.
+              </p>
+              
+              <div className={styles.voterLookupSearchBox}>
+                <input
+                  type="text"
+                  placeholder="Enter EPIC Number (e.g., AOP7398431)"
+                  value={epicSearch}
+                  onChange={(e) => {
+                    setEpicSearch(e.target.value.toUpperCase());
+                    setEpicResult(null);
+                  }}
+                  className={styles.epicSearchInput}
+                  maxLength={12}
+                />
+                <button 
+                  className={styles.epicSearchButton}
+                  onClick={() => {
+                    const searchEpic = epicSearch.trim().toUpperCase();
+                    
+                    if (searchEpic.length >= 6) {
+                      const result = searchEpicInOptimized(searchEpic);
+                      if (result) {
+                        setEpicResult(result);
+                      } else {
+                        setEpicResult({ found: false });
+                      }
+                    }
+                  }}
+                  disabled={epicSearch.length < 6}
+                >
+                  🔍 Search / शोधा
+                </button>
+              </div>
+
+              {epicResult && (
+                <div className={styles.epicResultCard} style={{ 
+                  background: epicResult.found ? 'linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%)' : 'linear-gradient(135deg, #fef2f2 0%, #fecaca 100%)',
+                  border: epicResult.found ? '2px solid #48bb78' : '2px solid #f56565'
+                }}>
+                  {epicResult.found ? (
+                    <>
+                      <h3 className={styles.epicResultTitle}>✅ Voter Found! / मतदार सापडला!</h3>
+                      <div className={styles.epicResultGrid}>
+                        <div className={styles.epicResultItem}>
+                          <div className={styles.epicResultIcon}>🏛️</div>
+                          <div className={styles.epicResultContent}>
+                            <div className={styles.epicResultLabel}>ZP Division / जि.प. विभाग</div>
+                            <div className={styles.epicResultValue}>{epicResult.division}</div>
+                          </div>
+                        </div>
+                        <div className={styles.epicResultItem}>
+                          <div className={styles.epicResultIcon}>🏘️</div>
+                          <div className={styles.epicResultContent}>
+                            <div className={styles.epicResultLabel}>PS Ward / पं.स. गण</div>
+                            <div className={styles.epicResultValue}>{epicResult.ward}</div>
+                          </div>
+                        </div>
+                        <div className={styles.epicResultItem}>
+                          <div className={styles.epicResultIcon}>📍</div>
+                          <div className={styles.epicResultContent}>
+                            <div className={styles.epicResultLabel}>Taluka / तालुका</div>
+                            <div className={styles.epicResultValue}>{epicResult.taluka}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <h3 className={styles.epicResultTitle}>❌ EPIC Not Found / EPIC सापडला नाही</h3>
+                      <p className={styles.epicNotFoundText}>
+                        This EPIC number is not in our database.
+                        <br />
+                        हा EPIC क्रमांक आमच्या डेटाबेसमध्ये नाही.
+                      </p>
+                      <p className={styles.epicLimitNote}>
+                        <small>📋 Currently indexed: Gadhinglaj Taluka (Divisions 60-64 only)</small>
+                      </p>
+                    </>
+                  )}
+                </div>
+              )}
+
+              <div className={styles.voterLookupInfo}>
+                <h4>📋 Coverage Information / माहिती</h4>
+                <ul>
+                  <li>✅ Gadhinglaj Taluka - Divisions 60-64 (170,523 voters indexed)</li>
+                  <li>⏳ Other talukas coming soon / इतर तालुके लवकरच</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
+
       </main>
 
       {/* Floating Feedback Button */}
@@ -1241,25 +1493,121 @@ _Forward करा - प्रत्येक उमेदवाराला उ
             </div>
 
             <div className={styles.modalBody}>
-              {/* Coming Soon Section */}
-              <div className={styles.comingSoonSection}>
-                <div className={styles.comingSoonIcon}>📊</div>
-                <h3 className={styles.comingSoonTitle}>Voter Analytics Coming Soon!</h3>
-                <p className={styles.comingSoonText}>
-                  We're working on bringing you detailed voter statistics including:
-                </p>
-                <ul className={styles.comingSoonList}>
-                  <li>✅ Total voter count</li>
-                  <li>✅ Gender-wise distribution</li>
-                  <li>✅ Age group analytics</li>
-                  <li>✅ Visual charts & insights</li>
-                </ul>
-                <p className={styles.comingSoonNote}>
-                  Data will be updated once official statistics are released by the Election Commission.
-                  <br />
-                  <strong>Stay tuned!</strong> 🚀
-                </p>
-              </div>
+              {/* Voter Analytics Section */}
+              {(() => {
+                const stats = getVoterStats(selectedSeat.seatNumber, selectedSeat.electionType);
+                
+                if (stats) {
+                  return (
+                    <div className={styles.voterAnalytics}>
+                      {/* Draft Notice */}
+                      <div className={styles.draftNotice}>
+                        📋 Draft Voter List / मसुदा मतदार यादी (08-10-2025)
+                      </div>
+
+                      {/* Total Voters - VISIBLE */}
+                      <div className={styles.totalVotersCard}>
+                        <div className={styles.totalVotersNumber}>{stats.total.toLocaleString()}</div>
+                        <div className={styles.totalVotersLabel}>Total Voters / एकूण मतदार</div>
+                        {stats.type === 'ward' && (
+                          <div className={styles.totalVotersSub}>{stats.name}</div>
+                        )}
+                      </div>
+
+                      {/* Gender Split */}
+                      <div className={styles.analyticsCard}>
+                        <h4 className={styles.analyticsTitle}>👫 Gender Distribution / लिंग विभाजन</h4>
+                        <div className={styles.genderStats}>
+                          <div className={styles.genderBar}>
+                            <div className={styles.genderBarMale} style={{ width: `${stats.malePercent}%` }} />
+                            <div className={styles.genderBarFemale} style={{ width: `${stats.femalePercent}%` }} />
+                          </div>
+                          <div className={styles.genderLabels}>
+                            <div className={styles.genderItem}>
+                              <span className={styles.genderDotMale}>●</span>
+                              <span>पुरुष / Male</span>
+                              <strong>{stats.male.toLocaleString()} ({stats.malePercentExact}%)</strong>
+                            </div>
+                            <div className={styles.genderItem}>
+                              <span className={styles.genderDotFemale}>●</span>
+                              <span>स्त्री / Female</span>
+                              <strong>{stats.female.toLocaleString()} ({stats.femalePercentExact}%)</strong>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Age Groups - Pie Chart + Bars */}
+                      {/* Age Groups - Horizontal Bars */}
+                      {stats.ageGroups && (
+                        <div className={styles.analyticsCard}>
+                          <h4 className={styles.analyticsTitle}>📊 Age Distribution / वयोगटानुसार</h4>
+                          <div className={styles.ageGroupsList}>
+                            {Object.entries(stats.ageGroups).map(([range, count]) => {
+                              const percent = ((count as number) / stats.total * 100).toFixed(1);
+                              return (
+                                <div key={range} className={styles.ageGroupRow}>
+                                  <div className={styles.ageGroupLabel}>{range}</div>
+                                  <div className={styles.ageGroupBarContainer}>
+                                    <div 
+                                      className={styles.ageGroupBar} 
+                                      style={{ width: `${percent}%` }}
+                                    />
+                                  </div>
+                                  <div className={styles.ageGroupStats}>
+                                    {(count as number).toLocaleString()} ({percent}%)
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                          {/* First Time Voters */}
+                          {stats.firstTimeVoters && (
+                            <div className={styles.firstTimeVoters}>
+                              <span className={styles.firstTimeIcon}>✨</span>
+                              <span>First-time Voters (18-21):</span>
+                              <strong>{stats.firstTimeVoters.toLocaleString()}</strong>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Wards in this Division - Only for ZP */}
+                      {stats.wardsList && stats.wardsList.length > 0 && (
+                        <div className={styles.analyticsCard}>
+                          <h4 className={styles.analyticsTitle}>🏘️ PS Wards in this Division / या विभागातील पं.स. गण</h4>
+                          <div className={styles.wardsList}>
+                            {stats.wardsList.map((ward, idx) => (
+                              <span key={idx} className={styles.wardChip}>{ward}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <p className={styles.dataSource}>
+                        📋 Draft Voter List - {stats.taluka} Taluka
+                        <br />
+                        <small>⚠️ Final list may vary / अंतिम यादीत बदल होऊ शकतात</small>
+                      </p>
+                    </div>
+                  );
+                } else {
+                  return (
+                    <div className={styles.comingSoonSection}>
+                      <div className={styles.comingSoonIcon}>📊</div>
+                      <h3 className={styles.comingSoonTitle}>Voter Analytics Coming Soon!</h3>
+                      <p className={styles.comingSoonText}>
+                        मतदार आकडेवारी लवकरच उपलब्ध होईल.
+                      </p>
+                      <ul className={styles.comingSoonList}>
+                        <li>✅ Total voter count</li>
+                        <li>✅ Gender-wise distribution</li>
+                        <li>✅ Age group analytics</li>
+                      </ul>
+                    </div>
+                  );
+                }
+              })()}
             </div>
           </div>
         </div>

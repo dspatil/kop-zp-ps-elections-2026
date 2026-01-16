@@ -36,19 +36,45 @@ next-env.d.ts
 coverage/
 jest.config.js
 
-# Source data files (keep locally, don't upload to repo)
-# These are used for data conversion but not needed in production
-*.pdf
-election_reservation_kop-ALL-OCR.pdf
-election_reservation_kop-ALL-text.pdf
+# ===========================================
+# SOURCE DATA FILES (not needed in production)
+# ===========================================
 
-# Source JSON files (used for data extraction, not needed in production)
-# The processed data is in data/reservations.json
+# PDF files
+*.pdf
+
+# Source JSON files for reservation data extraction
 kolhapur_election_reservation_details_*.json
 
-# Ward composition data from Gemini (source data, not needed in production)
+# Ward composition source data from Gemini
 ward_composition_ZP_and_PS/*-gemini.json
 ward_composition_ZP_and_PS/*.pdf
+
+# ===========================================
+# VOTER DATA (source files, not needed in prod)
+# ===========================================
+
+# EPIC index original is 33MB - too large!
+# Use optimized version (2MB) instead
+data/epic-index.json
+
+# Optimized EPIC index (2MB) - THIS ONE IS PUSHED
+# Regenerate with: node scripts/optimize-epic-index.js
+# data/epic-index-optimized.json  <-- NOT ignored, will be pushed!
+
+# Source voter stats (CSV extraction output)
+data/voter-stats.json
+
+# Official voter stats (screenshot data)
+data/voter-stats-official.json
+
+# ===========================================
+# FILES THAT ARE PUSHED (needed for app)
+# ===========================================
+# data/reservations.json - Reservation data (77 KB)
+# data/ward-composition.json - Ward map data (583 KB)
+# data/voter-stats-merged.json - Voter analytics (7.7 KB)
+# data/sample-data.ts - Helper functions (2.4 KB)
 
 # Misc
 *.log
