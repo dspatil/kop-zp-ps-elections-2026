@@ -1711,17 +1711,33 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                       ))}
                       
                       {nameSearchTotal > 20 && (
-                        <div className={styles.premiumLockSection}>
-                          <div className={styles.premiumLockIcon}>🔒</div>
-                          <div className={styles.premiumLockText}>
-                            <strong>{(nameSearchTotal - 20).toLocaleString()}+ more results available</strong>
-                            <p>Get full voter list access for your campaign</p>
+                        <div className={styles.premiumCard}>
+                          <div className={styles.premiumHeader}>
+                            <span className={styles.premiumBadge}>🔒 Premium</span>
+                            <h4>📋 Full Voter List</h4>
+                          </div>
+                          <div className={styles.premiumFeatures}>
+                            <div className={styles.premiumFeature}>
+                              <span>📊</span>
+                              <span>Total matching voters</span>
+                              <span className={styles.premiumBlur}>{nameSearchTotal.toLocaleString()}</span>
+                            </div>
+                            <div className={styles.premiumFeature}>
+                              <span>🔓</span>
+                              <span>Currently showing</span>
+                              <span>20 of {nameSearchTotal.toLocaleString()}</span>
+                            </div>
+                            <div className={styles.premiumFeature}>
+                              <span>📥</span>
+                              <span>Export to CSV</span>
+                              <span className={styles.premiumBlur}>████</span>
+                            </div>
                           </div>
                           <a 
                             href={`mailto:inbox.dpatil@gmail.com?subject=Full Voter List Request - Name Search&body=Hi,%0D%0A%0D%0AI searched for: ${encodeURIComponent(nameSearch)}%0D%0ATotal results: ${nameSearchTotal}%0D%0A%0D%0AI am interested in getting the complete voter list.%0D%0A%0D%0APurpose: %0D%0AContact Number: %0D%0A`}
-                            className={styles.premiumLockButton}
+                            className={styles.premiumCta}
                           >
-                            📩 Get Full Access
+                            📩 Get in Touch for Full Access
                           </a>
                         </div>
                       )}
