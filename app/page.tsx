@@ -1714,7 +1714,7 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                         <div className={styles.premiumLockSection}>
                           <div className={styles.premiumLockIcon}>🔒</div>
                           <div className={styles.premiumLockText}>
-                            <strong>{nameSearchTotal.toLocaleString() - 20}+ more results available</strong>
+                            <strong>{(nameSearchTotal - 20).toLocaleString()}+ more results available</strong>
                             <p>Get full voter list access for your campaign</p>
                           </div>
                           <a 
