@@ -1713,17 +1713,19 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                       {nameSearchTotal > 20 && (
                         <div className={styles.pagination}>
                           <button 
-                            disabled={nameSearchPage <= 1 || voterSearchLoading}
-                            onClick={() => searchByName(nameSearch.trim(), nameSearchPage - 1)}
+                            disabled={true}
+                            className={styles.paginationDisabled}
+                            title="🔒 Premium feature"
                           >
                             ← Prev
                           </button>
-                          <span>Page {nameSearchPage} of {Math.ceil(nameSearchTotal / 50)}</span>
+                          <span>Page 1 of {Math.ceil(nameSearchTotal / 20)} 🔒</span>
                           <button 
-                            disabled={nameSearchPage >= Math.ceil(nameSearchTotal / 50) || voterSearchLoading}
-                            onClick={() => searchByName(nameSearch.trim(), nameSearchPage + 1)}
+                            disabled={true}
+                            className={styles.paginationDisabled}
+                            title="🔒 Premium feature - Get in touch to unlock full list"
                           >
-                            Next →
+                            Next → 🔒
                           </button>
                         </div>
                       )}
