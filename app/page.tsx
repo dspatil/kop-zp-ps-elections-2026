@@ -4,7 +4,6 @@ import { useState, useMemo } from 'react';
 import { SeatReservation, ReservationCategory, ElectionType } from '@/types/reservation';
 import { getAllReservations, filterReservations, getMetadata } from '@/data/sample-data';
 import wardCompositionData from '@/data/ward-composition.json';
-import voterStatsData from '@/data/voter-stats-merged.json';
 import epicIndexOptimized from '@/data/epic-index-optimized.json';
 import styles from './page.module.css';
 
@@ -32,118 +31,6 @@ function searchEpicInOptimized(epic: string): { found: boolean; division?: strin
   return null;
 }
 
-// Type for ward-level stats
-interface WardStatsType {
-  wardNumber: number;
-  wardName: string;
-  total: number;
-  male: number;
-  female: number;
-  other?: number;
-  malePercent?: number;
-  femalePercent?: number;
-  ageGroups?: Record<string, number>;
-  firstTimeVoters?: number;
-}
-
-// Type for division-level voter stats
-interface DivisionStatsType {
-  divisionNumber: number;
-  divisionName: string;
-  taluka: string;
-  total: number;
-  male: number;
-  female: number;
-  other?: number;
-  malePercent: number;
-  femalePercent: number;
-  ageGroups?: Record<string, number>;
-  firstTimeVoters?: number;
-  wards?: Record<string, WardStatsType>;
-}
-
-// Return type for voter stats
-interface VoterStatsResult {
-  type: 'division' | 'ward';
-  name: string;
-  taluka: string;
-  total: number;
-  male: number;
-  female: number;
-  other?: number;
-  malePercent: number;
-  femalePercent: number;
-  malePercentExact?: number;  // Exact with decimals
-  femalePercentExact?: number; // Exact with decimals
-  ageGroups?: Record<string, number>;
-  firstTimeVoters?: number;
-  wardsList?: string[];
-}
-
-// Helper to get voter stats for a division or ward
-function getVoterStats(seatNumber: string, electionType: string): VoterStatsResult | null {
-  // Extract number from seat (e.g., "60-कसबा नुल" -> 60 or "119-हसूरचंपू" -> 119)
-  const match = seatNumber.match(/^(\d+)/);
-  if (!match) return null;
-  const num = parseInt(match[1]);
-
-  const byDivision = voterStatsData.byDivision as Record<string, DivisionStatsType>;
-
-  if (electionType === 'Zilla Parishad') {
-    // ZP: Use division-level stats
-    const divData = byDivision[num.toString()];
-    if (!divData) return null;
-    
-    // Calculate exact percentages
-    const malePercentExact = (divData.male / divData.total) * 100;
-    const femalePercentExact = (divData.female / divData.total) * 100;
-    
-    return {
-      type: 'division',
-      name: divData.divisionName,
-      taluka: divData.taluka,
-      total: divData.total,
-      male: divData.male,
-      female: divData.female,
-      other: divData.other,
-      malePercent: divData.malePercent,
-      femalePercent: divData.femalePercent,
-      malePercentExact: parseFloat(malePercentExact.toFixed(1)),
-      femalePercentExact: parseFloat(femalePercentExact.toFixed(1)),
-      ageGroups: divData.ageGroups,
-      firstTimeVoters: divData.firstTimeVoters,
-      wardsList: divData.wards ? Object.values(divData.wards).map(w => w.wardName) : []
-    };
-  } else {
-    // PS: Find ward-level stats
-    for (const divData of Object.values(byDivision)) {
-      if (divData.wards && divData.wards[num.toString()]) {
-        const wardData = divData.wards[num.toString()];
-        
-        // Calculate exact percentages
-        const malePercentExact = (wardData.male / wardData.total) * 100;
-        const femalePercentExact = (wardData.female / wardData.total) * 100;
-        
-        return {
-          type: 'ward',
-          name: wardData.wardName,
-          taluka: divData.taluka,
-          total: wardData.total,
-          male: wardData.male,
-          female: wardData.female,
-          other: wardData.other,
-          malePercent: wardData.malePercent || Math.round((wardData.male / wardData.total) * 100),
-          femalePercent: wardData.femalePercent || Math.round((wardData.female / wardData.total) * 100),
-          malePercentExact: parseFloat(malePercentExact.toFixed(1)),
-          femalePercentExact: parseFloat(femalePercentExact.toFixed(1)),
-          ageGroups: wardData.ageGroups,
-          firstTimeVoters: wardData.firstTimeVoters
-        };
-      }
-    }
-    return null;
-  }
-}
 
 type TabType = 'schedule' | 'eligibility' | 'reservations' | 'nomination' | 'wardmap' | 'voterlookup';
 
@@ -191,6 +78,42 @@ export default function Home() {
   const [villageSearch, setVillageSearch] = useState('');
   const [epicSearch, setEpicSearch] = useState('');
   const [epicResult, setEpicResult] = useState<{found: boolean; division?: string; ward?: string; taluka?: string} | null>(null);
+  
+  // Enhanced Voter Lookup state
+  const [voterSearchType, setVoterSearchType] = useState<'epic' | 'name' | 'village'>('epic');
+  const [nameSearch, setNameSearch] = useState('');
+  const [nameSearchResults, setNameSearchResults] = useState<any[]>([]);
+  const [nameSearchTotal, setNameSearchTotal] = useState(0);
+  const [nameSearchPage, setNameSearchPage] = useState(1);
+  const [voterSearchLoading, setVoterSearchLoading] = useState(false);
+  const [voterSearchError, setVoterSearchError] = useState<string | null>(null);
+  const [villageList, setVillageList] = useState<any[]>([]);
+  const [selectedVillageVoters, setSelectedVillageVoters] = useState<{village: string; stats: any; voters: any[]; page: number; totalPages: number} | null>(null);
+  const [apiEpicResult, setApiEpicResult] = useState<any>(null);
+  const [searchDivisionFilter, setSearchDivisionFilter] = useState<string>('');
+  const [searchWardFilter, setSearchWardFilter] = useState<string>('');
+  
+  // Get ward options for a division from ward-composition.json
+  const getWardOptionsForDivision = (divisionNo: string): {no: number, name: string}[] => {
+    const divNum = parseInt(divisionNo);
+    // Search through all PS talukas to find the division
+    for (const taluka of (wardCompositionData as any).ps?.talukas || []) {
+      for (const division of taluka.divisions || []) {
+        if (division.number === divNum) {
+          return (division.wards || []).map((ward: any) => ({
+            no: ward.number,
+            name: `${ward.number} - ${ward.name}`
+          }));
+        }
+      }
+    }
+    return [];
+  };
+  
+  // Seat Analytics from API
+  const [seatAnalytics, setSeatAnalytics] = useState<any>(null);
+  const [seatAnalyticsLoading, setSeatAnalyticsLoading] = useState(false);
+  const [seatAnalyticsNotFound, setSeatAnalyticsNotFound] = useState(false);
   
   // Ward Map state
   const [wardMapType, setWardMapType] = useState<'zp' | 'ps'>('zp');
@@ -253,6 +176,185 @@ export default function Home() {
 
   const clearFilters = () => {
     setFilters({});
+  };
+
+  // API-based voter search functions
+  const searchByEpicApi = async (epicId: string) => {
+    setVoterSearchLoading(true);
+    setVoterSearchError(null);
+    setApiEpicResult(null);
+    
+    try {
+      const response = await fetch(`/api/voters/epic/${epicId}`);
+      const data = await response.json();
+      
+      if (response.ok && data.found) {
+        setApiEpicResult(data.voter);
+      } else {
+        // Fallback to client-side search
+        const result = searchEpicInOptimized(epicId);
+        if (result) {
+          setApiEpicResult({ ...result, fromClientCache: true });
+        } else {
+          setVoterSearchError('Voter not found / मतदार सापडला नाही');
+        }
+      }
+    } catch {
+      // Fallback to client-side search on API error
+      const result = searchEpicInOptimized(epicId);
+      if (result) {
+        setApiEpicResult({ ...result, fromClientCache: true });
+      } else {
+        setVoterSearchError('Search failed. Please try again.');
+      }
+    } finally {
+      setVoterSearchLoading(false);
+    }
+  };
+
+  const searchByName = async (name: string, page = 1) => {
+    if (!name || name.length < 2) return;
+    
+    setVoterSearchLoading(true);
+    setVoterSearchError(null);
+    if (page === 1) setNameSearchResults([]);
+    
+    try {
+      let url = `/api/voters/search?name=${encodeURIComponent(name)}&limit=20&page=${page}`;
+      if (searchDivisionFilter) {
+        url += `&division=${searchDivisionFilter}`;
+      }
+      if (searchWardFilter) {
+        url += `&ward=${searchWardFilter}`;
+      }
+      
+      const response = await fetch(url);
+      const data = await response.json();
+      
+      if (response.ok) {
+        setNameSearchResults(data.voters || []);
+        setNameSearchTotal(data.total || 0);
+        setNameSearchPage(data.page || 1);
+        if (data.voters?.length === 0) {
+          setVoterSearchError('No voters found / मतदार सापडले नाहीत');
+        }
+      } else {
+        setVoterSearchError(data.error || 'Search failed');
+      }
+    } catch {
+      setVoterSearchError('Search failed. Please try again.');
+    } finally {
+      setVoterSearchLoading(false);
+    }
+  };
+
+  const loadVillageList = async () => {
+    setVoterSearchLoading(true);
+    try {
+      let url = '/api/voters/village?list=true';
+      if (searchDivisionFilter) {
+        url += `&division=${searchDivisionFilter}`;
+      }
+      if (searchWardFilter) {
+        url += `&ward=${searchWardFilter}`;
+      }
+      const response = await fetch(url);
+      const data = await response.json();
+      if (response.ok) {
+        setVillageList(data.villages || []);
+      }
+    } catch {
+      console.error('Failed to load villages');
+    } finally {
+      setVoterSearchLoading(false);
+    }
+  };
+
+  const loadVillageVoters = async (villageName: string, page = 1, divisionNo?: number, wardNo?: number) => {
+    setVoterSearchLoading(true);
+    try {
+      let url = `/api/voters/village?name=${encodeURIComponent(villageName)}&page=${page}&limit=20`;
+      if (divisionNo) url += `&division=${divisionNo}`;
+      if (wardNo) url += `&ward=${wardNo}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      if (response.ok) {
+        setSelectedVillageVoters({
+          village: villageName,
+          stats: data.stats,
+          voters: data.voters || [],
+          page: data.page,
+          totalPages: data.totalPages
+        });
+      }
+    } catch {
+      setVoterSearchError('Failed to load village voters');
+    } finally {
+      setVoterSearchLoading(false);
+    }
+  };
+
+  // Export search results to CSV
+  const exportToCSV = (data: any[], filename: string) => {
+    if (!data || data.length === 0) return;
+    
+    // CSV headers
+    const headers = ['Sr.No.', 'Name', 'Age', 'Gender', 'Village', 'EPIC', 'Division', 'Ward'];
+    
+    // Convert data to CSV rows
+    const rows = data.map(voter => [
+      voter.serialNumber || '',
+      voter.name || '',
+      voter.age || '',
+      voter.gender || '',
+      voter.village || '',
+      voter.epicId || '',
+      voter.divisionNo || voter.division || '',
+      voter.wardNo || voter.ward || ''
+    ]);
+    
+    // Create CSV content
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+    ].join('\n');
+    
+    // Add BOM for Excel to recognize UTF-8
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+    
+    // Create download link
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${filename}_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  };
+
+  // Fetch seat analytics from API (for divisions/wards not in client-side JSON)
+  const fetchSeatAnalytics = async (seatNumber: string, electionType: string) => {
+    const match = seatNumber.match(/^(\d+)/);
+    if (!match) return;
+    const num = parseInt(match[1]);
+    
+    setSeatAnalyticsLoading(true);
+    setSeatAnalyticsNotFound(false);
+    try {
+      const param = electionType === 'Zilla Parishad' ? `division=${num}` : `ward=${num}`;
+      const response = await fetch(`/api/voters/analytics?${param}`);
+      if (response.ok) {
+        const data = await response.json();
+        setSeatAnalytics(data);
+      } else {
+        // No data found (404 or other error)
+        setSeatAnalyticsNotFound(true);
+      }
+    } catch {
+      console.error('Failed to fetch seat analytics');
+      setSeatAnalyticsNotFound(true);
+    } finally {
+      setSeatAnalyticsLoading(false);
+    }
   };
 
   const getCategoryColor = (category: ReservationCategory): string => {
@@ -790,10 +892,10 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                   <div 
                     key={seat.id} 
                     className={styles.seatCard}
-                    onClick={() => setSelectedSeat(seat)}
+                    onClick={() => { setSeatAnalytics(null); setSeatAnalyticsNotFound(false); setSelectedSeat(seat); }}
                     role="button"
                     tabIndex={0}
-                    onKeyDown={(e) => e.key === 'Enter' && setSelectedSeat(seat)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') { setSeatAnalytics(null); setSeatAnalyticsNotFound(false); setSelectedSeat(seat); } }}
                   >
                     <div className={styles.seatHeader}>
                       <span 
@@ -1317,96 +1419,489 @@ _Forward करा - प्रत्येक उमेदवाराला उ
             <h2 className={styles.sectionTitle}>🪪 Voter Lookup / मतदार शोध</h2>
             
             <div className={styles.voterLookupMainBox}>
-              <p className={styles.voterLookupIntro}>
-                Find your ZP Division and PS Ward using your EPIC (Voter ID) number.
-                <br />
-                तुमचा EPIC (मतदार ओळखपत्र) क्रमांक वापरून तुमचा जि.प. विभाग आणि पं.स. गण शोधा.
-              </p>
-              
-              <div className={styles.voterLookupSearchBox}>
-                <input
-                  type="text"
-                  placeholder="Enter EPIC Number (e.g., AOP7398431)"
-                  value={epicSearch}
-                  onChange={(e) => {
-                    setEpicSearch(e.target.value.toUpperCase());
-                    setEpicResult(null);
-                  }}
-                  className={styles.epicSearchInput}
-                  maxLength={12}
-                />
+              {/* Search Type Toggle */}
+              <div className={styles.searchTypeToggle}>
                 <button 
-                  className={styles.epicSearchButton}
-                  onClick={() => {
-                    const searchEpic = epicSearch.trim().toUpperCase();
-                    
-                    if (searchEpic.length >= 6) {
-                      const result = searchEpicInOptimized(searchEpic);
-                      if (result) {
-                        setEpicResult(result);
-                      } else {
-                        setEpicResult({ found: false });
-                      }
-                    }
-                  }}
-                  disabled={epicSearch.length < 6}
+                  className={`${styles.toggleBtn} ${voterSearchType === 'epic' ? styles.toggleActive : ''}`}
+                  onClick={() => { setVoterSearchType('epic'); setVoterSearchError(null); setApiEpicResult(null); }}
                 >
-                  🔍 Search / शोधा
+                  🪪 EPIC
+                </button>
+                <button 
+                  className={`${styles.toggleBtn} ${voterSearchType === 'name' ? styles.toggleActive : ''}`}
+                  onClick={() => { setVoterSearchType('name'); setVoterSearchError(null); setNameSearchResults([]); }}
+                >
+                  👤 Name
+                </button>
+                <button 
+                  className={`${styles.toggleBtn} ${voterSearchType === 'village' ? styles.toggleActive : ''}`}
+                  onClick={() => { 
+                    setVoterSearchType('village'); 
+                    setVoterSearchError(null); 
+                    setSelectedVillageVoters(null);
+                    if (villageList.length === 0) loadVillageList();
+                  }}
+                >
+                  🏘️ Village
                 </button>
               </div>
 
-              {epicResult && (
-                <div className={styles.epicResultCard} style={{ 
-                  background: epicResult.found ? 'linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%)' : 'linear-gradient(135deg, #fef2f2 0%, #fecaca 100%)',
-                  border: epicResult.found ? '2px solid #48bb78' : '2px solid #f56565'
-                }}>
-                  {epicResult.found ? (
-                    <>
-                      <h3 className={styles.epicResultTitle}>✅ Voter Found! / मतदार सापडला!</h3>
+              {/* Division & Ward Filters for Name/Village search */}
+              {(voterSearchType === 'name' || voterSearchType === 'village') && (
+                <div className={styles.divisionFilter}>
+                  <div className={styles.filterGroup}>
+                    <label>Division / विभाग:</label>
+                    <select 
+                      value={searchDivisionFilter} 
+                      onChange={(e) => {
+                        const newDivision = e.target.value;
+                        setSearchDivisionFilter(newDivision);
+                        setSearchWardFilter(''); // Reset ward when division changes
+                        if (voterSearchType === 'village') {
+                          setVillageList([]);
+                          // Fetch with new division value directly (state update is async)
+                          setTimeout(async () => {
+                            setVoterSearchLoading(true);
+                            try {
+                              let url = '/api/voters/village?list=true';
+                              if (newDivision) {
+                                url += `&division=${newDivision}`;
+                              }
+                              const response = await fetch(url);
+                              const data = await response.json();
+                              if (response.ok) {
+                                setVillageList(data.villages || []);
+                              }
+                            } catch {
+                              console.error('Failed to load villages');
+                            } finally {
+                              setVoterSearchLoading(false);
+                            }
+                          }, 50);
+                        }
+                      }}
+                      className={styles.select}
+                    >
+                      <option value="">All / सर्व</option>
+                      <option value="60">60 - कसबा नुल</option>
+                      <option value="61">61 - हलकर्णी</option>
+                      <option value="62">62 - भडगांव</option>
+                      <option value="63">63 - गिजवणे</option>
+                      <option value="64">64 - नेसरी</option>
+                    </select>
+                  </div>
+                  
+                  <div className={styles.filterGroup}>
+                    <label>Ward/Gan / गण:</label>
+                    <select 
+                      value={searchWardFilter} 
+                      onChange={(e) => {
+                        const newWard = e.target.value;
+                        setSearchWardFilter(newWard);
+                        if (voterSearchType === 'village') {
+                          setVillageList([]);
+                          // Fetch with new ward value directly (state update is async)
+                          setTimeout(async () => {
+                            setVoterSearchLoading(true);
+                            try {
+                              let url = '/api/voters/village?list=true';
+                              if (searchDivisionFilter) {
+                                url += `&division=${searchDivisionFilter}`;
+                              }
+                              if (newWard) {
+                                url += `&ward=${newWard}`;
+                              }
+                              const response = await fetch(url);
+                              const data = await response.json();
+                              if (response.ok) {
+                                setVillageList(data.villages || []);
+                              }
+                            } catch {
+                              console.error('Failed to load villages');
+                            } finally {
+                              setVoterSearchLoading(false);
+                            }
+                          }, 50);
+                        }
+                      }}
+                      className={styles.select}
+                      disabled={!searchDivisionFilter}
+                    >
+                      <option value="">All Wards / सर्व गण</option>
+                      {searchDivisionFilter && getWardOptionsForDivision(searchDivisionFilter).map(ward => (
+                        <option key={ward.no} value={ward.no}>{ward.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              {/* EPIC Search */}
+              {voterSearchType === 'epic' && (
+                <>
+                  <p className={styles.voterLookupIntro}>
+                    Find voter details using EPIC (Voter ID) number.
+                    <br />
+                    EPIC क्रमांक वापरून मतदाराची माहिती शोधा.
+                  </p>
+                  
+                  <div className={styles.voterLookupSearchBox}>
+                    <input
+                      type="text"
+                      placeholder="Enter EPIC Number (e.g., AOP7398431)"
+                      value={epicSearch}
+                      onChange={(e) => {
+                        setEpicSearch(e.target.value.toUpperCase());
+                        setApiEpicResult(null);
+                        setVoterSearchError(null);
+                      }}
+                      className={styles.epicSearchInput}
+                      maxLength={15}
+                    />
+                    <button 
+                      className={styles.epicSearchButton}
+                      onClick={() => searchByEpicApi(epicSearch.trim().toUpperCase())}
+                      disabled={epicSearch.length < 6 || voterSearchLoading}
+                    >
+                      {voterSearchLoading ? '⏳' : '🔍'} Search
+                    </button>
+                  </div>
+
+                  {apiEpicResult && (
+                    <div className={styles.epicResultCard} style={{ 
+                      background: 'linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%)',
+                      border: '2px solid #48bb78'
+                    }}>
+                      <h3 className={styles.epicResultTitle}>✅ Voter Found!</h3>
                       <div className={styles.epicResultGrid}>
+                        {apiEpicResult.name && (
+                          <div className={styles.epicResultItem}>
+                            <div className={styles.epicResultIcon}>👤</div>
+                            <div className={styles.epicResultContent}>
+                              <div className={styles.epicResultLabel}>Name / नाव</div>
+                              <div className={styles.epicResultValue}>{apiEpicResult.name}</div>
+                            </div>
+                          </div>
+                        )}
+                        {apiEpicResult.age && (
+                          <div className={styles.epicResultItem}>
+                            <div className={styles.epicResultIcon}>🎂</div>
+                            <div className={styles.epicResultContent}>
+                              <div className={styles.epicResultLabel}>Age & Gender</div>
+                              <div className={styles.epicResultValue}>{apiEpicResult.age} yrs | {apiEpicResult.gender}</div>
+                            </div>
+                          </div>
+                        )}
+                        {apiEpicResult.village && (
+                          <div className={styles.epicResultItem}>
+                            <div className={styles.epicResultIcon}>🏠</div>
+                            <div className={styles.epicResultContent}>
+                              <div className={styles.epicResultLabel}>Village / गाव</div>
+                              <div className={styles.epicResultValue}>{apiEpicResult.village}</div>
+                            </div>
+                          </div>
+                        )}
                         <div className={styles.epicResultItem}>
                           <div className={styles.epicResultIcon}>🏛️</div>
                           <div className={styles.epicResultContent}>
-                            <div className={styles.epicResultLabel}>ZP Division / जि.प. विभाग</div>
-                            <div className={styles.epicResultValue}>{epicResult.division}</div>
+                            <div className={styles.epicResultLabel}>ZP Division</div>
+                            <div className={styles.epicResultValue}>{apiEpicResult.division}</div>
                           </div>
                         </div>
                         <div className={styles.epicResultItem}>
                           <div className={styles.epicResultIcon}>🏘️</div>
                           <div className={styles.epicResultContent}>
-                            <div className={styles.epicResultLabel}>PS Ward / पं.स. गण</div>
-                            <div className={styles.epicResultValue}>{epicResult.ward}</div>
+                            <div className={styles.epicResultLabel}>PS Ward</div>
+                            <div className={styles.epicResultValue}>{apiEpicResult.ward}</div>
                           </div>
                         </div>
-                        <div className={styles.epicResultItem}>
-                          <div className={styles.epicResultIcon}>📍</div>
-                          <div className={styles.epicResultContent}>
-                            <div className={styles.epicResultLabel}>Taluka / तालुका</div>
-                            <div className={styles.epicResultValue}>{epicResult.taluka}</div>
+                        {apiEpicResult.serialNumber && (
+                          <div className={styles.epicResultItem}>
+                            <div className={styles.epicResultIcon}>🔢</div>
+                            <div className={styles.epicResultContent}>
+                              <div className={styles.epicResultLabel}>Serial Number / क्रमांक</div>
+                              <div className={styles.epicResultValue}>{apiEpicResult.serialNumber}</div>
+                            </div>
                           </div>
-                        </div>
+                        )}
                       </div>
+                    </div>
+                  )}
+
+                  {voterSearchError && voterSearchType === 'epic' && (
+                    <div className={styles.epicResultCard} style={{ 
+                      background: 'linear-gradient(135deg, #fef2f2 0%, #fecaca 100%)',
+                      border: '2px solid #f56565'
+                    }}>
+                      <h3 className={styles.epicResultTitle}>❌ {voterSearchError}</h3>
+                      <p className={styles.epicLimitNote}>
+                        <small>📋 Currently indexed: Gadhinglaj Taluka (Divisions 61-64)</small>
+                      </p>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* Name Search */}
+              {voterSearchType === 'name' && (
+                <>
+                  <p className={styles.voterLookupIntro}>
+                    Search voters by name (partial match). Shows up to 50 results per page.
+                    <br />
+                    नावाने मतदार शोधा. प्रति पृष्ठ ५० परिणाम दाखवते.
+                  </p>
+                  
+                  <div className={styles.voterLookupSearchBox}>
+                    <input
+                      type="text"
+                      placeholder="Enter name / नाव टाका (e.g., पाटील, राम)"
+                      value={nameSearch}
+                      onChange={(e) => {
+                        setNameSearch(e.target.value);
+                        setVoterSearchError(null);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && nameSearch.length >= 2) {
+                          searchByName(nameSearch.trim());
+                        }
+                      }}
+                      className={styles.epicSearchInput}
+                      style={{ textTransform: 'none' }}
+                    />
+                    <button 
+                      className={styles.epicSearchButton}
+                      onClick={() => searchByName(nameSearch.trim())}
+                      disabled={nameSearch.length < 2 || voterSearchLoading}
+                    >
+                      {voterSearchLoading ? '⏳' : '🔍'} Search
+                    </button>
+                  </div>
+
+                  {nameSearchResults.length > 0 && (
+                    <div className={styles.searchResultsList}>
+                      <div className={styles.resultsHeader}>
+                        <h4 className={styles.resultsTitle}>
+                          🔍 Found {nameSearchTotal.toLocaleString()} voters 
+                          {nameSearchTotal > 20 && ` (showing ${nameSearchResults.length})`}
+                        </h4>
+                        <button 
+                          className={`${styles.exportButton} ${styles.exportButtonDisabled}`}
+                          disabled
+                          title="🔒 Premium feature - Get in touch to unlock"
+                        >
+                          📥 Export CSV 🔒
+                        </button>
+                      </div>
+                      {nameSearchResults.map((voter, idx) => (
+                        <div key={idx} className={styles.voterResultCard}>
+                          <div className={styles.voterResultMain}>
+                            <span className={styles.voterName}>{voter.name}</span>
+                            <span className={styles.voterMeta}>{voter.age} yrs | {voter.gender}</span>
+                          </div>
+                          <div className={styles.voterResultDetails}>
+                            <span>🏠 {voter.village}</span>
+                            <span>🏛️ Div {voter.divisionNo}</span>
+                            <span>🏘️ Ward {voter.wardNo}</span>
+                          </div>
+                          <div className={styles.voterEpic}>
+                            <span>EPIC: {voter.epicId}</span>
+                            {voter.serialNumber && <span style={{marginLeft: '1rem'}}>Sr: {voter.serialNumber}</span>}
+                          </div>
+                        </div>
+                      ))}
+                      
+                      {nameSearchTotal > 20 && (
+                        <div className={styles.pagination}>
+                          <button 
+                            disabled={nameSearchPage <= 1 || voterSearchLoading}
+                            onClick={() => searchByName(nameSearch.trim(), nameSearchPage - 1)}
+                          >
+                            ← Prev
+                          </button>
+                          <span>Page {nameSearchPage} of {Math.ceil(nameSearchTotal / 50)}</span>
+                          <button 
+                            disabled={nameSearchPage >= Math.ceil(nameSearchTotal / 50) || voterSearchLoading}
+                            onClick={() => searchByName(nameSearch.trim(), nameSearchPage + 1)}
+                          >
+                            Next →
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {voterSearchError && voterSearchType === 'name' && (
+                    <div className={styles.searchError}>{voterSearchError}</div>
+                  )}
+                </>
+              )}
+
+              {/* Village Voters */}
+              {voterSearchType === 'village' && (
+                <>
+                  <p className={styles.voterLookupIntro}>
+                    Select a village to view all voters with statistics.
+                    <br />
+                    गावातील सर्व मतदारांची यादी पहा.
+                  </p>
+                  
+                  {!selectedVillageVoters ? (
+                    <>
+                      {voterSearchLoading ? (
+                        <div className={styles.loadingText}>⏳ Loading villages...</div>
+                      ) : (
+                        <div className={styles.villageGrid}>
+                          {villageList.slice(0, 60).map((village, idx) => (
+                            <div 
+                              key={idx} 
+                              className={styles.villageCard}
+                              onClick={() => loadVillageVoters(village.name, 1, village.divisionNo, village.wardNo)}
+                            >
+                              <div className={styles.villageName}>{village.name}</div>
+                              <div className={styles.villageStats}>
+                                <span>👥 {village.total.toLocaleString()}</span>
+                                <span>👨 {village.male}</span>
+                                <span>👩 {village.female}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {villageList.length > 60 && (
+                        <p className={styles.moreResults}>+ {villageList.length - 60} more villages. Use Division filter to narrow down.</p>
+                      )}
                     </>
                   ) : (
-                    <>
-                      <h3 className={styles.epicResultTitle}>❌ EPIC Not Found / EPIC सापडला नाही</h3>
-                      <p className={styles.epicNotFoundText}>
-                        This EPIC number is not in our database.
-                        <br />
-                        हा EPIC क्रमांक आमच्या डेटाबेसमध्ये नाही.
-                      </p>
-                      <p className={styles.epicLimitNote}>
-                        <small>📋 Currently indexed: Gadhinglaj Taluka (Divisions 60-64 only)</small>
-                      </p>
-                    </>
+                    <div className={styles.villageVotersList}>
+                      <button 
+                        className={styles.backButton}
+                        onClick={() => setSelectedVillageVoters(null)}
+                      >
+                        ← Back to villages
+                      </button>
+                      
+                      <div className={styles.villageHeader}>
+                        <div className={styles.villageHeaderTop}>
+                          <h3>🏘️ {selectedVillageVoters.village}</h3>
+                          <button 
+                            className={`${styles.exportButton} ${styles.exportButtonDisabled}`}
+                            disabled
+                            title="🔒 Premium feature - Get in touch to unlock"
+                          >
+                            📥 Export CSV 🔒
+                          </button>
+                        </div>
+                        <div className={styles.villageStatsBar}>
+                          <span>👥 Total: {selectedVillageVoters.stats.total.toLocaleString()}</span>
+                          <span>👨 Male: {selectedVillageVoters.stats.male.toLocaleString()}</span>
+                          <span>👩 Female: {selectedVillageVoters.stats.female.toLocaleString()}</span>
+                        </div>
+                      </div>
+
+                      <div className={styles.voterTable}>
+                        <div className={styles.voterTableHeader}>
+                          <span>Sr. No.</span>
+                          <span>Name / नाव</span>
+                          <span>Age</span>
+                          <span>Gender</span>
+                          <span>EPIC</span>
+                        </div>
+                        {selectedVillageVoters.voters.map((voter, idx) => (
+                          <div key={idx} className={styles.voterTableRow}>
+                            <span>{voter.serialNumber || '-'}</span>
+                            <span>{voter.name}</span>
+                            <span>{voter.age}</span>
+                            <span>{voter.gender}</span>
+                            <span>{voter.epicId}</span>
+                          </div>
+                        ))}
+                        
+                        {/* Blurred teaser rows */}
+                        {selectedVillageVoters.stats.total > 20 && (
+                          <div className={styles.blurredRows}>
+                            <div className={styles.blurredRow}>
+                              <span>██</span>
+                              <span>██████ ████████ ██████</span>
+                              <span>██</span>
+                              <span>████</span>
+                              <span>███████████</span>
+                            </div>
+                            <div className={styles.blurredRow}>
+                              <span>██</span>
+                              <span>████████ ██████ ████</span>
+                              <span>██</span>
+                              <span>████</span>
+                              <span>███████████</span>
+                            </div>
+                            <div className={styles.blurredRow}>
+                              <span>██</span>
+                              <span>██████ ████ ██████████</span>
+                              <span>██</span>
+                              <span>████</span>
+                              <span>███████████</span>
+                            </div>
+                            <div className={styles.blurOverlay}>
+                              <span className={styles.blurLock}>🔒</span>
+                              <span className={styles.blurText}>
+                                +{(selectedVillageVoters.stats.total - 20).toLocaleString()} more voters
+                              </span>
+                              <a 
+                                href="mailto:inbox.dpatil@gmail.com?subject=Unlock Voter Data - Village: ${selectedVillageVoters.village}"
+                                className={styles.blurUnlock}
+                              >
+                                Unlock Full List →
+                              </a>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Campaign Insights Premium Card */}
+                      <div className={styles.premiumCard}>
+                        <div className={styles.premiumHeader}>
+                          <span className={styles.premiumBadge}>🔒 Premium</span>
+                          <h4>🎯 Campaign Insights</h4>
+                        </div>
+                        <div className={styles.premiumFeatures}>
+                          <div className={styles.premiumFeature}>
+                            <span>✨</span>
+                            <span>First-time Voters (18-21)</span>
+                            <span className={styles.premiumBlur}>████</span>
+                          </div>
+                          <div className={styles.premiumFeature}>
+                            <span>👴</span>
+                            <span>Senior Voters (60+)</span>
+                            <span className={styles.premiumBlur}>████</span>
+                          </div>
+                          <div className={styles.premiumFeature}>
+                            <span>📍</span>
+                            <span>Section-wise Breakdown</span>
+                            <span className={styles.premiumBlur}>████</span>
+                          </div>
+                          <div className={styles.premiumFeature}>
+                            <span>📥</span>
+                            <span>Export Full CSV/Excel</span>
+                            <span className={styles.premiumBlur}>████</span>
+                          </div>
+                        </div>
+                        <a 
+                          href="mailto:inbox.dpatil@gmail.com?subject=Campaign Insights Request - Kolhapur Elections"
+                          className={styles.premiumCta}
+                        >
+                          📩 Get in Touch for Full Access
+                        </a>
+                      </div>
+
+                      {/* Pagination disabled - premium feature */}
+                    </div>
                   )}
-                </div>
+                </>
               )}
 
               <div className={styles.voterLookupInfo}>
-                <h4>📋 Coverage Information / माहिती</h4>
+                <h4>📋 Coverage / माहिती</h4>
                 <ul>
-                  <li>✅ Gadhinglaj Taluka - Divisions 60-64 (170,523 voters indexed)</li>
+                  <li>✅ Gadhinglaj Taluka - Divisions 60-64 ({(170193).toLocaleString()} voters)</li>
                   <li>⏳ Other talukas coming soon / इतर तालुके लवकरच</li>
                 </ul>
               </div>
@@ -1415,6 +1910,29 @@ _Forward करा - प्रत्येक उमेदवाराला उ
         )}
 
       </main>
+
+      {/* Floating Campaign Data CTA - Desktop */}
+      <a 
+        href="mailto:inbox.dpatil@gmail.com?subject=Campaign Data Request - Kolhapur Elections&body=Hi,%0D%0A%0D%0AI am interested in getting voter data for my political campaign.%0D%0A%0D%0ATaluka/Division: %0D%0APurpose: %0D%0AContact Number: %0D%0A" 
+        className={styles.floatingCampaign}
+        title="Get voter data for campaigns"
+      >
+        <span className={styles.campaignIcon}>📊</span>
+        <span className={styles.campaignText}>
+          <span className={styles.campaignLine1}>Campaign Data?</span>
+          <span className={styles.campaignLine2}>Get in Touch →</span>
+        </span>
+      </a>
+      
+      {/* Mobile Bottom Sticky CTA Bar */}
+      <a 
+        href="mailto:inbox.dpatil@gmail.com?subject=Campaign Data Request - Kolhapur Elections&body=Hi,%0D%0A%0D%0AI am interested in getting voter data for my political campaign.%0D%0A%0D%0ATaluka/Division: %0D%0APurpose: %0D%0AContact Number: %0D%0A" 
+        className={styles.mobileBottomCta}
+      >
+        <span className={styles.mobileCtaIcon}>🎯</span>
+        <span className={styles.mobileCtaText}>Need Campaign Data? Get in Touch</span>
+        <span className={styles.mobileCtaArrow}>→</span>
+      </a>
 
       {/* Floating Feedback Button */}
       <a 
@@ -1431,9 +1949,9 @@ _Forward करा - प्रत्येक उमेदवाराला उ
 
       {/* Voter Analytics Modal */}
       {selectedSeat && (
-        <div className={styles.modalOverlay} onClick={() => setSelectedSeat(null)}>
+        <div className={styles.modalOverlay} onClick={() => { setSelectedSeat(null); setSeatAnalytics(null); setSeatAnalyticsNotFound(false); }}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <button className={styles.modalClose} onClick={() => setSelectedSeat(null)}>
+            <button className={styles.modalClose} onClick={() => { setSelectedSeat(null); setSeatAnalytics(null); setSeatAnalyticsNotFound(false); }}>
               ✕
             </button>
             
@@ -1493,66 +2011,98 @@ _Forward करा - प्रत्येक उमेदवाराला उ
             </div>
 
             <div className={styles.modalBody}>
-              {/* Voter Analytics Section */}
+              {/* Voter Analytics Section - Always from Neon API */}
               {(() => {
-                const stats = getVoterStats(selectedSeat.seatNumber, selectedSeat.electionType);
+                // Fetch from API if not already fetched
+                if (!seatAnalytics && !seatAnalyticsLoading && !seatAnalyticsNotFound) {
+                  fetchSeatAnalytics(selectedSeat.seatNumber, selectedSeat.electionType);
+                }
                 
-                if (stats) {
+                if (seatAnalyticsLoading) {
+                  return (
+                    <div className={styles.comingSoonSection}>
+                      <div className={styles.comingSoonIcon}>⏳</div>
+                      <h3 className={styles.comingSoonTitle}>Loading Analytics...</h3>
+                    </div>
+                  );
+                }
+                
+                if (seatAnalyticsNotFound) {
+                  return (
+                    <div className={styles.comingSoonSection}>
+                      <div className={styles.comingSoonIcon}>📋</div>
+                      <h3 className={styles.comingSoonTitle}>Data Not Available</h3>
+                      <p className={styles.comingSoonText}>
+                        या जागेसाठी मतदार यादी उपलब्ध नाही.
+                      </p>
+                      <p className={styles.requestDataText}>
+                        Want voter analytics for this seat?
+                      </p>
+                      <a 
+                        href={`mailto:inbox.dpatil@gmail.com?subject=Request%20Voter%20Data%20-%20${encodeURIComponent(selectedSeat.seatNumber)}`}
+                        className={styles.requestDataButton}
+                      >
+                        📩 Request Data / डेटा विनंती करा
+                      </a>
+                    </div>
+                  );
+                }
+                
+                if (seatAnalytics) {
                   return (
                     <div className={styles.voterAnalytics}>
-                      {/* Draft Notice */}
                       <div className={styles.draftNotice}>
                         📋 Draft Voter List / मसुदा मतदार यादी (08-10-2025)
                       </div>
 
-                      {/* Total Voters - VISIBLE */}
                       <div className={styles.totalVotersCard}>
-                        <div className={styles.totalVotersNumber}>{stats.total.toLocaleString()}</div>
+                        <div className={styles.totalVotersNumber}>{seatAnalytics.total.toLocaleString()}</div>
                         <div className={styles.totalVotersLabel}>Total Voters / एकूण मतदार</div>
-                        {stats.type === 'ward' && (
-                          <div className={styles.totalVotersSub}>{stats.name}</div>
-                        )}
                       </div>
 
-                      {/* Gender Split */}
                       <div className={styles.analyticsCard}>
                         <h4 className={styles.analyticsTitle}>👫 Gender Distribution / लिंग विभाजन</h4>
                         <div className={styles.genderStats}>
                           <div className={styles.genderBar}>
-                            <div className={styles.genderBarMale} style={{ width: `${stats.malePercent}%` }} />
-                            <div className={styles.genderBarFemale} style={{ width: `${stats.femalePercent}%` }} />
+                            <div className={styles.genderBarMale} style={{ width: `${seatAnalytics.gender.malePercent}%` }} />
+                            <div className={styles.genderBarFemale} style={{ width: `${seatAnalytics.gender.femalePercent}%` }} />
+                            {seatAnalytics.gender.other > 0 && (
+                              <div className={styles.genderBarOther} style={{ width: `${seatAnalytics.gender.otherPercent}%` }} />
+                            )}
                           </div>
                           <div className={styles.genderLabels}>
                             <div className={styles.genderItem}>
                               <span className={styles.genderDotMale}>●</span>
                               <span>पुरुष / Male</span>
-                              <strong>{stats.male.toLocaleString()} ({stats.malePercentExact}%)</strong>
+                              <strong>{seatAnalytics.gender.male.toLocaleString()} ({seatAnalytics.gender.malePercent}%)</strong>
                             </div>
                             <div className={styles.genderItem}>
                               <span className={styles.genderDotFemale}>●</span>
                               <span>स्त्री / Female</span>
-                              <strong>{stats.female.toLocaleString()} ({stats.femalePercentExact}%)</strong>
+                              <strong>{seatAnalytics.gender.female.toLocaleString()} ({seatAnalytics.gender.femalePercent}%)</strong>
                             </div>
+                            {seatAnalytics.gender.other > 0 && (
+                              <div className={styles.genderItem}>
+                                <span className={styles.genderDotOther}>●</span>
+                                <span>Unclassified</span>
+                                <strong className={styles.unclassifiedText}>{seatAnalytics.gender.other.toLocaleString()} <small>(data missing)</small></strong>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
 
-                      {/* Age Groups - Pie Chart + Bars */}
-                      {/* Age Groups - Horizontal Bars */}
-                      {stats.ageGroups && (
+                      {seatAnalytics.ageGroups && (
                         <div className={styles.analyticsCard}>
                           <h4 className={styles.analyticsTitle}>📊 Age Distribution / वयोगटानुसार</h4>
                           <div className={styles.ageGroupsList}>
-                            {Object.entries(stats.ageGroups).map(([range, count]) => {
-                              const percent = ((count as number) / stats.total * 100).toFixed(1);
+                            {Object.entries(seatAnalytics.ageGroups).map(([range, count]) => {
+                              const percent = ((count as number) / seatAnalytics.total * 100).toFixed(1);
                               return (
                                 <div key={range} className={styles.ageGroupRow}>
                                   <div className={styles.ageGroupLabel}>{range}</div>
                                   <div className={styles.ageGroupBarContainer}>
-                                    <div 
-                                      className={styles.ageGroupBar} 
-                                      style={{ width: `${percent}%` }}
-                                    />
+                                    <div className={styles.ageGroupBar} style={{ width: `${percent}%` }} />
                                   </div>
                                   <div className={styles.ageGroupStats}>
                                     {(count as number).toLocaleString()} ({percent}%)
@@ -1561,52 +2111,46 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                               );
                             })}
                           </div>
-                          {/* First Time Voters */}
-                          {stats.firstTimeVoters && (
+                          {seatAnalytics.specialCategories?.firstTimeVoters && (
                             <div className={styles.firstTimeVoters}>
                               <span className={styles.firstTimeIcon}>✨</span>
                               <span>First-time Voters (18-21):</span>
-                              <strong>{stats.firstTimeVoters.toLocaleString()}</strong>
+                              <strong>{seatAnalytics.specialCategories.firstTimeVoters.toLocaleString()}</strong>
                             </div>
                           )}
                         </div>
                       )}
 
-                      {/* Wards in this Division - Only for ZP */}
-                      {stats.wardsList && stats.wardsList.length > 0 && (
-                        <div className={styles.analyticsCard}>
-                          <h4 className={styles.analyticsTitle}>🏘️ PS Wards in this Division / या विभागातील पं.स. गण</h4>
-                          <div className={styles.wardsList}>
-                            {stats.wardsList.map((ward, idx) => (
-                              <span key={idx} className={styles.wardChip}>{ward}</span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
                       <p className={styles.dataSource}>
-                        📋 Draft Voter List - {stats.taluka} Taluka
+                        📋 Live data from Neon Database
                         <br />
-                        <small>⚠️ Final list may vary / अंतिम यादीत बदल होऊ शकतात</small>
+                        <small>⚠️ Draft list / अंतिम यादीत बदल होऊ शकतात</small>
                       </p>
-                    </div>
-                  );
-                } else {
-                  return (
-                    <div className={styles.comingSoonSection}>
-                      <div className={styles.comingSoonIcon}>📊</div>
-                      <h3 className={styles.comingSoonTitle}>Voter Analytics Coming Soon!</h3>
-                      <p className={styles.comingSoonText}>
-                        मतदार आकडेवारी लवकरच उपलब्ध होईल.
-                      </p>
-                      <ul className={styles.comingSoonList}>
-                        <li>✅ Total voter count</li>
-                        <li>✅ Gender-wise distribution</li>
-                        <li>✅ Age group analytics</li>
-                      </ul>
+
+                      {/* Premium Upsell Teaser */}
+                      <div className={styles.premiumTeaser}>
+                        <div className={styles.premiumTeaserHeader}>
+                          <span className={styles.premiumTeaserLock}>🔒</span>
+                          <span>UNLOCK FULL DATA</span>
+                        </div>
+                        <ul className={styles.premiumTeaserList}>
+                          <li>📋 Complete voter list with names</li>
+                          <li>🏘️ Village-wise breakdown</li>
+                          <li>📥 Export to CSV/Excel</li>
+                          <li>🔢 Serial numbers & addresses</li>
+                        </ul>
+                        <a 
+                          href={`mailto:inbox.dpatil@gmail.com?subject=Full Voter Data Request - ${selectedSeat.name} (${selectedSeat.electionType})&body=Hi,%0D%0A%0D%0AI am interested in getting full voter data for:%0D%0A%0D%0ASeat: ${selectedSeat.name} (${selectedSeat.seatNumber})%0D%0AElection: ${selectedSeat.electionType}%0D%0A%0D%0APurpose: %0D%0AContact Number: %0D%0A`}
+                          className={styles.premiumTeaserButton}
+                        >
+                          📩 Get Full Access
+                        </a>
+                      </div>
                     </div>
                   );
                 }
+                
+                return null;
               })()}
             </div>
           </div>

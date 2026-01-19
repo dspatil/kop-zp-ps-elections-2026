@@ -763,6 +763,535 @@
   }
 }
 
+/* Search Type Toggle */
+.searchTypeToggle {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  background: #f7fafc;
+  padding: 0.5rem;
+  border-radius: 12px;
+}
+
+.toggleBtn {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #4a5568;
+}
+
+.toggleBtn:hover {
+  background: #e2e8f0;
+}
+
+.toggleActive {
+  background: linear-gradient(135deg, #138808 0%, #0d6006 100%) !important;
+  color: white !important;
+  box-shadow: 0 2px 8px rgba(19, 136, 8, 0.3);
+}
+
+/* Division & Ward Filter */
+.divisionFilter {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  background: #f7fafc;
+  border-radius: 8px;
+  flex-wrap: wrap;
+}
+
+.filterGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 180px;
+}
+
+.filterGroup label {
+  font-weight: 600;
+  color: #4a5568;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.filterGroup .select,
+.divisionFilter .select {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  min-width: 120px;
+}
+
+.filterGroup .select:disabled {
+  background: #e2e8f0;
+  color: #a0aec0;
+  cursor: not-allowed;
+}
+
+/* Search Results List */
+.searchResultsList {
+  margin-top: 1rem;
+}
+
+.resultsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.resultsTitle {
+  margin: 0;
+  color: #1a365d;
+  font-size: 1rem;
+}
+
+.exportButton {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.exportButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+}
+
+.exportButtonDisabled {
+  background: #a0aec0 !important;
+  cursor: not-allowed !important;
+  opacity: 0.6;
+}
+
+.exportButtonDisabled:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.voterResultCard {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  transition: all 0.2s;
+}
+
+.voterResultCard:hover {
+  border-color: #138808;
+  box-shadow: 0 2px 8px rgba(19, 136, 8, 0.1);
+}
+
+.voterResultMain {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.voterName {
+  font-weight: 700;
+  color: #1a365d;
+  font-size: 1.05rem;
+}
+
+.voterMeta {
+  font-size: 0.85rem;
+  color: #718096;
+}
+
+.voterResultDetails {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: #4a5568;
+  margin-bottom: 0.5rem;
+}
+
+.voterEpic {
+  font-size: 0.8rem;
+  color: #718096;
+  font-family: monospace;
+}
+
+.searchError {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  color: #c53030;
+  margin-top: 1rem;
+}
+
+.loadingText {
+  text-align: center;
+  color: #718096;
+  padding: 2rem;
+  font-size: 1.1rem;
+}
+
+/* Village Grid */
+.villageGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+.villageCard {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.villageCard:hover {
+  border-color: #138808;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(19, 136, 8, 0.15);
+}
+
+.villageName {
+  font-weight: 700;
+  color: #1a365d;
+  margin-bottom: 0.5rem;
+}
+
+.villageStats {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.8rem;
+  color: #718096;
+}
+
+/* Village Voters List */
+.villageVotersList {
+  margin-top: 1rem;
+}
+
+.backButton {
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  transition: all 0.2s;
+}
+
+.backButton:hover {
+  background: #e2e8f0;
+}
+
+.villageHeader {
+  background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.villageHeaderTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.villageHeader h3 {
+  margin: 0;
+  color: #22543d;
+  font-size: 1.25rem;
+}
+
+.villageHeader .exportButton {
+  background: linear-gradient(135deg, #22543d 0%, #1a4731 100%);
+}
+
+.villageHeader .exportButton:hover {
+  background: linear-gradient(135deg, #1a4731 0%, #14532d 100%);
+  box-shadow: 0 4px 8px rgba(34, 84, 61, 0.3);
+}
+
+.villageStatsBar {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.95rem;
+  color: #276749;
+  font-weight: 600;
+}
+
+.voterTable {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.voterTableHeader {
+  display: grid;
+  grid-template-columns: 1.2fr 2fr 0.5fr 0.75fr 1.5fr;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: #f7fafc;
+  font-weight: 700;
+  color: #4a5568;
+  font-size: 0.85rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.voterTableRow {
+  display: grid;
+  grid-template-columns: 1.2fr 2fr 0.5fr 0.75fr 1.5fr;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  color: #2d3748;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.voterTableRow:hover {
+  background: #f7fafc;
+}
+
+.voterTableRow:last-child {
+  border-bottom: none;
+}
+
+/* Blurred Teaser Rows */
+.blurredRows {
+  position: relative;
+}
+
+.blurredRow {
+  display: grid;
+  grid-template-columns: 1.2fr 2fr 0.5fr 0.75fr 1.5fr;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  color: #a0aec0;
+  border-bottom: 1px solid #f0f0f0;
+  filter: blur(4px);
+  user-select: none;
+}
+
+.blurOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.95) 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.blurLock {
+  font-size: 2rem;
+}
+
+.blurText {
+  font-weight: 700;
+  color: #4a5568;
+  font-size: 0.95rem;
+}
+
+.blurUnlock {
+  padding: 0.5rem 1.25rem;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: white;
+  text-decoration: none;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.blurUnlock:hover {
+  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+/* Premium Campaign Insights Card */
+.premiumCard {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+  border: 2px dashed #a78bfa;
+  border-radius: 12px;
+}
+
+.premiumHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.premiumHeader h4 {
+  margin: 0;
+  color: #5b21b6;
+  font-size: 1.1rem;
+}
+
+.premiumBadge {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.premiumFeatures {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.premiumFeature {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: white;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #4a5568;
+}
+
+.premiumFeature span:first-child {
+  font-size: 1.1rem;
+}
+
+.premiumFeature span:last-child {
+  margin-left: auto;
+}
+
+.premiumBlur {
+  color: #a78bfa;
+  filter: blur(3px);
+  user-select: none;
+}
+
+.premiumCta {
+  display: block;
+  text-align: center;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+
+.premiumCta:hover {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 1rem;
+}
+
+.pagination button {
+  padding: 0.5rem 1rem;
+  background: #138808;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.pagination button:disabled {
+  background: #a0aec0;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  color: #4a5568;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .searchTypeToggle {
+    flex-direction: column;
+  }
+  
+  .divisionFilter {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .filterGroup {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.25rem;
+  }
+  
+  .voterResultDetails {
+    flex-wrap: wrap;
+  }
+  
+  .villageGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .voterTableHeader,
+  .voterTableRow {
+    grid-template-columns: 0.8fr 1.5fr 0.4fr 0.5fr 1fr;
+    font-size: 0.75rem;
+    gap: 0.25rem;
+    padding: 0.5rem;
+  }
+  
+  .villageStatsBar {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+}
+
 /* Voter Lookup (old location in Reservations - now removed) */
 .voterLookupBox {
   background: white;
@@ -1079,11 +1608,69 @@
   50% { transform: translateY(-3px); }
 }
 
-/* Mobile: Show as floating circle */
+/* Floating Campaign Data Button */
+.floatingCampaign {
+  position: fixed;
+  left: -5px;
+  top: 45%;
+  transform: translateY(-50%);
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: white;
+  padding: 0.75rem 0.75rem 0.75rem 1.25rem;
+  border-radius: 0 30px 30px 0;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.25);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.floatingCampaign:hover {
+  left: 0;
+  padding-left: 1.5rem;
+  box-shadow: 6px 6px 20px rgba(0, 0, 0, 0.35);
+  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+}
+
+.campaignIcon {
+  font-size: 1.5rem;
+  animation: pulse 2s infinite;
+}
+
+.campaignText {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.campaignLine1 {
+  font-size: 0.7rem;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+.campaignLine2 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* Mobile: Sticky bottom bar for campaign CTA */
 @media (max-width: 480px) {
+  .floatingCampaign {
+    display: none; /* Hide floating button on mobile */
+  }
+
   .floatingFeedback {
     top: auto;
-    bottom: 20px;
+    bottom: 70px;
     right: 15px;
     border-radius: 50%;
     padding: 1rem;
@@ -1100,6 +1687,120 @@
   .feedbackIcon {
     font-size: 1.5rem;
     margin: 0;
+  }
+}
+
+/* Mobile Bottom Sticky CTA Bar */
+.mobileBottomCta {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  .mobileBottomCta {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: white;
+    padding: 0.75rem 1rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    text-decoration: none;
+  }
+  
+  .mobileBottomCta:active {
+    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+  }
+  
+  .mobileCtaIcon {
+    font-size: 1.3rem;
+    animation: pulse 2s infinite;
+  }
+  
+  .mobileCtaText {
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  
+  .mobileCtaArrow {
+    font-size: 1.1rem;
+  }
+  
+  /* Add padding to main content to not be hidden by sticky bar */
+  .container {
+    padding-bottom: 60px;
+  }
+}
+
+/* Premium Teaser in Seat Card Modal */
+.premiumTeaser {
+  margin-top: 1.25rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+  border-radius: 12px;
+  border: 1px solid #4f46e5;
+  color: white;
+}
+
+.premiumTeaserHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 0.75rem;
+  color: #a5b4fc;
+}
+
+.premiumTeaserLock {
+  font-size: 1rem;
+}
+
+.premiumTeaserList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.premiumTeaserList li {
+  font-size: 0.8rem;
+  color: #e0e7ff;
+  padding: 0.25rem 0;
+}
+
+.premiumTeaserButton {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: white;
+  text-align: center;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.premiumTeaserButton:hover {
+  background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+@media (max-width: 480px) {
+  .premiumTeaserList {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -2240,6 +2941,12 @@
   transition: width 0.5s ease;
 }
 
+.genderBarOther {
+  background: linear-gradient(90deg, #a0aec0 0%, #718096 100%);
+  height: 100%;
+  transition: width 0.5s ease;
+}
+
 .genderLabels {
   display: flex;
   flex-direction: column;
@@ -2269,6 +2976,21 @@
   font-size: 1.2rem;
 }
 
+.genderDotOther {
+  color: #718096;
+  font-size: 1.2rem;
+}
+
+.unclassifiedText {
+  color: #718096;
+}
+
+.unclassifiedText small {
+  font-weight: 400;
+  font-size: 0.8em;
+  opacity: 0.8;
+}
+
 .analyticsCard {
   background: #f8fafc;
   border: 1px solid #e2e8f0;
@@ -2287,6 +3009,11 @@
 
 .genderDotFemale {
   color: #d53f8c;
+  font-size: 1rem;
+}
+
+.genderDotOther {
+  color: #718096;
   font-size: 1rem;
 }
 
@@ -2420,6 +3147,31 @@
   color: #2d3748;
   padding: 0.5rem 0;
   font-weight: 600;
+}
+
+.requestDataText {
+  font-size: 0.95rem;
+  color: #718096;
+  margin-bottom: 1rem;
+}
+
+.requestDataButton {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #138808 0%, #0d5f06 100%);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(19, 136, 8, 0.3);
+}
+
+.requestDataButton:hover {
+  background: linear-gradient(135deg, #0d5f06 0%, #094a04 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(19, 136, 8, 0.4);
 }
 
 .comingSoonNote {
@@ -2770,6 +3522,12 @@
 .genderBarFemale {
   height: 100%;
   background: linear-gradient(90deg, #d946ef 0%, #a21caf 100%);
+  transition: width 0.5s ease;
+}
+
+.genderBarOther {
+  height: 100%;
+  background: linear-gradient(90deg, #a0aec0 0%, #718096 100%);
   transition: width 0.5s ease;
 }
 
