@@ -2140,7 +2140,7 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                           <li>🔢 Serial numbers & addresses</li>
                         </ul>
                         <a 
-                          href={`mailto:inbox.dpatil@gmail.com?subject=Full Voter Data Request - ${selectedSeat.name} (${selectedSeat.electionType})&body=Hi,%0D%0A%0D%0AI am interested in getting full voter data for:%0D%0A%0D%0ASeat: ${selectedSeat.name} (${selectedSeat.seatNumber})%0D%0AElection: ${selectedSeat.electionType}%0D%0A%0D%0APurpose: %0D%0AContact Number: %0D%0A`}
+                          href={`mailto:inbox.dpatil@gmail.com?subject=Full Voter Data Request - ${selectedSeat.divisionName} (${selectedSeat.electionType})&body=Hi,%0D%0A%0D%0AI am interested in getting full voter data for:%0D%0A%0D%0ASeat: ${selectedSeat.divisionName} (${selectedSeat.seatNumber})%0D%0AElection: ${selectedSeat.electionType}%0D%0A%0D%0APurpose: %0D%0AContact Number: %0D%0A`}
                           className={styles.premiumTeaserButton}
                         >
                           📩 Get Full Access
