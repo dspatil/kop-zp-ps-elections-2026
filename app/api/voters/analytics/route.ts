@@ -66,7 +66,7 @@ export async function GET(request: Request) {
         values
       );
 
-      villages = villageResult.rows.map(v => ({
+      villages = villageResult.rows.map((v: any) => ({
         name: v.village,
         total: parseInt(v.total),
         male: parseInt(v.male),

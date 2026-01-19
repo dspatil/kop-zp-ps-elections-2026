@@ -74,7 +74,7 @@ export async function GET(request: Request) {
       page,
       limit,
       totalPages: Math.ceil(total / limit),
-      voters: result.rows.map(v => ({
+      voters: result.rows.map((v: any) => ({
         epicId: v.epic_id,
         name: v.name,
         age: v.age,
