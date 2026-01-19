@@ -1646,9 +1646,9 @@ _Forward करा - प्रत्येक उमेदवाराला उ
               {voterSearchType === 'name' && (
                 <>
                   <p className={styles.voterLookupIntro}>
-                    Search voters by name (partial match). Shows up to 50 results per page.
+                    Search voters by name (partial match). Shows first 20 results.
                     <br />
-                    नावाने मतदार शोधा. प्रति पृष्ठ ५० परिणाम दाखवते.
+                    नावाने मतदार शोधा. पहिले २० परिणाम दाखवते.
                   </p>
                   
                   <div className={styles.voterLookupSearchBox}>
@@ -1711,22 +1711,18 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                       ))}
                       
                       {nameSearchTotal > 20 && (
-                        <div className={styles.pagination}>
-                          <button 
-                            disabled={true}
-                            className={styles.paginationDisabled}
-                            title="🔒 Premium feature"
+                        <div className={styles.premiumLockSection}>
+                          <div className={styles.premiumLockIcon}>🔒</div>
+                          <div className={styles.premiumLockText}>
+                            <strong>{nameSearchTotal.toLocaleString() - 20}+ more results available</strong>
+                            <p>Get full voter list access for your campaign</p>
+                          </div>
+                          <a 
+                            href={`mailto:inbox.dpatil@gmail.com?subject=Full Voter List Request - Name Search&body=Hi,%0D%0A%0D%0AI searched for: ${encodeURIComponent(nameSearch)}%0D%0ATotal results: ${nameSearchTotal}%0D%0A%0D%0AI am interested in getting the complete voter list.%0D%0A%0D%0APurpose: %0D%0AContact Number: %0D%0A`}
+                            className={styles.premiumLockButton}
                           >
-                            ← Prev
-                          </button>
-                          <span>Page 1 of {Math.ceil(nameSearchTotal / 20)} 🔒</span>
-                          <button 
-                            disabled={true}
-                            className={styles.paginationDisabled}
-                            title="🔒 Premium feature - Get in touch to unlock full list"
-                          >
-                            Next → 🔒
-                          </button>
+                            📩 Get Full Access
+                          </a>
                         </div>
                       )}
                     </div>
