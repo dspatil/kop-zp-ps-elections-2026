@@ -42,7 +42,7 @@ export function GenderPieChart({ male, female, other = 0 }: GenderChartProps) {
             outerRadius={70}
             paddingAngle={2}
             dataKey="value"
-            label={({ percent }) => `${percent}%`}
+            label={({ percent }) => `${percent ?? 0}%`}
             labelLine={false}
           >
             {data.map((entry, index) => (
@@ -142,7 +142,7 @@ export function SurnameDonutChart({ surnames }: SurnameChartProps) {
             outerRadius={65}
             paddingAngle={2}
             dataKey="value"
-            label={({ percent }) => percent > 0.05 ? `${(percent * 100).toFixed(0)}%` : ''}
+            label={({ percent }) => (percent ?? 0) > 0.05 ? `${((percent ?? 0) * 100).toFixed(0)}%` : ''}
             labelLine={false}
           >
             {data.map((entry, index) => (
