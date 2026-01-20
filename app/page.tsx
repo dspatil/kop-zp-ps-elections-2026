@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { SeatReservation, ReservationCategory, ElectionType } from '@/types/reservation';
 import { getAllReservations, filterReservations, getMetadata } from '@/data/sample-data';
 import wardCompositionData from '@/data/ward-composition.json';
@@ -130,6 +130,77 @@ export default function Home() {
   }>({ isOpen: false, title: '', taluka: '', villages: [], currentVillage: '' });
   const [expandedWards, setExpandedWards] = useState<Set<string>>(new Set());
   
+  // Access Code System
+  const [hasAccess, setHasAccess] = useState(false);
+  const [accessName, setAccessName] = useState('');
+  const [showAccessModal, setShowAccessModal] = useState(false);
+  const [accessCodeInput, setAccessCodeInput] = useState('');
+  const [accessError, setAccessError] = useState('');
+  const [accessLoading, setAccessLoading] = useState(false);
+  
+  // Check localStorage on mount for existing access token
+  useEffect(() => {
+    const verifyStoredToken = async () => {
+      const storedToken = localStorage.getItem('election_access_token');
+      if (storedToken) {
+        try {
+          const response = await fetch(`/api/auth/validate-code?token=${encodeURIComponent(storedToken)}`);
+          const data = await response.json();
+          if (data.valid) {
+            setHasAccess(true);
+            setAccessName(data.name || 'Premium');
+          } else {
+            // Token invalid or expired, remove it
+            localStorage.removeItem('election_access_token');
+          }
+        } catch {
+          // Network error, keep token but don't set access
+        }
+      }
+    };
+    verifyStoredToken();
+  }, []);
+  
+  // Validate access code via API (secure - codes never exposed to browser)
+  const validateAccessCode = async () => {
+    const code = accessCodeInput.trim();
+    if (!code) return;
+    
+    setAccessLoading(true);
+    setAccessError('');
+    
+    try {
+      const response = await fetch('/api/auth/validate-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code })
+      });
+      
+      const data = await response.json();
+      
+      if (data.valid) {
+        localStorage.setItem('election_access_token', data.token);
+        setHasAccess(true);
+        setAccessName(data.name || 'Premium');
+        setShowAccessModal(false);
+        setAccessCodeInput('');
+      } else {
+        setAccessError(data.error || 'Invalid access code. Please check and try again.');
+      }
+    } catch {
+      setAccessError('Network error. Please try again.');
+    } finally {
+      setAccessLoading(false);
+    }
+  };
+  
+  // Logout function
+  const handleLogout = () => {
+    localStorage.removeItem('election_access_token');
+    setHasAccess(false);
+    setAccessName('');
+  };
+  
   const [filters, setFilters] = useState<{
     electionType?: ElectionType;
     category?: ReservationCategory;
@@ -220,7 +291,8 @@ export default function Home() {
     if (page === 1) setNameSearchResults([]);
     
     try {
-      let url = `/api/voters/search?name=${encodeURIComponent(name)}&limit=20&page=${page}`;
+      const limit = hasAccess ? 50 : 20; // Premium users get more results per page
+      let url = `/api/voters/search?name=${encodeURIComponent(name)}&limit=${limit}&page=${page}`;
       if (searchDivisionFilter) {
         url += `&division=${searchDivisionFilter}`;
       }
@@ -273,7 +345,8 @@ export default function Home() {
   const loadVillageVoters = async (villageName: string, page = 1, divisionNo?: number, wardNo?: number) => {
     setVoterSearchLoading(true);
     try {
-      let url = `/api/voters/village?name=${encodeURIComponent(villageName)}&page=${page}&limit=20`;
+      const limit = hasAccess ? 100 : 20; // Premium users get more results per page
+      let url = `/api/voters/village?name=${encodeURIComponent(villageName)}&page=${page}&limit=${limit}`;
       if (divisionNo) url += `&division=${divisionNo}`;
       if (wardNo) url += `&ward=${wardNo}`;
       const response = await fetch(url);
@@ -1646,9 +1719,9 @@ _Forward करा - प्रत्येक उमेदवाराला उ
               {voterSearchType === 'name' && (
                 <>
                   <p className={styles.voterLookupIntro}>
-                    Search voters by name (partial match). Shows first 20 results.
+                    Search voters by name (partial match). {hasAccess ? 'Full access enabled.' : 'Shows first 20 results.'}
                     <br />
-                    नावाने मतदार शोधा. पहिले २० परिणाम दाखवते.
+                    नावाने मतदार शोधा. {hasAccess ? 'पूर्ण प्रवेश सक्षम.' : 'पहिले २० परिणाम दाखवते.'}
                   </p>
                   
                   <div className={styles.voterLookupSearchBox}>
@@ -1682,15 +1755,37 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                       <div className={styles.resultsHeader}>
                         <h4 className={styles.resultsTitle}>
                           🔍 Found {nameSearchTotal.toLocaleString()} voters 
-                          {nameSearchTotal > 20 && ` (showing ${nameSearchResults.length})`}
+                          {nameSearchTotal > nameSearchResults.length && ` (showing ${nameSearchResults.length})`}
                         </h4>
-                        <button 
-                          className={`${styles.exportButton} ${styles.exportButtonDisabled}`}
-                          disabled
-                          title="🔒 Premium feature - Get in touch to unlock"
-                        >
-                          📥 Export CSV 🔒
-                        </button>
+                        {hasAccess ? (
+                          <button 
+                            className={styles.exportButton}
+                            onClick={() => {
+                              const csv = [
+                                ['Sr No', 'Name', 'Age', 'Gender', 'Village', 'Division', 'Ward', 'EPIC'].join(','),
+                                ...nameSearchResults.map(v => [
+                                  v.serialNumber || '', v.name, v.age, v.gender, v.village, v.divisionNo, v.wardNo, v.epicId
+                                ].join(','))
+                              ].join('\n');
+                              const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+                              const url = URL.createObjectURL(blob);
+                              const a = document.createElement('a');
+                              a.href = url;
+                              a.download = `voter_search_${nameSearch}.csv`;
+                              a.click();
+                            }}
+                          >
+                            📥 Export CSV
+                          </button>
+                        ) : (
+                          <button 
+                            className={`${styles.exportButton} ${styles.exportButtonDisabled}`}
+                            disabled
+                            title="🔒 Premium feature - Get in touch to unlock"
+                          >
+                            📥 Export CSV 🔒
+                          </button>
+                        )}
                       </div>
                       {nameSearchResults.map((voter, idx) => (
                         <div key={idx} className={styles.voterResultCard}>
@@ -1710,7 +1805,8 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                         </div>
                       ))}
                       
-                      {nameSearchTotal > 20 && (
+                      {/* Show premium card only for non-premium users with more than 20 results */}
+                      {!hasAccess && nameSearchTotal > 20 && (
                         <div className={styles.premiumCard}>
                           <div className={styles.premiumHeader}>
                             <span className={styles.premiumBadge}>🔒 Premium</span>
@@ -1733,12 +1829,35 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                               <span className={styles.premiumBlur}>████</span>
                             </div>
                           </div>
-                          <a 
-                            href={`mailto:inbox.dpatil@gmail.com?subject=Full Voter List Request - Name Search&body=Hi,%0D%0A%0D%0AI searched for: ${encodeURIComponent(nameSearch)}%0D%0ATotal results: ${nameSearchTotal}%0D%0A%0D%0AI am interested in getting the complete voter list.%0D%0A%0D%0APurpose: %0D%0AContact Number: %0D%0A`}
+                          <button 
+                            onClick={() => setShowAccessModal(true)}
                             className={styles.premiumCta}
                           >
-                            📩 Get in Touch for Full Access
-                          </a>
+                            🔐 Enter Access Code
+                          </button>
+                        </div>
+                      )}
+                      
+                      {/* Show pagination for premium users */}
+                      {hasAccess && nameSearchTotal > nameSearchResults.length && (
+                        <div className={styles.pagination}>
+                          <button 
+                            className={styles.paginationBtn}
+                            onClick={() => searchByName(nameSearch, nameSearchPage - 1)}
+                            disabled={nameSearchPage === 1}
+                          >
+                            ← Prev
+                          </button>
+                          <span className={styles.pageInfo}>
+                            Page {nameSearchPage} of {Math.ceil(nameSearchTotal / 50)}
+                          </span>
+                          <button 
+                            className={styles.paginationBtn}
+                            onClick={() => searchByName(nameSearch, nameSearchPage + 1)}
+                            disabled={nameSearchPage >= Math.ceil(nameSearchTotal / 50)}
+                          >
+                            Next →
+                          </button>
                         </div>
                       )}
                     </div>
@@ -1797,13 +1916,35 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                       <div className={styles.villageHeader}>
                         <div className={styles.villageHeaderTop}>
                           <h3>🏘️ {selectedVillageVoters.village}</h3>
-                          <button 
-                            className={`${styles.exportButton} ${styles.exportButtonDisabled}`}
-                            disabled
-                            title="🔒 Premium feature - Get in touch to unlock"
-                          >
-                            📥 Export CSV 🔒
-                          </button>
+                          {hasAccess ? (
+                            <button 
+                              className={styles.exportButton}
+                              onClick={() => {
+                                const csv = [
+                                  ['Sr No', 'Name', 'Age', 'Gender', 'EPIC'].join(','),
+                                  ...selectedVillageVoters.voters.map(v => [
+                                    v.serialNumber || '', v.name, v.age, v.gender, v.epicId
+                                  ].join(','))
+                                ].join('\n');
+                                const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = `voters_${selectedVillageVoters.village}.csv`;
+                                a.click();
+                              }}
+                            >
+                              📥 Export CSV
+                            </button>
+                          ) : (
+                            <button 
+                              className={`${styles.exportButton} ${styles.exportButtonDisabled}`}
+                              disabled
+                              title="🔒 Premium feature - Get in touch to unlock"
+                            >
+                              📥 Export CSV 🔒
+                            </button>
+                          )}
                         </div>
                         <div className={styles.villageStatsBar}>
                           <span>👥 Total: {selectedVillageVoters.stats.total.toLocaleString()}</span>
@@ -1830,8 +1971,8 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                           </div>
                         ))}
                         
-                        {/* Blurred teaser rows */}
-                        {selectedVillageVoters.stats.total > 20 && (
+                        {/* Blurred teaser rows - only for non-premium users */}
+                        {!hasAccess && selectedVillageVoters.stats.total > 20 && (
                           <div className={styles.blurredRows}>
                             <div className={styles.blurredRow}>
                               <span>██</span>
@@ -1859,54 +2000,83 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                               <span className={styles.blurText}>
                                 +{(selectedVillageVoters.stats.total - 20).toLocaleString()} more voters
                               </span>
-                              <a 
-                                href="mailto:inbox.dpatil@gmail.com?subject=Unlock Voter Data - Village: ${selectedVillageVoters.village}"
+                              <button 
+                                onClick={() => setShowAccessModal(true)}
                                 className={styles.blurUnlock}
                               >
-                                Unlock Full List →
-                              </a>
+                                🔐 Enter Access Code →
+                              </button>
                             </div>
                           </div>
                         )}
                       </div>
 
-                      {/* Campaign Insights Premium Card */}
-                      <div className={styles.premiumCard}>
-                        <div className={styles.premiumHeader}>
-                          <span className={styles.premiumBadge}>🔒 Premium</span>
-                          <h4>🎯 Campaign Insights</h4>
+                      {/* Campaign Insights Premium Card - only for non-premium users */}
+                      {!hasAccess && (
+                        <div className={styles.premiumCard}>
+                          <div className={styles.premiumHeader}>
+                            <span className={styles.premiumBadge}>🔒 Premium</span>
+                            <h4>🎯 Campaign Insights</h4>
+                          </div>
+                          <div className={styles.premiumFeatures}>
+                            <div className={styles.premiumFeature}>
+                              <span>✨</span>
+                              <span>First-time Voters (18-21)</span>
+                              <span className={styles.premiumBlur}>████</span>
+                            </div>
+                            <div className={styles.premiumFeature}>
+                              <span>👴</span>
+                              <span>Senior Voters (60+)</span>
+                              <span className={styles.premiumBlur}>████</span>
+                            </div>
+                            <div className={styles.premiumFeature}>
+                              <span>📍</span>
+                              <span>Section-wise Breakdown</span>
+                              <span className={styles.premiumBlur}>████</span>
+                            </div>
+                            <div className={styles.premiumFeature}>
+                              <span>📥</span>
+                              <span>Export Full CSV/Excel</span>
+                              <span className={styles.premiumBlur}>████</span>
+                            </div>
+                          </div>
+                          <button 
+                            onClick={() => setShowAccessModal(true)}
+                            className={styles.premiumCta}
+                          >
+                            🔐 Enter Access Code
+                          </button>
                         </div>
-                        <div className={styles.premiumFeatures}>
-                          <div className={styles.premiumFeature}>
-                            <span>✨</span>
-                            <span>First-time Voters (18-21)</span>
-                            <span className={styles.premiumBlur}>████</span>
-                          </div>
-                          <div className={styles.premiumFeature}>
-                            <span>👴</span>
-                            <span>Senior Voters (60+)</span>
-                            <span className={styles.premiumBlur}>████</span>
-                          </div>
-                          <div className={styles.premiumFeature}>
-                            <span>📍</span>
-                            <span>Section-wise Breakdown</span>
-                            <span className={styles.premiumBlur}>████</span>
-                          </div>
-                          <div className={styles.premiumFeature}>
-                            <span>📥</span>
-                            <span>Export Full CSV/Excel</span>
-                            <span className={styles.premiumBlur}>████</span>
-                          </div>
-                        </div>
-                        <a 
-                          href="mailto:inbox.dpatil@gmail.com?subject=Campaign Insights Request - Kolhapur Elections"
-                          className={styles.premiumCta}
-                        >
-                          📩 Get in Touch for Full Access
-                        </a>
-                      </div>
+                      )}
 
-                      {/* Pagination disabled - premium feature */}
+                      {/* Pagination for premium users */}
+                      {hasAccess && selectedVillageVoters.totalPages > 1 && (
+                        <div className={styles.pagination}>
+                          <button 
+                            className={styles.paginationBtn}
+                            onClick={() => loadVillageVoters(
+                              selectedVillageVoters.village, 
+                              selectedVillageVoters.page - 1
+                            )}
+                            disabled={selectedVillageVoters.page === 1}
+                          >
+                            ← Prev
+                          </button>
+                          <span className={styles.pageInfo}>
+                            Page {selectedVillageVoters.page} of {selectedVillageVoters.totalPages}
+                          </span>
+                          <button 
+                            className={styles.paginationBtn}
+                            onClick={() => loadVillageVoters(
+                              selectedVillageVoters.village, 
+                              selectedVillageVoters.page + 1
+                            )}
+                            disabled={selectedVillageVoters.page >= selectedVillageVoters.totalPages}
+                          >
+                            Next →
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </>
@@ -1926,27 +2096,45 @@ _Forward करा - प्रत्येक उमेदवाराला उ
       </main>
 
       {/* Floating Campaign Data CTA - Desktop */}
-      <a 
-        href="mailto:inbox.dpatil@gmail.com?subject=Campaign Data Request - Kolhapur Elections&body=Hi,%0D%0A%0D%0AI am interested in getting voter data for my political campaign.%0D%0A%0D%0ATaluka/Division: %0D%0APurpose: %0D%0AContact Number: %0D%0A" 
-        className={styles.floatingCampaign}
-        title="Get voter data for campaigns"
-      >
-        <span className={styles.campaignIcon}>📊</span>
-        <span className={styles.campaignText}>
-          <span className={styles.campaignLine1}>Campaign Data?</span>
-          <span className={styles.campaignLine2}>Get in Touch →</span>
-        </span>
-      </a>
+      {hasAccess ? (
+        <div className={`${styles.floatingCampaign} ${styles.floatingAccessActive}`}>
+          <span className={styles.campaignIcon}>✅</span>
+          <span className={styles.campaignText}>
+            <span className={styles.campaignLine1}>{accessName || 'Premium'}</span>
+            <button onClick={handleLogout} className={styles.logoutLink}>Logout</button>
+          </span>
+        </div>
+      ) : (
+        <button 
+          onClick={() => setShowAccessModal(true)}
+          className={styles.floatingCampaign}
+          title="Enter access code to unlock premium"
+        >
+          <span className={styles.campaignIcon}>🔐</span>
+          <span className={styles.campaignText}>
+            <span className={styles.campaignLine1}>Have a Code?</span>
+            <span className={styles.campaignLine2}>Enter Here →</span>
+          </span>
+        </button>
+      )}
       
       {/* Mobile Bottom Sticky CTA Bar */}
-      <a 
-        href="mailto:inbox.dpatil@gmail.com?subject=Campaign Data Request - Kolhapur Elections&body=Hi,%0D%0A%0D%0AI am interested in getting voter data for my political campaign.%0D%0A%0D%0ATaluka/Division: %0D%0APurpose: %0D%0AContact Number: %0D%0A" 
-        className={styles.mobileBottomCta}
-      >
-        <span className={styles.mobileCtaIcon}>🎯</span>
-        <span className={styles.mobileCtaText}>Need Campaign Data? Get in Touch</span>
-        <span className={styles.mobileCtaArrow}>→</span>
-      </a>
+      {hasAccess ? (
+        <div className={`${styles.mobileBottomCta} ${styles.mobileAccessActive}`}>
+          <span className={styles.mobileCtaIcon}>✅</span>
+          <span className={styles.mobileCtaText}>Premium Access Active</span>
+          <button onClick={handleLogout} className={styles.mobileLogoutBtn}>Logout</button>
+        </div>
+      ) : (
+        <button 
+          onClick={() => setShowAccessModal(true)}
+          className={styles.mobileBottomCta}
+        >
+          <span className={styles.mobileCtaIcon}>🔐</span>
+          <span className={styles.mobileCtaText}>Have Access Code? Enter Here</span>
+          <span className={styles.mobileCtaArrow}>→</span>
+        </button>
+      )}
 
       {/* Floating Feedback Button */}
       <a 
@@ -2186,6 +2374,55 @@ _Forward करा - प्रत्येक उमेदवाराला उ
         <p className={styles.copyright}>© {new Date().getFullYear()} dspatil. All rights reserved.</p>
         <p className={styles.madeWith}>Made with ❤️ for Kolhapur 🇮🇳</p>
       </footer>
+
+      {/* Access Code Modal */}
+      {showAccessModal && (
+        <div className={styles.accessModalOverlay} onClick={() => setShowAccessModal(false)}>
+          <div className={styles.accessModalContent} onClick={(e) => e.stopPropagation()}>
+            <button 
+              className={styles.accessModalClose}
+              onClick={() => setShowAccessModal(false)}
+            >
+              ✕
+            </button>
+            <div className={styles.accessModalHeader}>
+              <span className={styles.accessModalIcon}>🔐</span>
+              <h3>Enter Access Code</h3>
+              <p>Enter your premium access code to unlock all features</p>
+            </div>
+            <div className={styles.accessModalBody}>
+              <input
+                type="text"
+                className={styles.accessCodeInput}
+                placeholder="Enter access code..."
+                value={accessCodeInput}
+                onChange={(e) => {
+                  setAccessCodeInput(e.target.value);
+                  setAccessError('');
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !accessLoading) validateAccessCode();
+                }}
+                autoFocus
+                disabled={accessLoading}
+              />
+              {accessError && (
+                <div className={styles.accessError}>{accessError}</div>
+              )}
+              <button 
+                className={styles.accessSubmitBtn}
+                onClick={validateAccessCode}
+                disabled={accessLoading || !accessCodeInput.trim()}
+              >
+                {accessLoading ? '⏳ Verifying...' : '🔓 Unlock Premium'}
+              </button>
+              <div className={styles.accessModalFooter}>
+                <p>Don&apos;t have a code? <a href="mailto:inbox.dpatil@gmail.com?subject=Premium Access Request - Kolhapur Elections">Get in touch</a></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Map Modal */}
       {mapModal.isOpen && (

@@ -4201,3 +4201,250 @@
   }
 }
 
+/* ===== ACCESS CODE MODAL STYLES ===== */
+.accessModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 1rem;
+  animation: fadeIn 0.2s ease;
+}
+
+.accessModalContent {
+  background: linear-gradient(145deg, #1a365d 0%, #2c5282 100%);
+  border-radius: 16px;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+  position: relative;
+  animation: slideUp 0.3s ease;
+  border: 2px solid #FF9933;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.accessModalClose {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #ffffff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.accessModalClose:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.accessModalHeader {
+  text-align: center;
+  padding: 2rem 2rem 1rem;
+}
+
+.accessModalIcon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.accessModalHeader h3 {
+  color: #ffffff;
+  font-size: 1.5rem;
+  margin: 0 0 0.5rem;
+}
+
+.accessModalHeader p {
+  color: #a0aec0;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.accessModalBody {
+  padding: 1rem 2rem 2rem;
+}
+
+.accessCodeInput {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid rgba(255, 153, 51, 0.3);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  font-size: 1.1rem;
+  text-align: center;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  outline: none;
+  transition: all 0.3s;
+}
+
+.accessCodeInput::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.accessCodeInput:focus {
+  border-color: #FF9933;
+  box-shadow: 0 0 20px rgba(255, 153, 51, 0.3);
+}
+
+.accessError {
+  background: rgba(220, 38, 38, 0.2);
+  color: #fca5a5;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.accessSubmitBtn {
+  width: 100%;
+  background: linear-gradient(135deg, #FF9933 0%, #FF6600 100%);
+  color: #ffffff;
+  border: none;
+  padding: 1rem;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: all 0.3s;
+}
+
+.accessSubmitBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(255, 153, 51, 0.4);
+}
+
+.accessModalFooter {
+  text-align: center;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.accessModalFooter p {
+  color: #a0aec0;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.accessModalFooter a {
+  color: #FF9933;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.accessModalFooter a:hover {
+  text-decoration: underline;
+}
+
+/* Floating Access Button Styles */
+.floatingAccessActive {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
+  cursor: default !important;
+}
+
+.floatingAccessActive:hover {
+  transform: none !important;
+}
+
+.logoutLink {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: #ffffff;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  margin-top: 0.25rem;
+}
+
+.logoutLink:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Mobile Access Active Styles */
+.mobileAccessActive {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
+  justify-content: center !important;
+}
+
+.mobileLogoutBtn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.mobileLogoutBtn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Pagination Styles */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+  margin-top: 1rem;
+  background: #f7fafc;
+  border-radius: 8px;
+}
+
+.paginationBtn {
+  background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+  color: #ffffff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.paginationBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.3);
+}
+
+.paginationBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pageInfo {
+  color: #4a5568;
+  font-size: 0.9rem;
+}
+
