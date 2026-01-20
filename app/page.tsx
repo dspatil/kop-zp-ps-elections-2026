@@ -88,7 +88,9 @@ export default function Home() {
   const [voterSearchLoading, setVoterSearchLoading] = useState(false);
   const [voterSearchError, setVoterSearchError] = useState<string | null>(null);
   const [villageList, setVillageList] = useState<any[]>([]);
-  const [selectedVillageVoters, setSelectedVillageVoters] = useState<{village: string; stats: any; voters: any[]; page: number; totalPages: number} | null>(null);
+  const [selectedVillageVoters, setSelectedVillageVoters] = useState<{village: string; stats: any; voters: any[]; page: number; totalPages: number; divisionNo?: number; wardNo?: number} | null>(null);
+  const [villageAnalytics, setVillageAnalytics] = useState<any>(null);
+  const [villageAnalyticsLoading, setVillageAnalyticsLoading] = useState(false);
   const [apiEpicResult, setApiEpicResult] = useState<any>(null);
   const [searchDivisionFilter, setSearchDivisionFilter] = useState<string>('');
   const [searchWardFilter, setSearchWardFilter] = useState<string>('');
@@ -344,6 +346,7 @@ export default function Home() {
 
   const loadVillageVoters = async (villageName: string, page = 1, divisionNo?: number, wardNo?: number) => {
     setVoterSearchLoading(true);
+    setVillageAnalytics(null); // Reset analytics
     try {
       const limit = hasAccess ? 100 : 20; // Premium users get more results per page
       let url = `/api/voters/village?name=${encodeURIComponent(villageName)}&page=${page}&limit=${limit}`;
@@ -357,13 +360,39 @@ export default function Home() {
           stats: data.stats,
           voters: data.voters || [],
           page: data.page,
-          totalPages: data.totalPages
+          totalPages: data.totalPages,
+          divisionNo,
+          wardNo
         });
+        
+        // Fetch detailed analytics for premium users
+        if (hasAccess) {
+          loadVillageAnalytics(villageName, divisionNo, wardNo);
+        }
       }
     } catch {
       setVoterSearchError('Failed to load village voters');
     } finally {
       setVoterSearchLoading(false);
+    }
+  };
+  
+  // Load detailed village analytics (premium feature)
+  const loadVillageAnalytics = async (villageName: string, divisionNo?: number, wardNo?: number) => {
+    setVillageAnalyticsLoading(true);
+    try {
+      let url = `/api/voters/village-analytics?village=${encodeURIComponent(villageName)}`;
+      if (divisionNo) url += `&division=${divisionNo}`;
+      if (wardNo) url += `&ward=${wardNo}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      if (response.ok) {
+        setVillageAnalytics(data);
+      }
+    } catch {
+      console.error('Failed to load village analytics');
+    } finally {
+      setVillageAnalyticsLoading(false);
     }
   };
 
@@ -1953,6 +1982,119 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                         </div>
                       </div>
 
+                      {/* Premium Analytics Section */}
+                      {hasAccess && (
+                        <div className={styles.analyticsSection}>
+                          {villageAnalyticsLoading ? (
+                            <div className={styles.analyticsLoading}>⏳ Loading analytics...</div>
+                          ) : villageAnalytics ? (
+                            <div className={styles.analyticsGrid}>
+                              {/* Top Surnames - using topFirstNames which has the surnames (last word extraction in DB gives first names due to name order) */}
+                              <div className={styles.analyticsCard}>
+                                <h4>👨‍👩‍👧‍👦 Top Surnames / आडनावे</h4>
+                                <div className={styles.surnameList}>
+                                  {villageAnalytics.topFirstNames.slice(0, 5).map((s: any, idx: number) => (
+                                    <div key={idx} className={styles.surnameRow}>
+                                      <span className={styles.surnameRank}>#{idx + 1}</span>
+                                      <span className={styles.surnameName}>{s.name}</span>
+                                      <span className={styles.surnameCount}>{s.count}</span>
+                                      <div className={styles.surnameBar}>
+                                        <div 
+                                          className={styles.surnameBarFill} 
+                                          style={{ width: `${Math.min(parseFloat(s.percentage), 100)}%` }}
+                                        />
+                                      </div>
+                                      <span className={styles.surnamePercent}>{s.percentage}%</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+
+                              {/* Age Insights */}
+                              <div className={styles.analyticsCard}>
+                                <h4>📊 Age Insights / वय विश्लेषण</h4>
+                                <div className={styles.ageInsights}>
+                                  <div className={styles.ageInsightRow}>
+                                    <span className={styles.ageIcon}>✨</span>
+                                    <span className={styles.ageLabel}>First-time Voters (18-21)</span>
+                                    <span className={styles.ageValue}>{villageAnalytics.ageStats.firstTimeVoters}</span>
+                                  </div>
+                                  <div className={styles.ageInsightRow}>
+                                    <span className={styles.ageIcon}>🧑</span>
+                                    <span className={styles.ageLabel}>Young (22-25)</span>
+                                    <span className={styles.ageValue}>{villageAnalytics.ageStats.young22to25}</span>
+                                  </div>
+                                  <div className={styles.ageInsightRow}>
+                                    <span className={styles.ageIcon}>👨</span>
+                                    <span className={styles.ageLabel}>Adults (26-35)</span>
+                                    <span className={styles.ageValue}>{villageAnalytics.ageStats.age26to35}</span>
+                                  </div>
+                                  <div className={styles.ageInsightRow}>
+                                    <span className={styles.ageIcon}>👴</span>
+                                    <span className={styles.ageLabel}>Senior Citizens (60+)</span>
+                                    <span className={styles.ageValue}>{villageAnalytics.ageStats.seniorCitizens}</span>
+                                  </div>
+                                  <div className={styles.ageInsightRow}>
+                                    <span className={styles.ageIcon}>🎂</span>
+                                    <span className={styles.ageLabel}>Average Age</span>
+                                    <span className={styles.ageValue}>{villageAnalytics.ageStats.avgAge} yrs</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Common First Names - using topSurnames which has actual first names */}
+                              <div className={styles.analyticsCard}>
+                                <h4>🔤 Common First Names / नावे</h4>
+                                <div className={styles.firstNameList}>
+                                  {villageAnalytics.topSurnames.slice(0, 5).map((n: any, idx: number) => (
+                                    <div key={idx} className={styles.firstNameRow}>
+                                      <span className={styles.firstNameRank}>#{idx + 1}</span>
+                                      <span className={styles.firstName}>{n.name}</span>
+                                      <span className={styles.firstNameCount}>{n.count} ({n.percentage}%)</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+
+                              {/* Special Groups */}
+                              <div className={styles.analyticsCard}>
+                                <h4>🎯 Campaign Focus Groups</h4>
+                                <div className={styles.focusGroups}>
+                                  <div className={styles.focusGroup}>
+                                    <div className={styles.focusGroupHeader}>
+                                      <span>✨ First-time Voters</span>
+                                      <span className={styles.focusGroupTotal}>{villageAnalytics.ageStats.firstTimeVoters}</span>
+                                    </div>
+                                    <div className={styles.focusGroupBreakdown}>
+                                      <span>👨 {villageAnalytics.firstTimeVotersByGender.male} M</span>
+                                      <span>👩 {villageAnalytics.firstTimeVotersByGender.female} F</span>
+                                    </div>
+                                  </div>
+                                  <div className={styles.focusGroup}>
+                                    <div className={styles.focusGroupHeader}>
+                                      <span>👴 Senior Citizens (60+)</span>
+                                      <span className={styles.focusGroupTotal}>{villageAnalytics.ageStats.seniorCitizens}</span>
+                                    </div>
+                                    <div className={styles.focusGroupBreakdown}>
+                                      <span>👨 {villageAnalytics.seniorVotersByGender.male} M</span>
+                                      <span>👩 {villageAnalytics.seniorVotersByGender.female} F</span>
+                                    </div>
+                                  </div>
+                                  {villageAnalytics.ageStats.superSeniors > 0 && (
+                                    <div className={styles.focusGroup}>
+                                      <div className={styles.focusGroupHeader}>
+                                        <span>🎖️ Super Seniors (80+)</span>
+                                        <span className={styles.focusGroupTotal}>{villageAnalytics.ageStats.superSeniors}</span>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ) : null}
+                        </div>
+                      )}
+
                       <div className={styles.voterTable}>
                         <div className={styles.voterTableHeader}>
                           <span>Sr. No.</span>
@@ -2015,10 +2157,15 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                       {!hasAccess && (
                         <div className={styles.premiumCard}>
                           <div className={styles.premiumHeader}>
-                            <span className={styles.premiumBadge}>🔒 Premium</span>
-                            <h4>🎯 Campaign Insights</h4>
+                            <span className={styles.premiumBadge}>🔒 Premium Analytics</span>
+                            <h4>🎯 Unlock Campaign Insights</h4>
                           </div>
                           <div className={styles.premiumFeatures}>
+                            <div className={styles.premiumFeature}>
+                              <span>👨‍👩‍👧‍👦</span>
+                              <span>Top Surnames Analysis</span>
+                              <span className={styles.premiumBlur}>████</span>
+                            </div>
                             <div className={styles.premiumFeature}>
                               <span>✨</span>
                               <span>First-time Voters (18-21)</span>
@@ -2026,17 +2173,22 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                             </div>
                             <div className={styles.premiumFeature}>
                               <span>👴</span>
-                              <span>Senior Voters (60+)</span>
+                              <span>Senior Citizens (60+)</span>
                               <span className={styles.premiumBlur}>████</span>
                             </div>
                             <div className={styles.premiumFeature}>
-                              <span>📍</span>
-                              <span>Section-wise Breakdown</span>
+                              <span>🔤</span>
+                              <span>Common First Names</span>
+                              <span className={styles.premiumBlur}>████</span>
+                            </div>
+                            <div className={styles.premiumFeature}>
+                              <span>📊</span>
+                              <span>Age Distribution Chart</span>
                               <span className={styles.premiumBlur}>████</span>
                             </div>
                             <div className={styles.premiumFeature}>
                               <span>📥</span>
-                              <span>Export Full CSV/Excel</span>
+                              <span>Export Full CSV</span>
                               <span className={styles.premiumBlur}>████</span>
                             </div>
                           </div>

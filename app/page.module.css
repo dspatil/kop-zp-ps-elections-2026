@@ -4448,3 +4448,229 @@
   font-size: 0.9rem;
 }
 
+/* ===== VILLAGE ANALYTICS SECTION ===== */
+.analyticsSection {
+  margin: 1.5rem 0;
+}
+
+.analyticsLoading {
+  text-align: center;
+  padding: 2rem;
+  color: #718096;
+  font-size: 1rem;
+}
+
+.analyticsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .analyticsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.analyticsCard {
+  background: linear-gradient(145deg, #ffffff 0%, #f7fafc 100%);
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.analyticsCard h4 {
+  margin: 0 0 1rem 0;
+  font-size: 0.95rem;
+  color: #1a365d;
+  border-bottom: 2px solid #FF9933;
+  padding-bottom: 0.5rem;
+}
+
+/* Surname List */
+.surnameList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.surnameRow {
+  display: grid;
+  grid-template-columns: 30px 1fr 50px 80px 50px;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.surnameRank {
+  color: #718096;
+  font-weight: 600;
+}
+
+.surnameName {
+  color: #2d3748;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.surnameCount {
+  color: #4a5568;
+  text-align: right;
+}
+
+.surnameBar {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.surnameBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #FF9933 0%, #FF6600 100%);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.surnamePercent {
+  color: #718096;
+  font-size: 0.8rem;
+  text-align: right;
+}
+
+/* Age Insights */
+.ageInsights {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.ageInsightRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.5rem;
+  background: #f7fafc;
+  border-radius: 6px;
+}
+
+.ageIcon {
+  font-size: 1rem;
+  width: 24px;
+  text-align: center;
+}
+
+.ageLabel {
+  flex: 1;
+  font-size: 0.85rem;
+  color: #4a5568;
+}
+
+.ageValue {
+  font-weight: 600;
+  color: #1a365d;
+  font-size: 0.9rem;
+}
+
+/* First Names */
+.firstNameList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.firstNameRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.firstNameRow:last-child {
+  border-bottom: none;
+}
+
+.firstNameRank {
+  color: #a0aec0;
+  font-size: 0.8rem;
+  width: 25px;
+}
+
+.firstName {
+  flex: 1;
+  color: #2d3748;
+  font-size: 0.9rem;
+}
+
+.firstNameCount {
+  color: #718096;
+  font-size: 0.8rem;
+}
+
+/* Focus Groups */
+.focusGroups {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.focusGroup {
+  background: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
+  border-radius: 8px;
+  padding: 0.75rem;
+}
+
+.focusGroupHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: #2d3748;
+  margin-bottom: 0.4rem;
+}
+
+.focusGroupTotal {
+  font-weight: 700;
+  color: #1a365d;
+  background: #ffffff;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.focusGroupBreakdown {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: #4a5568;
+}
+
+.focusGroupNote {
+  font-size: 0.8rem;
+  color: #718096;
+  text-align: center;
+  padding: 0.5rem;
+  background: #fff5e6;
+  border-radius: 6px;
+  border: 1px solid #ffecd2;
+}
+
+/* Mobile adjustments for surname rows */
+@media (max-width: 480px) {
+  .surnameRow {
+    grid-template-columns: 25px 1fr 40px 50px;
+  }
+  
+  .surnameBar {
+    display: none;
+  }
+  
+  .surnamePercent {
+    display: none;
+  }
+}
+
