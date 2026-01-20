@@ -4659,6 +4659,76 @@
   border: 1px solid #ffecd2;
 }
 
+/* Average Age Note */
+.avgAgeNote {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #4a5568;
+  padding: 0.5rem;
+  background: #f7fafc;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+}
+
+.avgAgeNote strong {
+  color: #1a365d;
+}
+
+/* Super Seniors Note */
+.superSeniorsNote {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #744210;
+  padding: 0.5rem;
+  background: linear-gradient(135deg, #fefcbf 0%, #faf089 100%);
+  border-radius: 6px;
+  margin-top: 0.5rem;
+  border: 1px solid #ecc94b;
+}
+
+.superSeniorsNote strong {
+  color: #744210;
+}
+
+/* Quick Stats */
+.quickStats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.quickStatItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.quickStatIcon {
+  font-size: 1.25rem;
+  width: 30px;
+  text-align: center;
+}
+
+.quickStatLabel {
+  flex: 1;
+  font-size: 0.85rem;
+  color: #4a5568;
+}
+
+.quickStatValue {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #1a365d;
+  background: #ffffff;
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
 /* Mobile adjustments for surname rows */
 @media (max-width: 480px) {
   .surnameRow {
