@@ -42,7 +42,7 @@ export function GenderPieChart({ male, female, other = 0 }: GenderChartProps) {
             outerRadius={70}
             paddingAngle={2}
             dataKey="value"
-            label={({ name, percent }) => `${percent}%`}
+            label={({ percent }) => `${percent}%`}
             labelLine={false}
           >
             {data.map((entry, index) => (
@@ -50,12 +50,12 @@ export function GenderPieChart({ male, female, other = 0 }: GenderChartProps) {
             ))}
           </Pie>
           <Tooltip 
-            formatter={(value: number, name: string) => [value.toLocaleString(), name]}
+            formatter={(value: any, name: any) => [Number(value).toLocaleString(), name]}
           />
           <Legend 
             verticalAlign="bottom" 
             height={36}
-            formatter={(value) => <span style={{ color: '#4a5568', fontSize: '0.8rem' }}>{value}</span>}
+            formatter={(value: any) => <span style={{ color: '#4a5568', fontSize: '0.8rem' }}>{value}</span>}
           />
         </PieChart>
       </ResponsiveContainer>
@@ -96,8 +96,8 @@ export function AgeBarChart({
           <XAxis type="number" tick={{ fontSize: 11 }} />
           <YAxis dataKey="name" type="category" tick={{ fontSize: 11 }} width={40} />
           <Tooltip 
-            formatter={(value: number) => [value.toLocaleString(), 'Voters']}
-            labelFormatter={(label) => `Age: ${label}`}
+            formatter={(value: any) => [Number(value).toLocaleString(), 'Voters']}
+            labelFormatter={(label: any) => `Age: ${label}`}
           />
           <Bar 
             dataKey="value" 
@@ -121,7 +121,7 @@ export function SurnameDonutChart({ surnames }: SurnameChartProps) {
   const topSurnames = surnames.slice(0, 5);
   const othersCount = surnames.slice(5).reduce((sum, s) => sum + s.count, 0);
   
-  const data = topSurnames.map((s, idx) => ({
+  const data = topSurnames.map((s) => ({
     name: s.name,
     value: s.count,
   }));
@@ -142,7 +142,7 @@ export function SurnameDonutChart({ surnames }: SurnameChartProps) {
             outerRadius={65}
             paddingAngle={2}
             dataKey="value"
-            label={({ name, percent }) => percent > 0.05 ? `${(percent * 100).toFixed(0)}%` : ''}
+            label={({ percent }) => percent > 0.05 ? `${(percent * 100).toFixed(0)}%` : ''}
             labelLine={false}
           >
             {data.map((entry, index) => (
@@ -153,12 +153,12 @@ export function SurnameDonutChart({ surnames }: SurnameChartProps) {
             ))}
           </Pie>
           <Tooltip 
-            formatter={(value: number, name: string) => [value.toLocaleString(), name]}
+            formatter={(value: any, name: any) => [Number(value).toLocaleString(), name]}
           />
           <Legend 
             verticalAlign="bottom" 
             height={50}
-            formatter={(value) => <span style={{ color: '#4a5568', fontSize: '0.75rem' }}>{value}</span>}
+            formatter={(value: any) => <span style={{ color: '#4a5568', fontSize: '0.75rem' }}>{value}</span>}
           />
         </PieChart>
       </ResponsiveContainer>
@@ -197,7 +197,7 @@ export function FocusGroupChart({ firstTimeVoters, seniorVoters }: FocusGroupCha
           <Legend 
             verticalAlign="top" 
             height={30}
-            formatter={(value) => <span style={{ fontSize: '0.75rem' }}>{value === 'male' ? '👨 Male' : '👩 Female'}</span>}
+            formatter={(value: any) => <span style={{ fontSize: '0.75rem' }}>{value === 'male' ? '👨 Male' : '👩 Female'}</span>}
           />
           <Bar dataKey="male" stackId="a" fill={COLORS.male} radius={[0, 0, 0, 0]} />
           <Bar dataKey="female" stackId="a" fill={COLORS.female} radius={[4, 4, 0, 0]} />
@@ -206,4 +206,3 @@ export function FocusGroupChart({ firstTimeVoters, seniorVoters }: FocusGroupCha
     </div>
   );
 }
-
