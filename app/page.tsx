@@ -583,8 +583,8 @@ export default function Home() {
       {/* Pricing Ticker */}
       <div className={styles.pricingTicker}>
         <div className={styles.tickerContent}>
-          {/* Duplicate content for seamless scrolling */}
-          {[1, 2].map((_, idx) => (
+          {/* Multiple copies for seamless continuous scrolling */}
+          {[1, 2, 3, 4].map((_, idx) => (
             <div key={idx} style={{ display: 'flex' }}>
               <a href="/pricing" target="_blank" rel="noopener noreferrer" className={styles.tickerLink}>
                 <span className={styles.tickerItem}>
