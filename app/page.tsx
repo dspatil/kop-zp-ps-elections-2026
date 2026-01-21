@@ -583,10 +583,10 @@ export default function Home() {
       {/* Pricing Ticker */}
       <div className={styles.pricingTicker}>
         <div className={styles.tickerContent}>
-          {/* 2 copies for seamless loop: Marathi first, then English */}
-          {[1, 2].map((_, idx) => (
-            <div key={idx} style={{ display: 'flex' }}>
-              <a href="/pricing" target="_blank" rel="noopener noreferrer" className={styles.tickerLink}>
+          {/* Duplicate entire sequence for seamless loop */}
+          {[1, 2].map((idx) => (
+            <>
+              <a key={`mr-${idx}`} href="/pricing" target="_blank" rel="noopener noreferrer" className={styles.tickerLink}>
                 <span className={styles.tickerItem}>
                   <span>🗳️</span>
                   <span>तुमच्या प्रचारासाठी मतदार यादी हवी? फक्त</span>
@@ -594,8 +594,8 @@ export default function Home() {
                   <span>→ किंमत पहा</span>
                 </span>
               </a>
-              <span className={styles.tickerDivider}>•</span>
-              <a href="/pricing" target="_blank" rel="noopener noreferrer" className={styles.tickerLink}>
+              <span key={`div1-${idx}`} className={styles.tickerDivider}>•</span>
+              <a key={`en-${idx}`} href="/pricing" target="_blank" rel="noopener noreferrer" className={styles.tickerLink}>
                 <span className={styles.tickerItem}>
                   <span>🗳️</span>
                   <span>Need voter data for your campaign? Get it for just</span>
@@ -603,8 +603,8 @@ export default function Home() {
                   <span>→ View Pricing</span>
                 </span>
               </a>
-              <span className={styles.tickerDivider}>•</span>
-            </div>
+              <span key={`div2-${idx}`} className={styles.tickerDivider}>•</span>
+            </>
           ))}
         </div>
       </div>
