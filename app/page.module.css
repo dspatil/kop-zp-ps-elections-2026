@@ -4758,7 +4758,7 @@
 
 .tickerContent {
   display: flex;
-  animation: tickerScroll 30s linear infinite;
+  animation: tickerScroll 15s linear infinite;
   white-space: nowrap;
 }
 
