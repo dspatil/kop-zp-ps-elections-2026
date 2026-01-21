@@ -4760,6 +4760,8 @@
   display: flex;
   animation: tickerScroll 15s linear infinite;
   white-space: nowrap;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .tickerContent:hover {
@@ -5299,6 +5301,10 @@
   .tickerItem {
     font-size: 0.8rem;
     padding: 0 1.5rem;
+  }
+  
+  .tickerContent {
+    animation: tickerScroll 8s linear infinite;
   }
   
   .talukaExamples {
