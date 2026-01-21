@@ -5298,40 +5298,13 @@
     font-size: 1.8rem;
   }
   
-  /* Mobile: Two-line marquee - Marathi on top, English below */
-  .pricingTicker {
-    padding: 0.75rem 0;
+  .tickerItem {
+    font-size: 0.85rem;
+    padding: 0 2rem;
   }
   
   .tickerContent {
-    flex-direction: column;
-    animation: none;
-    gap: 0.75rem;
-  }
-  
-  .tickerLink:nth-child(1) {
-    display: block;
-    animation: tickerScroll 8s linear infinite;
-  }
-  
-  .tickerLink:nth-child(3) {
-    display: block;
-    animation: tickerScroll 8s linear infinite;
-  }
-  
-  .tickerLink:nth-child(5),
-  .tickerLink:nth-child(7) {
-    display: none;
-  }
-  
-  .tickerDivider {
-    display: none;
-  }
-  
-  .tickerItem {
-    font-size: 0.85rem;
-    padding: 0 1.5rem;
-    display: inline-flex;
+    animation: tickerScroll 6s linear infinite;
   }
   
   .talukaExamples {
