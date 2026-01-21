@@ -2254,19 +2254,21 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                 </ul>
               </div>
 
-              {/* Pricing CTA */}
-              <div className={styles.voterLookupPricing}>
-                <h4>💰 Need Complete Voter Data? / संपूर्ण मतदार यादी हवी?</h4>
-                <p>Get voter data for your campaign starting at just ₹1/voter</p>
-                <a 
-                  href="/pricing" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className={styles.voterLookupPricingBtn}
-                >
-                  View Pricing Plans / किंमत पहा →
-                </a>
-              </div>
+              {/* Pricing CTA - Only show if user doesn't have access */}
+              {!hasAccess && (
+                <div className={styles.voterLookupPricing}>
+                  <h4>💰 Need Complete Voter Data? / संपूर्ण मतदार यादी हवी?</h4>
+                  <p>Get voter data for your campaign starting at just ₹1/voter</p>
+                  <a 
+                    href="/pricing" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className={styles.voterLookupPricingBtn}
+                  >
+                    View Pricing Plans / किंमत पहा →
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         )}
