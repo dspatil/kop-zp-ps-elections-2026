@@ -583,24 +583,24 @@ export default function Home() {
       {/* Pricing Ticker */}
       <div className={styles.pricingTicker}>
         <div className={styles.tickerContent}>
-          {/* Multiple copies for seamless continuous scrolling */}
-          {[1, 2, 3, 4].map((_, idx) => (
+          {/* 2 copies for seamless loop: Marathi first, then English */}
+          {[1, 2].map((_, idx) => (
             <div key={idx} style={{ display: 'flex' }}>
-              <a href="/pricing" target="_blank" rel="noopener noreferrer" className={styles.tickerLink}>
-                <span className={styles.tickerItem}>
-                  <span>🗳️</span>
-                  <span>Need voter data for your campaign? Get it for just</span>
-                  <span className={styles.tickerHighlight}>₹1/voter</span>
-                  <span>→ View Pricing</span>
-                </span>
-              </a>
-              <span className={styles.tickerDivider}>•</span>
               <a href="/pricing" target="_blank" rel="noopener noreferrer" className={styles.tickerLink}>
                 <span className={styles.tickerItem}>
                   <span>🗳️</span>
                   <span>तुमच्या प्रचारासाठी मतदार यादी हवी? फक्त</span>
                   <span className={styles.tickerHighlight}>₹१/मतदार</span>
                   <span>→ किंमत पहा</span>
+                </span>
+              </a>
+              <span className={styles.tickerDivider}>•</span>
+              <a href="/pricing" target="_blank" rel="noopener noreferrer" className={styles.tickerLink}>
+                <span className={styles.tickerItem}>
+                  <span>🗳️</span>
+                  <span>Need voter data for your campaign? Get it for just</span>
+                  <span className={styles.tickerHighlight}>₹1/voter</span>
+                  <span>→ View Pricing</span>
                 </span>
               </a>
               <span className={styles.tickerDivider}>•</span>
