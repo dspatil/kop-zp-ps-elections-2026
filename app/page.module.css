@@ -5304,7 +5304,7 @@
   }
   
   .tickerContent {
-    animation: tickerScroll 6s linear infinite;
+    animation: tickerScroll 3s linear infinite;
   }
   
   .talukaExamples {
