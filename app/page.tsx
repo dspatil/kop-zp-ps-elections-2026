@@ -580,6 +580,35 @@ export default function Home() {
         </p>
       </header>
 
+      {/* Pricing Ticker */}
+      <div className={styles.pricingTicker}>
+        <div className={styles.tickerContent}>
+          {/* Duplicate content for seamless scrolling */}
+          {[1, 2].map((_, idx) => (
+            <div key={idx} style={{ display: 'flex' }}>
+              <a href="/pricing" target="_blank" rel="noopener noreferrer" className={styles.tickerLink}>
+                <span className={styles.tickerItem}>
+                  <span>🗳️</span>
+                  <span>Need voter data for your campaign? Get it for just</span>
+                  <span className={styles.tickerHighlight}>₹1/voter</span>
+                  <span>→ View Pricing</span>
+                </span>
+              </a>
+              <span className={styles.tickerDivider}>•</span>
+              <a href="/pricing" target="_blank" rel="noopener noreferrer" className={styles.tickerLink}>
+                <span className={styles.tickerItem}>
+                  <span>🗳️</span>
+                  <span>तुमच्या प्रचारासाठी मतदार यादी हवी? फक्त</span>
+                  <span className={styles.tickerHighlight}>₹१/मतदार</span>
+                  <span>→ किंमत पहा</span>
+                </span>
+              </a>
+              <span className={styles.tickerDivider}>•</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Tab Navigation */}
       <nav className={styles.tabNav}>
         <button 
@@ -1738,7 +1767,7 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                     }}>
                       <h3 className={styles.epicResultTitle}>❌ {voterSearchError}</h3>
                       <p className={styles.epicLimitNote}>
-                        <small>📋 Currently indexed: Gadhinglaj Taluka (Divisions 61-64)</small>
+                        <small>📋 Currently indexed: Divisions 60-64</small>
                       </p>
                     </div>
                   )}
@@ -2220,9 +2249,23 @@ _Forward करा - प्रत्येक उमेदवाराला उ
               <div className={styles.voterLookupInfo}>
                 <h4>📋 Coverage / माहिती</h4>
                 <ul>
-                  <li>✅ Gadhinglaj Taluka - Divisions 60-64 ({(170193).toLocaleString()} voters)</li>
+                  <li>✅ Divisions 60-64 ({(170193).toLocaleString()} voters)</li>
                   <li>⏳ Other talukas coming soon / इतर तालुके लवकरच</li>
                 </ul>
+              </div>
+
+              {/* Pricing CTA */}
+              <div className={styles.voterLookupPricing}>
+                <h4>💰 Need Complete Voter Data? / संपूर्ण मतदार यादी हवी?</h4>
+                <p>Get voter data for your campaign starting at just ₹1/voter</p>
+                <a 
+                  href="/pricing" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className={styles.voterLookupPricingBtn}
+                >
+                  View Pricing Plans / किंमत पहा →
+                </a>
               </div>
             </div>
           </div>
