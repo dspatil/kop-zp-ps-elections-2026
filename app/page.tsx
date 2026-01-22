@@ -1620,6 +1620,10 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                       <option value="62">62 - भडगांव</option>
                       <option value="63">63 - गिजवणे</option>
                       <option value="64">64 - नेसरी</option>
+                      <option value="65">65 - अडकूर</option>
+                      <option value="66">66 - माणगाव</option>
+                      <option value="67">67 - कुदनुर</option>
+                      <option value="68">68 - तुडये</option>
                     </select>
                   </div>
                   
