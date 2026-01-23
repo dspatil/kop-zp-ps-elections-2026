@@ -2445,8 +2445,6 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                       )}
 
                       <p className={styles.dataSource}>
-                        📋 Live data from Neon Database
-                        <br />
                         <small>⚠️ Draft list / अंतिम यादीत बदल होऊ शकतात</small>
                       </p>
 
