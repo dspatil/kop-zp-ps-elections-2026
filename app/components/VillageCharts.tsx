@@ -31,18 +31,18 @@ export function GenderPieChart({ male, female, other = 0 }: GenderChartProps) {
   const colors = [COLORS.male, COLORS.female, COLORS.other];
 
   return (
-    <div style={{ width: '100%', height: 240 }}>
+    <div style={{ width: '100%', height: 260 }}>
       <ResponsiveContainer>
-        <PieChart>
+        <PieChart margin={{ top: 20, right: 0, bottom: 0, left: 0 }}>
           <Pie
             data={data}
             cx="50%"
-            cy="42%"
+            cy="45%"
             innerRadius={40}
             outerRadius={70}
             paddingAngle={2}
             dataKey="value"
-            label={({ percent }) => `${percent ?? 0}%`}
+            label={(entry: any) => `${entry.percent}%`}
             labelLine={false}
           >
             {data.map((entry, index) => (
@@ -90,9 +90,9 @@ export function AgeBarChart({
   ];
 
   return (
-    <div style={{ width: '100%', height: 200 }}>
+    <div style={{ width: '100%', height: 240 }}>
       <ResponsiveContainer>
-        <BarChart data={data} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
+        <BarChart data={data} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 0 }}>
           <XAxis type="number" tick={{ fontSize: 11 }} />
           <YAxis dataKey="name" type="category" tick={{ fontSize: 11 }} width={40} />
           <Tooltip 
@@ -131,13 +131,13 @@ export function SurnameDonutChart({ surnames }: SurnameChartProps) {
   }
 
   return (
-    <div style={{ width: '100%', height: 200 }}>
+    <div style={{ width: '100%', height: 260 }}>
       <ResponsiveContainer>
-        <PieChart>
+        <PieChart margin={{ top: 20, right: 0, bottom: 0, left: 0 }}>
           <Pie
             data={data}
             cx="50%"
-            cy="50%"
+            cy="45%"
             innerRadius={35}
             outerRadius={65}
             paddingAngle={2}
@@ -188,9 +188,9 @@ export function FocusGroupChart({ firstTimeVoters, seniorVoters }: FocusGroupCha
   ];
 
   return (
-    <div style={{ width: '100%', height: 160 }}>
+    <div style={{ width: '100%', height: 260 }}>
       <ResponsiveContainer>
-        <BarChart data={data} margin={{ top: 10, right: 10, left: 10, bottom: 5 }}>
+        <BarChart data={data} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
           <XAxis dataKey="name" tick={{ fontSize: 10 }} />
           <YAxis tick={{ fontSize: 10 }} />
           <Tooltip />
@@ -234,15 +234,15 @@ export function ReligionPieChart({ data }: ReligionChartProps) {
   }));
 
   return (
-    <div style={{ width: '100%', height: 280 }}>
+    <div style={{ width: '100%', height: 320 }}>
       <ResponsiveContainer>
-        <PieChart>
+        <PieChart margin={{ top: 20, right: 0, bottom: 0, left: 0 }}>
           <Pie
             data={chartData}
             cx="50%"
-            cy="40%"
-            innerRadius={50}
-            outerRadius={80}
+            cy="42%"
+            innerRadius={55}
+            outerRadius={90}
             paddingAngle={2}
             dataKey="value"
             label={(entry: any) => entry.percentage > 5 ? `${entry.percentage}%` : ''}
@@ -374,7 +374,7 @@ export function CommunityBarChart({ data }: CommunityChartProps) {
   }));
 
   return (
-    <div style={{ width: '100%', height: 280 }}>
+    <div style={{ width: '100%', height: 320 }}>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart 
           data={chartData} 

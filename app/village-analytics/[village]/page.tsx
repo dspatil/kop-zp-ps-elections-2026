@@ -209,12 +209,10 @@ export default function VillageAnalyticsPage() {
           <div className={styles.disclaimerContent}>
             <strong>Data Accuracy Notice:</strong>
             <p>
-              The religion and community classifications shown below are <strong>probabilistic estimates</strong> based on surname analysis. 
-              This is not official government data. Actual classifications may vary. Use for reference and planning purposes only.
+              Religion and community data are probabilistic estimates from surname analysis, not official records. Use for reference only.
             </p>
             <p className={styles.disclaimerMr}>
-              खाली दर्शविलेले धर्म आणि समाज वर्गीकरण आडनावावर आधारित <strong>संभाव्य अंदाज</strong> आहेत. 
-              हा अधिकृत सरकारी डेटा नाही. केवळ संदर्भ आणि नियोजनासाठी वापरा.
+              धर्म व समाज डेटा आडनावावरून अंदाजे आहे, अधिकृत नाही. फक्त संदर्भासाठी वापरा.
             </p>
           </div>
         </div>
