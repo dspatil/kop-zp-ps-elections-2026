@@ -70,6 +70,14 @@ interface AgeChartProps {
   age36to45: number;
   age46to60: number;
   seniorCitizens: number;
+  ageGroupsByGender?: {
+    age18_21: { male: number; female: number };
+    age22_25: { male: number; female: number };
+    age26_35: { male: number; female: number };
+    age36_45: { male: number; female: number };
+    age46_60: { male: number; female: number };
+    age60plus: { male: number; female: number };
+  };
 }
 
 export function AgeBarChart({ 
@@ -78,8 +86,46 @@ export function AgeBarChart({
   age26to35, 
   age36to45, 
   age46to60, 
-  seniorCitizens 
+  seniorCitizens,
+  ageGroupsByGender 
 }: AgeChartProps) {
+  // If we have gender breakdown, use stacked bars
+  if (ageGroupsByGender) {
+    const data = [
+      { name: '18-21', male: ageGroupsByGender.age18_21.male, female: ageGroupsByGender.age18_21.female },
+      { name: '22-25', male: ageGroupsByGender.age22_25.male, female: ageGroupsByGender.age22_25.female },
+      { name: '26-35', male: ageGroupsByGender.age26_35.male, female: ageGroupsByGender.age26_35.female },
+      { name: '36-45', male: ageGroupsByGender.age36_45.male, female: ageGroupsByGender.age36_45.female },
+      { name: '46-60', male: ageGroupsByGender.age46_60.male, female: ageGroupsByGender.age46_60.female },
+      { name: '60+', male: ageGroupsByGender.age60plus.male, female: ageGroupsByGender.age60plus.female },
+    ];
+
+    return (
+      <div style={{ width: '100%', height: 240 }}>
+        <ResponsiveContainer>
+          <BarChart data={data} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 0 }}>
+            <XAxis type="number" tick={{ fontSize: 11 }} />
+            <YAxis dataKey="name" type="category" tick={{ fontSize: 11 }} width={40} />
+            <Tooltip 
+              formatter={(value: any, name: any) => [
+                Number(value).toLocaleString(), 
+                name === 'male' ? '👨 Male' : '👩 Female'
+              ]}
+            />
+            <Legend 
+              verticalAlign="bottom" 
+              height={30}
+              formatter={(value: any) => <span style={{ fontSize: '0.75rem' }}>{value === 'male' ? '👨 Male' : '👩 Female'}</span>}
+            />
+            <Bar dataKey="male" stackId="a" fill={COLORS.male} radius={[0, 0, 0, 0]} />
+            <Bar dataKey="female" stackId="a" fill={COLORS.female} radius={[0, 4, 4, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    );
+  }
+
+  // Fallback to old single-bar chart if no gender data
   const data = [
     { name: '18-21', value: firstTimeVoters, label: 'First-time' },
     { name: '22-25', value: young22to25, label: 'Young' },
@@ -195,7 +241,7 @@ export function FocusGroupChart({ firstTimeVoters, seniorVoters }: FocusGroupCha
           <YAxis tick={{ fontSize: 10 }} />
           <Tooltip />
           <Legend 
-            verticalAlign="top" 
+            verticalAlign="bottom" 
             height={30}
             formatter={(value: any) => <span style={{ fontSize: '0.75rem' }}>{value === 'male' ? '👨 Male' : '👩 Female'}</span>}
           />

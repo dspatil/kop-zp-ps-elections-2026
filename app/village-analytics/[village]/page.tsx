@@ -18,6 +18,14 @@ interface VillageDemographics {
     age46to60: number;
     seniorCitizens: number;
   };
+  ageGroupsByGender?: {
+    age18_21: { male: number; female: number };
+    age22_25: { male: number; female: number };
+    age26_35: { male: number; female: number };
+    age36_45: { male: number; female: number };
+    age46_60: { male: number; female: number };
+    age60plus: { male: number; female: number };
+  };
   topSurnames?: Array<{ name: string; count: number; percentage: string }>;
   topFirstNames?: Array<{ name: string; count: number; percentage: string }>;
   focusGroups?: {
@@ -86,6 +94,7 @@ export default function VillageAnalyticsPage() {
       setDemographics({
         gender: analyticsData.genderStats,
         ageGroups: analyticsData.ageStats,
+        ageGroupsByGender: analyticsData.ageGroupsByGender,  // Add gender breakdown for age chart
         topSurnames: analyticsData.topFirstNames,  // SWAPPED - API returns them reversed
         topFirstNames: analyticsData.topSurnames,  // SWAPPED - API returns them reversed
         focusGroups: {
@@ -143,7 +152,7 @@ export default function VillageAnalyticsPage() {
           {demographics.ageGroups && (
             <div className={styles.analyticsCard}>
               <h3>📊 Age Distribution / वय वितरण</h3>
-              <AgeBarChart {...demographics.ageGroups} />
+              <AgeBarChart {...demographics.ageGroups} ageGroupsByGender={demographics.ageGroupsByGender} />
             </div>
           )}
 

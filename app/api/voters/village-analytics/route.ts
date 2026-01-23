@@ -44,16 +44,34 @@ export async function GET(request: NextRequest) {
       LIMIT 10
     `, params);
 
-    // 2. Age Statistics
+    // 2. Age Statistics with Gender Breakdown
     const ageStatsResult = await query(`
       SELECT 
         COUNT(*) as total,
         SUM(CASE WHEN age BETWEEN 18 AND 21 THEN 1 ELSE 0 END) as first_time_voters,
+        SUM(CASE WHEN age BETWEEN 18 AND 21 AND gender = 'पुरुष' THEN 1 ELSE 0 END) as first_time_male,
+        SUM(CASE WHEN age BETWEEN 18 AND 21 AND gender = 'स्त्री' THEN 1 ELSE 0 END) as first_time_female,
+        
         SUM(CASE WHEN age BETWEEN 22 AND 25 THEN 1 ELSE 0 END) as young_22_25,
+        SUM(CASE WHEN age BETWEEN 22 AND 25 AND gender = 'पुरुष' THEN 1 ELSE 0 END) as young_22_25_male,
+        SUM(CASE WHEN age BETWEEN 22 AND 25 AND gender = 'स्त्री' THEN 1 ELSE 0 END) as young_22_25_female,
+        
         SUM(CASE WHEN age BETWEEN 26 AND 35 THEN 1 ELSE 0 END) as age_26_35,
+        SUM(CASE WHEN age BETWEEN 26 AND 35 AND gender = 'पुरुष' THEN 1 ELSE 0 END) as age_26_35_male,
+        SUM(CASE WHEN age BETWEEN 26 AND 35 AND gender = 'स्त्री' THEN 1 ELSE 0 END) as age_26_35_female,
+        
         SUM(CASE WHEN age BETWEEN 36 AND 45 THEN 1 ELSE 0 END) as age_36_45,
+        SUM(CASE WHEN age BETWEEN 36 AND 45 AND gender = 'पुरुष' THEN 1 ELSE 0 END) as age_36_45_male,
+        SUM(CASE WHEN age BETWEEN 36 AND 45 AND gender = 'स्त्री' THEN 1 ELSE 0 END) as age_36_45_female,
+        
         SUM(CASE WHEN age BETWEEN 46 AND 60 THEN 1 ELSE 0 END) as age_46_60,
+        SUM(CASE WHEN age BETWEEN 46 AND 60 AND gender = 'पुरुष' THEN 1 ELSE 0 END) as age_46_60_male,
+        SUM(CASE WHEN age BETWEEN 46 AND 60 AND gender = 'स्त्री' THEN 1 ELSE 0 END) as age_46_60_female,
+        
         SUM(CASE WHEN age > 60 THEN 1 ELSE 0 END) as senior_citizens,
+        SUM(CASE WHEN age > 60 AND gender = 'पुरुष' THEN 1 ELSE 0 END) as senior_male,
+        SUM(CASE WHEN age > 60 AND gender = 'स्त्री' THEN 1 ELSE 0 END) as senior_female,
+        
         SUM(CASE WHEN age >= 80 THEN 1 ELSE 0 END) as super_seniors,
         ROUND(AVG(age)::numeric, 1) as avg_age,
         MIN(age) as min_age,
@@ -148,7 +166,7 @@ export async function GET(request: NextRequest) {
       // Surname Analysis
       topSurnames: surnames,
       
-      // Age Statistics
+      // Age Statistics with Gender Breakdown
       ageStats: {
         avgAge: parseFloat(ageStats.avg_age) || 0,
         minAge: parseInt(ageStats.min_age) || 0,
@@ -160,6 +178,34 @@ export async function GET(request: NextRequest) {
         age46to60: parseInt(ageStats.age_46_60) || 0,
         seniorCitizens: parseInt(ageStats.senior_citizens) || 0,
         superSeniors: parseInt(ageStats.super_seniors) || 0,
+      },
+      
+      // Age Groups by Gender (for stacked bars)
+      ageGroupsByGender: {
+        age18_21: {
+          male: parseInt(ageStats.first_time_male) || 0,
+          female: parseInt(ageStats.first_time_female) || 0
+        },
+        age22_25: {
+          male: parseInt(ageStats.young_22_25_male) || 0,
+          female: parseInt(ageStats.young_22_25_female) || 0
+        },
+        age26_35: {
+          male: parseInt(ageStats.age_26_35_male) || 0,
+          female: parseInt(ageStats.age_26_35_female) || 0
+        },
+        age36_45: {
+          male: parseInt(ageStats.age_36_45_male) || 0,
+          female: parseInt(ageStats.age_36_45_female) || 0
+        },
+        age46_60: {
+          male: parseInt(ageStats.age_46_60_male) || 0,
+          female: parseInt(ageStats.age_46_60_female) || 0
+        },
+        age60plus: {
+          male: parseInt(ageStats.senior_male) || 0,
+          female: parseInt(ageStats.senior_female) || 0
+        }
       },
       
       // Gender Stats
