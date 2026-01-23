@@ -1,36 +1,11 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { SeatReservation, ReservationCategory, ElectionType } from '@/types/reservation';
-import { getAllReservations, filterReservations, getMetadata } from '@/data/sample-data';
+import { getAllReservations, filterReservations, getMetadata } from '@/app/lib/reservations';
 import wardCompositionData from '@/data/ward-composition.json';
-import epicIndexOptimized from '@/data/epic-index-optimized.json';
 import styles from './page.module.css';
-import { GenderPieChart, AgeBarChart, SurnameDonutChart, FocusGroupChart } from './components/VillageCharts';
-
-// Helper to search EPIC in optimized nested structure
-function searchEpicInOptimized(epic: string): { found: boolean; division?: string; ward?: string; taluka?: string } | null {
-  const data = epicIndexOptimized as any;
-  
-  for (const [talukaName, talukaData] of Object.entries(data.talukas || {})) {
-    const taluka = talukaData as any;
-    for (const [, divData] of Object.entries(taluka.divisions || {})) {
-      const division = divData as any;
-      for (const [, wardData] of Object.entries(division.wards || {})) {
-        const ward = wardData as any;
-        if (ward.epics && ward.epics.includes(epic)) {
-          return {
-            found: true,
-            division: division.name,
-            ward: ward.name,
-            taluka: talukaName
-          };
-        }
-      }
-    }
-  }
-  return null;
-}
+import { GenderPieChart, AgeBarChart, SurnameDonutChart, FocusGroupChart, ReligionPieChart, CommunityBarChart } from './components/VillageCharts';
 
 
 type TabType = 'schedule' | 'eligibility' | 'reservations' | 'nomination' | 'wardmap' | 'voterlookup';
@@ -92,6 +67,8 @@ export default function Home() {
   const [selectedVillageVoters, setSelectedVillageVoters] = useState<{village: string; stats: any; voters: any[]; page: number; totalPages: number; divisionNo?: number; wardNo?: number} | null>(null);
   const [villageAnalytics, setVillageAnalytics] = useState<any>(null);
   const [villageAnalyticsLoading, setVillageAnalyticsLoading] = useState(false);
+  const [villageDemographics, setVillageDemographics] = useState<any>(null);
+  const [villageDemographicsLoading, setVillageDemographicsLoading] = useState(false);
   const [apiEpicResult, setApiEpicResult] = useState<any>(null);
   const [searchDivisionFilter, setSearchDivisionFilter] = useState<string>('');
   const [searchWardFilter, setSearchWardFilter] = useState<string>('');
@@ -265,22 +242,11 @@ export default function Home() {
       if (response.ok && data.found) {
         setApiEpicResult(data.voter);
       } else {
-        // Fallback to client-side search
-        const result = searchEpicInOptimized(epicId);
-        if (result) {
-          setApiEpicResult({ ...result, fromClientCache: true });
-        } else {
-          setVoterSearchError('Voter not found / मतदार सापडला नाही');
-        }
+        setVoterSearchError('Voter not found / मतदार सापडला नाही');
       }
-    } catch {
-      // Fallback to client-side search on API error
-      const result = searchEpicInOptimized(epicId);
-      if (result) {
-        setApiEpicResult({ ...result, fromClientCache: true });
-      } else {
-        setVoterSearchError('Search failed. Please try again.');
-      }
+    } catch (error) {
+      console.error('EPIC lookup error:', error);
+      setVoterSearchError('Search failed. Please try again / शोध अयशस्वी. कृपया पुन्हा प्रयत्न करा');
     } finally {
       setVoterSearchLoading(false);
     }
@@ -348,6 +314,7 @@ export default function Home() {
   const loadVillageVoters = async (villageName: string, page = 1, divisionNo?: number, wardNo?: number) => {
     setVoterSearchLoading(true);
     setVillageAnalytics(null); // Reset analytics
+    setVillageDemographics(null); // Reset demographics
     try {
       const limit = hasAccess ? 100 : 20; // Premium users get more results per page
       let url = `/api/voters/village?name=${encodeURIComponent(villageName)}&page=${page}&limit=${limit}`;
@@ -369,6 +336,7 @@ export default function Home() {
         // Fetch detailed analytics for premium users
         if (hasAccess) {
           loadVillageAnalytics(villageName, divisionNo, wardNo);
+          loadVillageDemographics(villageName, divisionNo, wardNo);
         }
       }
     } catch {
@@ -394,6 +362,29 @@ export default function Home() {
       console.error('Failed to load village analytics');
     } finally {
       setVillageAnalyticsLoading(false);
+    }
+  };
+
+  // Load village demographics (religion, community, family power) - premium feature
+  const loadVillageDemographics = async (villageName: string, divisionNo?: number, wardNo?: number) => {
+    setVillageDemographicsLoading(true);
+    try {
+      let url = `/api/voters/demographics?village=${encodeURIComponent(villageName)}`;
+      if (divisionNo) url += `&division=${divisionNo}`;
+      if (wardNo) url += `&ward=${wardNo}`;
+      console.log('Fetching demographics from:', url);
+      const response = await fetch(url);
+      const data = await response.json();
+      console.log('Demographics response:', response.ok, data);
+      if (response.ok) {
+        setVillageDemographics(data);
+      } else {
+        console.error('Demographics API error:', data);
+      }
+    } catch (error) {
+      console.error('Failed to load village demographics:', error);
+    } finally {
+      setVillageDemographicsLoading(false);
     }
   };
 
@@ -585,8 +576,8 @@ export default function Home() {
         <div className={styles.tickerContent}>
           {/* Duplicate entire sequence for seamless loop */}
           {[1, 2].map((idx) => (
-            <>
-              <a key={`mr-${idx}`} href="/pricing" target="_blank" rel="noopener noreferrer" className={styles.tickerLink}>
+            <React.Fragment key={`ticker-${idx}`}>
+              <a href="/pricing" target="_blank" rel="noopener noreferrer" className={styles.tickerLink}>
                 <span className={styles.tickerItem}>
                   <span>🗳️</span>
                   <span>तुमच्या प्रचारासाठी मतदार यादी हवी? फक्त</span>
@@ -594,8 +585,8 @@ export default function Home() {
                   <span>→ किंमत पहा</span>
                 </span>
               </a>
-              <span key={`div1-${idx}`} className={styles.tickerDivider}>•</span>
-              <a key={`en-${idx}`} href="/pricing" target="_blank" rel="noopener noreferrer" className={styles.tickerLink}>
+              <span className={styles.tickerDivider}>•</span>
+              <a href="/pricing" target="_blank" rel="noopener noreferrer" className={styles.tickerLink}>
                 <span className={styles.tickerItem}>
                   <span>🗳️</span>
                   <span>Need voter data for your campaign? Get it for just</span>
@@ -603,8 +594,8 @@ export default function Home() {
                   <span>→ View Pricing</span>
                 </span>
               </a>
-              <span key={`div2-${idx}`} className={styles.tickerDivider}>•</span>
-            </>
+              <span className={styles.tickerDivider}>•</span>
+            </React.Fragment>
           ))}
         </div>
       </div>
@@ -2016,98 +2007,34 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                         </div>
                       </div>
 
-                      {/* Premium Analytics Section */}
+                      {/* Premium Analytics Link */}
                       {hasAccess && (
-                        <div className={styles.analyticsSection}>
-                          {villageAnalyticsLoading ? (
-                            <div className={styles.analyticsLoading}>⏳ Loading analytics...</div>
-                          ) : villageAnalytics ? (
-                            <div className={styles.analyticsGrid}>
-                              {/* Gender Distribution Pie Chart */}
-                              <div className={styles.analyticsCard}>
-                                <h4>👫 Gender Distribution / लिंग वितरण</h4>
-                                <GenderPieChart 
-                                  male={villageAnalytics.genderStats.male}
-                                  female={villageAnalytics.genderStats.female}
-                                  other={villageAnalytics.genderStats.other}
-                                />
-                              </div>
-
-                              {/* Age Distribution Bar Chart */}
-                              <div className={styles.analyticsCard}>
-                                <h4>📊 Age Distribution / वय वितरण</h4>
-                                <AgeBarChart 
-                                  firstTimeVoters={villageAnalytics.ageStats.firstTimeVoters}
-                                  young22to25={villageAnalytics.ageStats.young22to25}
-                                  age26to35={villageAnalytics.ageStats.age26to35}
-                                  age36to45={villageAnalytics.ageStats.age36to45}
-                                  age46to60={villageAnalytics.ageStats.age46to60}
-                                  seniorCitizens={villageAnalytics.ageStats.seniorCitizens}
-                                />
-                                <div className={styles.avgAgeNote}>
-                                  🎂 Average Age: <strong>{villageAnalytics.ageStats.avgAge} yrs</strong>
-                                </div>
-                              </div>
-
-                              {/* Top Surnames Donut Chart */}
-                              <div className={styles.analyticsCard}>
-                                <h4>👨‍👩‍👧‍👦 Top Surnames / आडनावे</h4>
-                                <SurnameDonutChart surnames={villageAnalytics.topFirstNames} />
-                              </div>
-
-                              {/* Campaign Focus Groups Chart */}
-                              <div className={styles.analyticsCard}>
-                                <h4>🎯 Campaign Focus Groups</h4>
-                                <FocusGroupChart 
-                                  firstTimeVoters={villageAnalytics.firstTimeVotersByGender}
-                                  seniorVoters={villageAnalytics.seniorVotersByGender}
-                                />
-                                {villageAnalytics.ageStats.superSeniors > 0 && (
-                                  <div className={styles.superSeniorsNote}>
-                                    🎖️ Super Seniors (80+): <strong>{villageAnalytics.ageStats.superSeniors}</strong>
-                                  </div>
-                                )}
-                              </div>
-
-                              {/* Common First Names List */}
-                              <div className={styles.analyticsCard}>
-                                <h4>🔤 Common First Names / नावे</h4>
-                                <div className={styles.firstNameList}>
-                                  {villageAnalytics.topSurnames.slice(0, 5).map((n: any, idx: number) => (
-                                    <div key={idx} className={styles.firstNameRow}>
-                                      <span className={styles.firstNameRank}>#{idx + 1}</span>
-                                      <span className={styles.firstName}>{n.name}</span>
-                                      <span className={styles.firstNameCount}>{n.count} ({n.percentage}%)</span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-
-                              {/* Quick Stats Card */}
-                              <div className={styles.analyticsCard}>
-                                <h4>📈 Quick Stats / झटपट आकडे</h4>
-                                <div className={styles.quickStats}>
-                                  <div className={styles.quickStatItem}>
-                                    <span className={styles.quickStatIcon}>✨</span>
-                                    <span className={styles.quickStatLabel}>First-time Voters</span>
-                                    <span className={styles.quickStatValue}>{villageAnalytics.ageStats.firstTimeVoters}</span>
-                                  </div>
-                                  <div className={styles.quickStatItem}>
-                                    <span className={styles.quickStatIcon}>👴</span>
-                                    <span className={styles.quickStatLabel}>Senior Citizens</span>
-                                    <span className={styles.quickStatValue}>{villageAnalytics.ageStats.seniorCitizens}</span>
-                                  </div>
-                                  <div className={styles.quickStatItem}>
-                                    <span className={styles.quickStatIcon}>📊</span>
-                                    <span className={styles.quickStatLabel}>% First-time Voters</span>
-                                    <span className={styles.quickStatValue}>
-                                      {((villageAnalytics.ageStats.firstTimeVoters / villageAnalytics.total) * 100).toFixed(1)}%
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          ) : null}
+                        <div style={{ margin: '1rem 0', padding: '1rem', background: 'linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%)', borderRadius: '12px', border: '2px solid #48bb78', textAlign: 'center' }}>
+                          <a 
+                            href={`/village-analytics/${encodeURIComponent(selectedVillageVoters.village)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.5rem',
+                              padding: '0.75rem 1.5rem',
+                              background: 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)',
+                              color: 'white',
+                              borderRadius: '8px',
+                              textDecoration: 'none',
+                              fontWeight: 600,
+                              fontSize: '1rem',
+                              boxShadow: '0 4px 12px rgba(72, 187, 120, 0.3)',
+                              transition: 'all 0.2s'
+                            }}
+                          >
+                            📊 View Premium Analytics
+                            <span style={{ fontSize: '1.2rem' }}>↗</span>
+                          </a>
+                          <p style={{ margin: '0.5rem 0 0', fontSize: '0.75rem', color: '#276749' }}>
+                            Opens in new tab
+                          </p>
                         </div>
                       )}
 
@@ -2200,6 +2127,16 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                             <div className={styles.premiumFeature}>
                               <span>📊</span>
                               <span>Age Distribution Chart</span>
+                              <span className={styles.premiumBlur}>████</span>
+                            </div>
+                            <div className={styles.premiumFeature}>
+                              <span>🕉️</span>
+                              <span>Religion Distribution</span>
+                              <span className={styles.premiumBlur}>████</span>
+                            </div>
+                            <div className={styles.premiumFeature}>
+                              <span>👥</span>
+                              <span>Community Analysis</span>
                               <span className={styles.premiumBlur}>████</span>
                             </div>
                             <div className={styles.premiumFeature}>

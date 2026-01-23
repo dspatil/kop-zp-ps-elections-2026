@@ -24,7 +24,7 @@ interface ReservationsData {
 }
 
 // Load JSON file (valid JSON - credibility info is in metadata)
-import reservationsData from './reservations.json';
+import reservationsData from '@/data/reservations.json';
 
 const data = reservationsData as ReservationsData;
 

@@ -201,6 +201,12 @@ export default function PricingPage() {
             सर्व डेटा अधिकृत मतदार यादीतून. फक्त निवडणूक प्रचारासाठी वापर.
           </p>
         </div>
+
+        {/* Footer */}
+        <div className={styles.pricingFooter}>
+          <p>© 2026 dspatil. All rights reserved.</p>
+          <p>Made with ❤️ for Kolhapur 🇮🇳</p>
+        </div>
       </div>
     </div>
   );

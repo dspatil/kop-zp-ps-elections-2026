@@ -31,13 +31,13 @@ export function GenderPieChart({ male, female, other = 0 }: GenderChartProps) {
   const colors = [COLORS.male, COLORS.female, COLORS.other];
 
   return (
-    <div style={{ width: '100%', height: 200 }}>
+    <div style={{ width: '100%', height: 240 }}>
       <ResponsiveContainer>
         <PieChart>
           <Pie
             data={data}
             cx="50%"
-            cy="50%"
+            cy="42%"
             innerRadius={40}
             outerRadius={70}
             paddingAngle={2}
@@ -203,6 +203,275 @@ export function FocusGroupChart({ firstTimeVoters, seniorVoters }: FocusGroupCha
           <Bar dataKey="female" stackId="a" fill={COLORS.female} radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
+    </div>
+  );
+}
+
+// New Religion Distribution Chart
+interface ReligionChartProps {
+  data: Array<{ name: string; nameMr: string; count: number; percentage: number }>;
+}
+
+const RELIGION_COLORS: { [key: string]: string } = {
+  Hindu: '#FF9933',
+  Muslim: '#138808',
+  Buddhist: '#000080',
+  Christian: '#8B0000',
+  Jain: '#FFD700',
+  Sikh: '#FF4500',
+  Unknown: '#A0AEC0'
+};
+
+export function ReligionPieChart({ data }: ReligionChartProps) {
+  if (!data || data.length === 0) {
+    return <div style={{ padding: '20px', textAlign: 'center', color: '#718096' }}>No data available</div>;
+  }
+
+  const chartData = data.map(item => ({
+    name: `${item.nameMr} (${item.name})`,
+    value: item.count,
+    percentage: item.percentage
+  }));
+
+  return (
+    <div style={{ width: '100%', height: 280 }}>
+      <ResponsiveContainer>
+        <PieChart>
+          <Pie
+            data={chartData}
+            cx="50%"
+            cy="40%"
+            innerRadius={50}
+            outerRadius={80}
+            paddingAngle={2}
+            dataKey="value"
+            label={({ percentage }) => percentage > 5 ? `${percentage}%` : ''}
+            labelLine={false}
+          >
+            {chartData.map((entry, index) => {
+              const religionName = data[index].name;
+              const color = RELIGION_COLORS[religionName] || COLORS.primary[index % COLORS.primary.length];
+              return <Cell key={`cell-${index}`} fill={color} />;
+            })}
+          </Pie>
+          <Tooltip 
+            formatter={(value: any, name: any) => [
+              `${Number(value).toLocaleString()} voters`,
+              name
+            ]}
+          />
+          <Legend 
+            verticalAlign="bottom" 
+            height={60}
+            formatter={(value: any) => <span style={{ color: '#4a5568', fontSize: '0.75rem' }}>{value}</span>}
+          />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+// New Community Distribution Chart
+interface CommunityChartProps {
+  data: Array<{ name: string; nameMr: string; count: number; percentage: number }>;
+}
+
+// Quick Stats Card Component
+interface QuickStatsProps {
+  totalVoters: number;
+  avgAge: number;
+  genderRatio: number;
+  firstTimeVoters: number;
+  seniorCitizens: number;
+}
+
+export function QuickStatsCard({ totalVoters, avgAge, genderRatio, firstTimeVoters, seniorCitizens }: QuickStatsProps) {
+  const stats = [
+    { 
+      icon: '👥', 
+      label: 'Total Voters / एकूण मतदार',
+      value: totalVoters.toLocaleString(), 
+      color: '#3182ce' 
+    },
+    { 
+      icon: '📅', 
+      label: 'Average Age / सरासरी वय',
+      value: `${avgAge.toFixed(1)} yrs`, 
+      color: '#38b2ac' 
+    },
+    { 
+      icon: '🆕', 
+      label: 'First-time Voters / प्रथमवार मतदार',
+      value: firstTimeVoters.toLocaleString(), 
+      color: '#48bb78' 
+    },
+    { 
+      icon: '👴', 
+      label: 'Senior Citizens / ज्येष्ठ नागरिक',
+      value: seniorCitizens.toLocaleString(), 
+      color: '#ed8936' 
+    },
+  ];
+
+  return (
+    <div style={{ 
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '0.65rem'
+    }}>
+      {stats.map((stat, idx) => (
+        <div 
+          key={idx}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.85rem',
+            padding: '0.65rem 0.85rem',
+            background: '#f7fafc',
+            borderRadius: '6px',
+            borderLeft: `3px solid ${stat.color}`
+          }}
+        >
+          <span style={{ fontSize: '1.1rem' }}>{stat.icon}</span>
+          <span style={{ 
+            flex: 1,
+            color: '#2d3748',
+            fontWeight: 500,
+            fontSize: '0.9rem'
+          }}>
+            {stat.label}
+          </span>
+          <span style={{ 
+            color: '#718096',
+            fontSize: '0.9rem',
+            fontWeight: 500
+          }}>
+            {stat.value}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Community Distribution Chart
+interface CommunityChartProps {
+  data: Array<{ name: string; nameMr: string; count: number; percentage: number }>;
+}
+
+const COMMUNITY_COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85929E'];
+
+export function CommunityBarChart({ data }: CommunityChartProps) {
+  if (!data || data.length === 0) {
+    return <div style={{ padding: '20px', textAlign: 'center', color: '#718096' }}>No data available</div>;
+  }
+
+  const chartData = data.map((item, index) => ({
+    name: item.nameMr,
+    nameEn: item.name,
+    value: item.count,
+    percentage: item.percentage
+  }));
+
+  return (
+    <div style={{ width: '100%', height: 280 }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart 
+          data={chartData} 
+          margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+        >
+          <XAxis 
+            dataKey="name" 
+            angle={-45} 
+            textAnchor="end" 
+            height={90}
+            tick={{ fontSize: 11 }}
+            interval={0}
+          />
+          <YAxis 
+            tick={{ fontSize: 11 }}
+            domain={[0, 'auto']}
+            width={40}
+          />
+          <Tooltip 
+            formatter={(value: any, name: any, props: any) => [
+              `${Number(value).toLocaleString()} (${props.payload.percentage}%)`,
+              'Voters'
+            ]}
+            contentStyle={{ 
+              backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+              border: '1px solid #ccc',
+              borderRadius: '4px',
+              fontSize: '12px'
+            }}
+          />
+          <Bar 
+            dataKey="value" 
+            radius={[4, 4, 0, 0]}
+          >
+            {chartData.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={COMMUNITY_COLORS[index % COMMUNITY_COLORS.length]} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+// New Family Power Analysis Table
+interface FamilyPowerProps {
+  data: Array<{ family: string; surname: string; houseNo: string; voters: number }>;
+}
+
+export function FamilyPowerTable({ data }: FamilyPowerProps) {
+  if (!data || data.length === 0) {
+    return (
+      <div style={{ padding: '20px', textAlign: 'center', color: '#718096' }}>
+        No influential families found (min 3 voters per family)
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ width: '100%', maxHeight: '300px', overflowY: 'auto' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+        <thead style={{ position: 'sticky', top: 0, background: '#f7fafc', borderBottom: '2px solid #e2e8f0' }}>
+          <tr>
+            <th style={{ padding: '10px 8px', textAlign: 'left', color: '#2d3748' }}>Rank</th>
+            <th style={{ padding: '10px 8px', textAlign: 'left', color: '#2d3748' }}>Family (Surname)</th>
+            <th style={{ padding: '10px 8px', textAlign: 'left', color: '#2d3748' }}>House No</th>
+            <th style={{ padding: '10px 8px', textAlign: 'right', color: '#2d3748' }}>Voters</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((family, index) => (
+            <tr 
+              key={index} 
+              style={{ 
+                borderBottom: '1px solid #e2e8f0',
+                background: index % 2 === 0 ? '#fff' : '#f7fafc'
+              }}
+            >
+              <td style={{ padding: '10px 8px' }}>
+                {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`}
+              </td>
+              <td style={{ padding: '10px 8px', fontWeight: index < 3 ? 'bold' : 'normal' }}>
+                {family.surname}
+              </td>
+              <td style={{ padding: '10px 8px', color: '#718096' }}>{family.houseNo}</td>
+              <td style={{ 
+                padding: '10px 8px', 
+                textAlign: 'right', 
+                fontWeight: 'bold',
+                color: index < 3 ? '#2b6cb0' : '#4a5568'
+              }}>
+                {family.voters}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

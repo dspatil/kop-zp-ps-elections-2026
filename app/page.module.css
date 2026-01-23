@@ -5283,6 +5283,25 @@
   color: #1a365d;
 }
 
+/* Pricing Footer */
+.pricingFooter {
+  text-align: center;
+  padding: 2rem 1rem 1rem;
+  margin-top: 2rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.pricingFooter p {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+  color: #718096;
+}
+
+.pricingFooter p:first-child {
+  font-weight: 600;
+  color: #1a365d;
+}
+
 /* Mobile pricing adjustments */
 @media (max-width: 768px) {
   .pricingCards {
