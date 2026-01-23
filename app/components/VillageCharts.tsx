@@ -245,7 +245,7 @@ export function ReligionPieChart({ data }: ReligionChartProps) {
             outerRadius={80}
             paddingAngle={2}
             dataKey="value"
-            label={({ percentage }) => percentage > 5 ? `${percentage}%` : ''}
+            label={(entry: any) => entry.percentage > 5 ? `${entry.percentage}%` : ''}
             labelLine={false}
           >
             {chartData.map((entry, index) => {
