@@ -17,7 +17,7 @@ export async function GET(
 
     const result = await query(
       `SELECT 
-        epic_id, name, age, gender, village, section,
+        epic_id, name, age, gender, village,
         zp_division, zp_division_no, ps_ward, ps_ward_no, taluka, serial_number
       FROM voters 
       WHERE epic_id = $1
@@ -41,7 +41,6 @@ export async function GET(
         age: voter.age,
         gender: voter.gender,
         village: voter.village,
-        section: voter.section,
         division: voter.zp_division,
         divisionNo: voter.zp_division_no,
         ward: voter.ps_ward,

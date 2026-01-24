@@ -106,11 +106,11 @@ export async function GET(request: Request) {
     const listValues = [...countValues, limit, offset];
     const result = await query(
       `SELECT 
-        epic_id, name, age, gender, section,
+        epic_id, name, age, gender,
         zp_division, ps_ward, serial_number
       FROM voters 
       ${whereClause}
-      ORDER BY section, name
+      ORDER BY name
       LIMIT $${paramIdx} OFFSET $${paramIdx + 1}`,
       listValues
     );
@@ -130,7 +130,6 @@ export async function GET(request: Request) {
         name: v.name,
         age: v.age,
         gender: v.gender,
-        section: v.section,
         division: v.zp_division,
         ward: v.ps_ward,
         serialNumber: v.serial_number

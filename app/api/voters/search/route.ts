@@ -60,7 +60,7 @@ export async function GET(request: Request) {
     // Get paginated results
     const result = await query(
       `SELECT 
-        epic_id, name, age, gender, village, section,
+        epic_id, name, age, gender, village,
         zp_division, zp_division_no, ps_ward, ps_ward_no, taluka, serial_number
       FROM voters 
       ${whereClause}
@@ -80,7 +80,6 @@ export async function GET(request: Request) {
         age: v.age,
         gender: v.gender,
         village: v.village,
-        section: v.section,
         division: v.zp_division,
         divisionNo: v.zp_division_no,
         ward: v.ps_ward,

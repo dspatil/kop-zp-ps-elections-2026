@@ -147,13 +147,14 @@ async function importFile(client, filePath) {
     try {
       const columns = parseCSVLine(line);
       
-      // Expected: Prabhag,Gan,SerialNumber,AC_No,EPIC_ID,Name,Age,Gender,Village,Section,Status
-      if (columns.length < 10) {
+      // Expected: Prabhag,Gan,SerialNumber,AC_No,EPIC_ID,Name,Age,Gender,Village,Status
+      // Note: Section column has been removed from CSVs
+      if (columns.length < 9) {
         errorCount++;
         continue;
       }
       
-      const [prabhag, gan, serialNumber, acNo, epicId, name, age, gender, village, section, status] = columns;
+      const [prabhag, gan, serialNumber, acNo, epicId, name, age, gender, village, status] = columns;
       
       // Skip inactive or problematic records
       if (status && status.toLowerCase() === 'deleted') continue;
@@ -169,7 +170,7 @@ async function importFile(client, filePath) {
         ps_ward: gan || null,
         ps_ward_no: extractNumber(gan),
         village: village || null,
-        section: section || null,
+        section: null,  // Section column removed from CSV
         ac_no: convertMarathiNumber(acNo) || extractNumber(acNo),
         serial_number: serialNumber || null
       });
