@@ -571,6 +571,13 @@ export default function Home() {
         </p>
       </header>
 
+      {/* Voter Data Availability Marquee */}
+      <div className={styles.dataMarqueeContainer}>
+        <div className={styles.dataMarqueeText}>
+          🎉 गडहिंग्लज, आजरा व चंदगड तालुक्यातील सर्व मतदार यादी उपलब्ध! | Voter data available for Gadhinglaj, Ajara & Chandgad talukas | 4+ लाख मतदारांची माहिती | 400,000+ voters indexed 🎉
+        </div>
+      </div>
+
       {/* Pricing Ticker */}
       <div className={styles.pricingTicker}>
         <div className={styles.tickerContent}>
