@@ -1541,6 +1541,13 @@ _Forward करा - प्रत्येक उमेदवाराला उ
           <div className={styles.voterLookupTab}>
             <h2 className={styles.sectionTitle}>🪪 Voter Lookup / मतदार शोध</h2>
             
+            {/* Marquee Announcement */}
+            <div className={styles.marqueeContainer}>
+              <marquee behavior="scroll" direction="left" scrollamount="5" className={styles.marqueeText}>
+                🎉 गडहिंग्लज, आजरा व चंदगड तालुक्यातील सर्व मतदार यादी उपलब्ध! | Voter data available for Gadhinglaj, Ajara & Chandgad talukas | 4+ लाख मतदारांची माहिती | 400,000+ voters indexed 🎉
+              </marquee>
+            </div>
+            
             <div className={styles.voterLookupMainBox}>
               {/* Search Type Toggle */}
               <div className={styles.searchTypeToggle}>
