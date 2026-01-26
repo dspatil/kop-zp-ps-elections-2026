@@ -1764,7 +1764,7 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                     }}>
                       <h3 className={styles.epicResultTitle}>❌ {voterSearchError}</h3>
                       <p className={styles.epicLimitNote}>
-                        <small>📋 Currently indexed: Divisions 60-68</small>
+                        <small>📋 Currently indexed: Divisions 58-68</small>
                       </p>
                     </div>
                   )}
@@ -2192,7 +2192,7 @@ _Forward करा - प्रत्येक उमेदवाराला उ
               <div className={styles.voterLookupInfo}>
                 <h4>📋 Coverage / माहिती</h4>
                 <ul>
-                  <li>✅ Divisions 60-68 ({(316699).toLocaleString()} voters)</li>
+                  <li>✅ Divisions 58-68 ({(402718).toLocaleString()} voters)</li>
                   <li>⏳ Other talukas coming soon / इतर तालुके लवकरच</li>
                 </ul>
               </div>
