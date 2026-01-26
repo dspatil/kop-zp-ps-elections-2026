@@ -1606,6 +1606,8 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                       className={styles.select}
                     >
                       <option value="">All / सर्व</option>
+                      <option value="58">58 - उत्तुर</option>
+                      <option value="59">59 - पेरणोली</option>
                       <option value="60">60 - कसबा नुल</option>
                       <option value="61">61 - हलकर्णी</option>
                       <option value="62">62 - भडगांव</option>
