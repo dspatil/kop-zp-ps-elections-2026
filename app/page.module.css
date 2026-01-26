@@ -4827,11 +4827,11 @@
 }
 
 .tickerContent {
-  display: flex;
-  animation: tickerScroll 12s linear infinite;
   white-space: nowrap;
-  will-change: transform;
-  transform: translateZ(0);
+  color: #ffffff;
+  font-size: 0.95rem;
+  animation: tickerScroll 40s linear infinite;
+  display: inline-block;
 }
 
 .tickerContent:hover {
@@ -4840,7 +4840,7 @@
 
 @keyframes tickerScroll {
   0% {
-    transform: translateX(0);
+    transform: translateX(0%);
   }
   100% {
     transform: translateX(-50%);
@@ -5387,13 +5387,9 @@
     font-size: 1.8rem;
   }
   
-  .tickerItem {
-    font-size: 0.85rem;
-    padding: 0 2rem;
-  }
-  
   .tickerContent {
-    animation: tickerScroll 20s linear infinite;
+    animation: tickerScroll 30s linear infinite;
+    font-size: 0.85rem;
   }
   
   .talukaExamples {

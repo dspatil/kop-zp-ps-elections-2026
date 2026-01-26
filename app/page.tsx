@@ -582,31 +582,18 @@ export default function Home() {
 
       {/* Pricing Ticker */}
       <div className={styles.pricingTicker}>
-        <div className={styles.tickerContent}>
-          {/* Duplicate entire sequence for seamless loop */}
-          {[1, 2].map((idx) => (
-            <React.Fragment key={`ticker-${idx}`}>
-              <a href="/pricing" target="_blank" rel="noopener noreferrer" className={styles.tickerLink}>
-                <span className={styles.tickerItem}>
-                  <span>🗳️</span>
-                  <span>तुमच्या प्रचारासाठी मतदार यादी हवी? फक्त</span>
-                  <span className={styles.tickerHighlight}>₹१/मतदार</span>
-                  <span>→ किंमत पहा</span>
-                </span>
-              </a>
-              <span className={styles.tickerDivider}>•</span>
-              <a href="/pricing" target="_blank" rel="noopener noreferrer" className={styles.tickerLink}>
-                <span className={styles.tickerItem}>
-                  <span>🗳️</span>
-                  <span>Need voter data for your campaign? Get it for just</span>
-                  <span className={styles.tickerHighlight}>₹1/voter</span>
-                  <span>→ View Pricing</span>
-                </span>
-              </a>
-              <span className={styles.tickerDivider}>•</span>
-            </React.Fragment>
-          ))}
-        </div>
+        <a href="/pricing" target="_blank" rel="noopener noreferrer" className={styles.tickerLink}>
+          <div className={styles.tickerContent}>
+            🗳️ तुमच्या प्रचारासाठी मतदार यादी हवी? फक्त <span className={styles.tickerHighlight}>₹१/मतदार</span> → किंमत पहा
+            &nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;
+            🗳️ Need voter data for your campaign? Get it for just <span className={styles.tickerHighlight}>₹1/voter</span> → View Pricing
+            &nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;
+            🗳️ तुमच्या प्रचारासाठी मतदार यादी हवी? फक्त <span className={styles.tickerHighlight}>₹१/मतदार</span> → किंमत पहा
+            &nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;
+            🗳️ Need voter data for your campaign? Get it for just <span className={styles.tickerHighlight}>₹1/voter</span> → View Pricing
+            &nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;
+          </div>
+        </a>
       </div>
 
       {/* Tab Navigation */}
