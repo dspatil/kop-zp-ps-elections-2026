@@ -588,6 +588,7 @@
   box-shadow: 0 4px 12px rgba(19, 136, 8, 0.3);
   border: 2px solid #0f6b06;
   overflow: hidden;
+  position: relative;
 }
 
 .marqueeText {
@@ -597,11 +598,24 @@
   margin: 0;
   padding: 0;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+  display: inline-block;
+  animation: scroll-left 30s linear infinite;
+}
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
 }
 
 @media (max-width: 768px) {
   .marqueeText {
     font-size: 0.95rem;
+    animation: scroll-left 20s linear infinite;
   }
 }
 
