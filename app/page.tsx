@@ -575,6 +575,8 @@ export default function Home() {
       <div className={styles.dataMarqueeContainer}>
         <div className={styles.dataMarqueeText}>
           🎉 गडहिंग्लज, आजरा व चंदगड तालुक्यातील सर्व मतदार यादी उपलब्ध! | Voter data available for Gadhinglaj, Ajara & Chandgad talukas | 4+ लाख मतदारांची माहिती | 400,000+ voters indexed 🎉
+          &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+          🎉 गडहिंग्लज, आजरा व चंदगड तालुक्यातील सर्व मतदार यादी उपलब्ध! | Voter data available for Gadhinglaj, Ajara & Chandgad talukas | 4+ लाख मतदारांची माहिती | 400,000+ voters indexed 🎉
         </div>
       </div>
 
@@ -1547,13 +1549,6 @@ _Forward करा - प्रत्येक उमेदवाराला उ
         {activeTab === 'voterlookup' && (
           <div className={styles.voterLookupTab}>
             <h2 className={styles.sectionTitle}>🪪 Voter Lookup / मतदार शोध</h2>
-            
-            {/* Marquee Announcement */}
-            <div className={styles.marqueeContainer}>
-              <div className={styles.marqueeText}>
-                🎉 गडहिंग्लज, आजरा व चंदगड तालुक्यातील सर्व मतदार यादी उपलब्ध! | Voter data available for Gadhinglaj, Ajara & Chandgad talukas | 4+ लाख मतदारांची माहिती | 400,000+ voters indexed 🎉
-              </div>
-            </div>
             
             <div className={styles.voterLookupMainBox}>
               {/* Search Type Toggle */}
