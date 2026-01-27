@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "generatedAt": "2026-01-16T10:10:05.185Z",
+    "generatedAt": "2026-01-27T17:30:02.019Z",
     "source": "Official Ward Composition PDFs",
     "authority": "जिल्हाधिकारी कोल्हापूर"
   },
@@ -664,7 +664,7 @@
           "बेलवळे खुर्द",
           "बेलवळे बुद्रुक",
           "बाचणी",
-          "वाळवे खुर्द",
+          "याळवे खुर्द",
           "पिराचीवाडी",
           "बोरवडे",
           "बिद्री",
@@ -2069,14 +2069,7 @@
                   "मोरेवाडी",
                   "तामगांव"
                 ]
-              }
-            ]
-          },
-          {
-            "number": 41,
-            "name": "कळंबे तर्फ ठाणे",
-            "fullName": "४१. कळंबे तर्फ ठाणे",
-            "wards": [
+              },
               {
                 "number": 80,
                 "name": "पाचगांव",
@@ -2089,7 +2082,14 @@
                   "कोगील खुर्द",
                   "कोगील बुद्रुक"
                 ]
-              },
+              }
+            ]
+          },
+          {
+            "number": 41,
+            "name": "कळंबे तर्फ ठाणे",
+            "fullName": "४१. कळंबे तर्फ ठाणे",
+            "wards": [
               {
                 "number": 81,
                 "name": "कळंबे तर्फ ठाणे",
@@ -2099,14 +2099,7 @@
                   "दिंडनेलीं",
                   "दऱ्याचे वडगांव"
                 ]
-              }
-            ]
-          },
-          {
-            "number": 42,
-            "name": "पाडळी खुर्द",
-            "fullName": "४२. पाडळी खुर्द",
-            "wards": [
+              },
               {
                 "number": 82,
                 "name": "दिंडगेर्ली",
@@ -2119,7 +2112,14 @@
                   "वाशी",
                   "वाडीपीर"
                 ]
-              },
+              }
+            ]
+          },
+          {
+            "number": 42,
+            "name": "पाडळी खुर्द",
+            "fullName": "४२. पाडळी खुर्द",
+            "wards": [
               {
                 "number": 83,
                 "name": "पाडळी खुर्द",
@@ -2133,14 +2133,7 @@
                   "बीड",
                   "आरे"
                 ]
-              }
-            ]
-          },
-          {
-            "number": 43,
-            "name": "शिंगणापूर",
-            "fullName": "४३. शिंगणापूर",
-            "wards": [
+              },
               {
                 "number": 84,
                 "name": "शिरोली दुमाला",
@@ -2152,7 +2145,14 @@
                   "सडोली दुमाला",
                   "हिरवडे दुमाला"
                 ]
-              },
+              }
+            ]
+          },
+          {
+            "number": 43,
+            "name": "शिंगणापूर",
+            "fullName": "४३. शिंगणापूर",
+            "wards": [
               {
                 "number": 85,
                 "name": "शिंगणापूर",
@@ -9649,7 +9649,7 @@
         "wardName": "सावर्डे बुद्रूक"
       }
     },
-    "वाळवे खुर्द": {
+    "याळवे खुर्द": {
       "zp": {
         "divisionNumber": 31,
         "divisionName": "बोरवडे",
@@ -10891,8 +10891,8 @@
       },
       "ps": {
         "taluka": "करवीर",
-        "divisionNumber": 41,
-        "divisionName": "कळंबे तर्फ ठाणे",
+        "divisionNumber": 40,
+        "divisionName": "पाचगांव",
         "wardNumber": 80,
         "wardName": "पाचगांव"
       }
@@ -10905,8 +10905,8 @@
       },
       "ps": {
         "taluka": "करवीर",
-        "divisionNumber": 41,
-        "divisionName": "कळंबे तर्फ ठाणे",
+        "divisionNumber": 40,
+        "divisionName": "पाचगांव",
         "wardNumber": 80,
         "wardName": "पाचगांव"
       }
@@ -10919,8 +10919,8 @@
       },
       "ps": {
         "taluka": "करवीर",
-        "divisionNumber": 41,
-        "divisionName": "कळंबे तर्फ ठाणे",
+        "divisionNumber": 40,
+        "divisionName": "पाचगांव",
         "wardNumber": 80,
         "wardName": "पाचगांव"
       }
@@ -10933,8 +10933,8 @@
       },
       "ps": {
         "taluka": "करवीर",
-        "divisionNumber": 41,
-        "divisionName": "कळंबे तर्फ ठाणे",
+        "divisionNumber": 40,
+        "divisionName": "पाचगांव",
         "wardNumber": 80,
         "wardName": "पाचगांव"
       }
@@ -10947,8 +10947,8 @@
       },
       "ps": {
         "taluka": "करवीर",
-        "divisionNumber": 41,
-        "divisionName": "कळंबे तर्फ ठाणे",
+        "divisionNumber": 40,
+        "divisionName": "पाचगांव",
         "wardNumber": 80,
         "wardName": "पाचगांव"
       }
@@ -10983,8 +10983,8 @@
       },
       "ps": {
         "taluka": "करवीर",
-        "divisionNumber": 42,
-        "divisionName": "पाडळी खुर्द",
+        "divisionNumber": 41,
+        "divisionName": "कळंबे तर्फ ठाणे",
         "wardNumber": 82,
         "wardName": "दिंडगेर्ली"
       }
@@ -10997,8 +10997,8 @@
       },
       "ps": {
         "taluka": "करवीर",
-        "divisionNumber": 42,
-        "divisionName": "पाडळी खुर्द",
+        "divisionNumber": 41,
+        "divisionName": "कळंबे तर्फ ठाणे",
         "wardNumber": 82,
         "wardName": "दिंडगेर्ली"
       }
@@ -11025,8 +11025,8 @@
       },
       "ps": {
         "taluka": "करवीर",
-        "divisionNumber": 42,
-        "divisionName": "पाडळी खुर्द",
+        "divisionNumber": 41,
+        "divisionName": "कळंबे तर्फ ठाणे",
         "wardNumber": 82,
         "wardName": "दिंडगेर्ली"
       }
@@ -11137,8 +11137,8 @@
       },
       "ps": {
         "taluka": "करवीर",
-        "divisionNumber": 43,
-        "divisionName": "शिंगणापूर",
+        "divisionNumber": 42,
+        "divisionName": "पाडळी खुर्द",
         "wardNumber": 84,
         "wardName": "शिरोली दुमाला"
       }
@@ -11151,8 +11151,8 @@
       },
       "ps": {
         "taluka": "करवीर",
-        "divisionNumber": 43,
-        "divisionName": "शिंगणापूर",
+        "divisionNumber": 42,
+        "divisionName": "पाडळी खुर्द",
         "wardNumber": 84,
         "wardName": "शिरोली दुमाला"
       }
@@ -11165,8 +11165,8 @@
       },
       "ps": {
         "taluka": "करवीर",
-        "divisionNumber": 43,
-        "divisionName": "शिंगणापूर",
+        "divisionNumber": 42,
+        "divisionName": "पाडळी खुर्द",
         "wardNumber": 84,
         "wardName": "शिरोली दुमाला"
       }
@@ -11179,8 +11179,8 @@
       },
       "ps": {
         "taluka": "करवीर",
-        "divisionNumber": 43,
-        "divisionName": "शिंगणापूर",
+        "divisionNumber": 42,
+        "divisionName": "पाडळी खुर्द",
         "wardNumber": 84,
         "wardName": "शिरोली दुमाला"
       }
@@ -19155,8 +19155,8 @@
       "zp": null,
       "ps": {
         "taluka": "करवीर",
-        "divisionNumber": 42,
-        "divisionName": "पाडळी खुर्द",
+        "divisionNumber": 41,
+        "divisionName": "कळंबे तर्फ ठाणे",
         "wardNumber": 82,
         "wardName": "दिंडगेर्ली"
       }
