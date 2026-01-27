@@ -574,9 +574,9 @@ export default function Home() {
       {/* Voter Data Availability Marquee */}
       <div className={styles.dataMarqueeContainer}>
         <div className={styles.dataMarqueeText}>
-          🎉 गडहिंग्लज, आजरा व चंदगड तालुक्यातील सर्व मतदार यादी उपलब्ध! | Voter data available for Gadhinglaj, Ajara & Chandgad talukas | 4+ लाख मतदारांची माहिती | 400,000+ voters indexed 🎉
+          🎉 गडहिंग्लज, आजरा, चंदगड तालुके व करवीर (पाडळी खुर्द) मतदार यादी उपलब्ध! | Voter data for Gadhinglaj, Ajara, Chandgad talukas & Karaveer (Padali Khurd) | 4+ लाख मतदार | 430,000+ voters indexed 🎉
           &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-          🎉 गडहिंग्लज, आजरा व चंदगड तालुक्यातील सर्व मतदार यादी उपलब्ध! | Voter data available for Gadhinglaj, Ajara & Chandgad talukas | 4+ लाख मतदारांची माहिती | 400,000+ voters indexed 🎉
+          🎉 गडहिंग्लज, आजरा, चंदगड तालुके व करवीर (पाडळी खुर्द) मतदार यादी उपलब्ध! | Voter data for Gadhinglaj, Ajara, Chandgad talukas & Karaveer (Padali Khurd) | 4+ लाख मतदार | 430,000+ voters indexed 🎉
         </div>
       </div>
 
@@ -1602,6 +1602,7 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                       className={styles.select}
                     >
                       <option value="">All / सर्व</option>
+                      <option value="42">42 - पाडळी खुर्द</option>
                       <option value="58">58 - उत्तुर</option>
                       <option value="59">59 - पेरणोली</option>
                       <option value="60">60 - कसबा नुल</option>
@@ -1760,7 +1761,7 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                     }}>
                       <h3 className={styles.epicResultTitle}>❌ {voterSearchError}</h3>
                       <p className={styles.epicLimitNote}>
-                        <small>📋 Currently indexed: Divisions 58-68</small>
+                        <small>📋 Currently indexed: Divisions 42, 58-68</small>
                       </p>
                     </div>
                   )}
@@ -2188,7 +2189,7 @@ _Forward करा - प्रत्येक उमेदवाराला उ
               <div className={styles.voterLookupInfo}>
                 <h4>📋 Coverage / माहिती</h4>
                 <ul>
-                  <li>✅ Divisions 58-68 ({(402718).toLocaleString()} voters)</li>
+                  <li>✅ Divisions 42, 58-68 ({(432083).toLocaleString()} voters)</li>
                   <li>⏳ Other talukas coming soon / इतर तालुके लवकरच</li>
                 </ul>
               </div>
