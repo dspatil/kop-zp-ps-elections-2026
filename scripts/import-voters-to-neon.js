@@ -156,8 +156,7 @@ async function importFile(client, filePath) {
       
       const [prabhag, gan, serialNumber, acNo, epicId, name, age, gender, village, status] = columns;
       
-      // Skip inactive or problematic records
-      if (status && status.toLowerCase() === 'deleted') continue;
+      // Skip only records with invalid EPIC IDs
       if (!epicId || epicId.length < 5) continue;
       
       batch.push({

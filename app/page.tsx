@@ -574,9 +574,9 @@ export default function Home() {
       {/* Voter Data Availability Marquee */}
       <div className={styles.dataMarqueeContainer}>
         <div className={styles.dataMarqueeText}>
-          🎉 गडहिंग्लज, आजरा, चंदगड तालुके व करवीर (पाडळी खुर्द) मतदार यादी उपलब्ध! | Voter data for Gadhinglaj, Ajara, Chandgad talukas & Karaveer (Padali Khurd) | 4+ लाख मतदार | 430,000+ voters indexed 🎉
+          🎉 कागल, गडहिंग्लज, आजरा, चंदगड तालुके व करवीर (पाडळी खुर्द) मतदार यादी उपलब्ध! | Voter data for Kagal, Gadhinglaj, Ajara, Chandgad talukas & Karaveer (Padali Khurd) | 6+ लाख मतदार | 600,000+ voters indexed 🎉
           &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-          🎉 गडहिंग्लज, आजरा, चंदगड तालुके व करवीर (पाडळी खुर्द) मतदार यादी उपलब्ध! | Voter data for Gadhinglaj, Ajara, Chandgad talukas & Karaveer (Padali Khurd) | 4+ लाख मतदार | 430,000+ voters indexed 🎉
+          🎉 कागल, गडहिंग्लज, आजरा, चंदगड तालुके व करवीर (पाडळी खुर्द) मतदार यादी उपलब्ध! | Voter data for Kagal, Gadhinglaj, Ajara, Chandgad talukas & Karaveer (Padali Khurd) | 6+ लाख मतदार | 600,000+ voters indexed 🎉
         </div>
       </div>
 
@@ -1602,6 +1602,12 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                       className={styles.select}
                     >
                       <option value="">All / सर्व</option>
+                      <option value="29">29 - कसबा सांगाव</option>
+                      <option value="30">30 - सिध्दनेर्ली</option>
+                      <option value="31">31 - बोरवडे</option>
+                      <option value="32">32 - म्हाकवे</option>
+                      <option value="33">33 - चिखली</option>
+                      <option value="34">34 - कापशी</option>
                       <option value="42">42 - पाडळी खुर्द</option>
                       <option value="58">58 - उत्तुर</option>
                       <option value="59">59 - पेरणोली</option>
@@ -1761,7 +1767,7 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                     }}>
                       <h3 className={styles.epicResultTitle}>❌ {voterSearchError}</h3>
                       <p className={styles.epicLimitNote}>
-                        <small>📋 Currently indexed: Divisions 42, 58-68</small>
+                        <small>📋 Currently indexed: Divisions 29-34, 42, 58-68</small>
                       </p>
                     </div>
                   )}
@@ -2189,7 +2195,7 @@ _Forward करा - प्रत्येक उमेदवाराला उ
               <div className={styles.voterLookupInfo}>
                 <h4>📋 Coverage / माहिती</h4>
                 <ul>
-                  <li>✅ Divisions 42, 58-68 ({(432083).toLocaleString()} voters)</li>
+                  <li>✅ Divisions 29-34, 42, 58-68 ({(633996).toLocaleString()} voters)</li>
                   <li>⏳ Other talukas coming soon / इतर तालुके लवकरच</li>
                 </ul>
               </div>
