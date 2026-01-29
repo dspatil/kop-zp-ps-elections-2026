@@ -260,7 +260,7 @@ export default function Home() {
     if (page === 1) setNameSearchResults([]);
     
     try {
-      const limit = hasAccess ? 50 : 20; // Premium users get more results per page
+      const limit = hasAccess ? 50 : 10; // Premium users get more results per page
       let url = `/api/voters/search?name=${encodeURIComponent(name)}&limit=${limit}&page=${page}`;
       if (searchDivisionFilter) {
         url += `&division=${searchDivisionFilter}`;
@@ -316,7 +316,7 @@ export default function Home() {
     setVillageAnalytics(null); // Reset analytics
     setVillageDemographics(null); // Reset demographics
     try {
-      const limit = hasAccess ? 100 : 20; // Premium users get more results per page
+      const limit = hasAccess ? 100 : 10; // Premium users get more results per page
       let url = `/api/voters/village?name=${encodeURIComponent(villageName)}&page=${page}&limit=${limit}`;
       if (divisionNo) url += `&division=${divisionNo}`;
       if (wardNo) url += `&ward=${wardNo}`;
@@ -1778,9 +1778,9 @@ _Forward करा - प्रत्येक उमेदवाराला उ
               {voterSearchType === 'name' && (
                 <>
                   <p className={styles.voterLookupIntro}>
-                    Search voters by name (partial match). {hasAccess ? 'Full access enabled.' : 'Shows first 20 results.'}
+                    Search voters by name (partial match).
                     <br />
-                    नावाने मतदार शोधा. {hasAccess ? 'पूर्ण प्रवेश सक्षम.' : 'पहिले २० परिणाम दाखवते.'}
+                    नावाने मतदार शोधा.
                   </p>
                   
                   <div className={styles.voterLookupSearchBox}>
@@ -1864,8 +1864,8 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                         </div>
                       ))}
                       
-                      {/* Show premium card only for non-premium users with more than 20 results */}
-                      {!hasAccess && nameSearchTotal > 20 && (
+                      {/* Show premium card only for non-premium users with more than 10 results */}
+                      {!hasAccess && nameSearchTotal > 10 && (
                         <div className={styles.premiumCard}>
                           <div className={styles.premiumHeader}>
                             <span className={styles.premiumBadge}>🔒 Premium</span>
@@ -1880,7 +1880,7 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                             <div className={styles.premiumFeature}>
                               <span>🔓</span>
                               <span>Currently showing</span>
-                              <span>20 of {nameSearchTotal.toLocaleString()}</span>
+                              <span>10 of {nameSearchTotal.toLocaleString()}</span>
                             </div>
                             <div className={styles.premiumFeature}>
                               <span>📥</span>
@@ -2062,7 +2062,7 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                         ))}
                         
                         {/* Blurred teaser rows - only for non-premium users */}
-                        {!hasAccess && selectedVillageVoters.stats.total > 20 && (
+                        {!hasAccess && selectedVillageVoters.stats.total > 10 && (
                           <div className={styles.blurredRows}>
                             <div className={styles.blurredRow}>
                               <span>██</span>
@@ -2088,7 +2088,7 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                             <div className={styles.blurOverlay}>
                               <span className={styles.blurLock}>🔒</span>
                               <span className={styles.blurText}>
-                                +{(selectedVillageVoters.stats.total - 20).toLocaleString()} more voters
+                                +{(selectedVillageVoters.stats.total - 10).toLocaleString()} more voters
                               </span>
                               <button 
                                 onClick={() => setShowAccessModal(true)}
