@@ -72,6 +72,7 @@ export default function Home() {
   const [apiEpicResult, setApiEpicResult] = useState<any>(null);
   const [searchDivisionFilter, setSearchDivisionFilter] = useState<string>('');
   const [searchWardFilter, setSearchWardFilter] = useState<string>('');
+  const [exportLoading, setExportLoading] = useState(false);
   
   // Get ward options for a division from ward-composition.json
   const getWardOptionsForDivision = (divisionNo: string): {no: number, name: string}[] => {
@@ -343,6 +344,156 @@ export default function Home() {
       setVoterSearchError('Failed to load village voters');
     } finally {
       setVoterSearchLoading(false);
+    }
+  };
+
+  // Handle full list export
+  const handleExportFullList = async (type: 'csv' | 'pdf') => {
+    if (!selectedVillageVoters) return;
+    
+    setExportLoading(true);
+    try {
+      // 1. Fetch ALL data
+      let url = `/api/voters/village/export?name=${encodeURIComponent(selectedVillageVoters.village)}`;
+      if (selectedVillageVoters.divisionNo) url += `&division=${selectedVillageVoters.divisionNo}`;
+      if (selectedVillageVoters.wardNo) url += `&ward=${selectedVillageVoters.wardNo}`;
+      
+      const response = await fetch(url);
+      const data = await response.json();
+      
+      if (!response.ok) throw new Error(data.error || 'Export failed');
+      
+      const voters = data.voters || [];
+
+      // 2. Generate File
+      if (type === 'csv') {
+        const csvContent = [
+          ['Sr No', 'Name', 'Age', 'Gender', 'EPIC', 'Division', 'Ward'].join(','),
+          ...voters.map((v: any) => [
+            v.serialNumber || '',
+            `"${v.name}"`, // Quote name to handle commas
+            v.age,
+            v.gender,
+            v.epicId,
+            v.division,
+            v.ward
+          ].join(','))
+        ].join('\n');
+
+        const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `Voters_${selectedVillageVoters.village}_Full_List.csv`;
+        link.click();
+      } else if (type === 'pdf') {
+        try {
+          const jsPDFModule = await import('jspdf');
+          const jsPDF = jsPDFModule.default;
+          
+          // Import autotable
+          const autoTableModule = await import('jspdf-autotable');
+          const autoTable = autoTableModule.default || (autoTableModule as any); 
+
+          const doc = new jsPDF();
+
+          // --- FIX: Load Marathi Font ---
+          // Using Noto Sans Devanagari from GitHub Raw (supports CORS)
+          try {
+            const fontUrl = 'https://raw.githubusercontent.com/googlefonts/noto-fonts/main/hinted/ttf/NotoSansDevanagari/NotoSansDevanagari-Regular.ttf';
+            const fontBytes = await fetch(fontUrl).then(res => {
+              if (!res.ok) throw new Error('Failed to load font');
+              return res.arrayBuffer();
+            });
+
+            // Convert to binary string for jsPDF
+            const filename = 'NotoSansDevanagari-Regular.ttf';
+            const fontData = new Uint8Array(fontBytes);
+            let binaryString = '';
+            for (let i = 0; i < fontData.length; i++) {
+              binaryString += String.fromCharCode(fontData[i]);
+            }
+
+            doc.addFileToVFS(filename, binaryString);
+            doc.addFont(filename, 'NotoSansDevanagari', 'normal');
+            doc.setFont('NotoSansDevanagari');
+          } catch (fontError) {
+            console.warn('Could not load Marathi font, text may be garbled:', fontError);
+            alert('Warning: Marathi font could not be loaded. Text might not display correctly.');
+          }
+          // -----------------------------
+          
+          doc.setFontSize(14);
+          doc.text(`Voter List: ${selectedVillageVoters.village}`, 14, 20);
+          
+          doc.setFontSize(10);
+          doc.text(`Total Voters: ${voters.length}`, 14, 28);
+          doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 33);
+          doc.setFontSize(8);
+          doc.setTextColor(100);
+          doc.text(`Note: Marathi names may display incorrectly due to PDF font limitations. For accurate names, please use CSV Export.`, 14, 38);
+          doc.setTextColor(0);
+          
+          const tableColumn = ["Sr No", "Name", "Age", "Gender", "EPIC"];
+          const tableRows = voters.map((v: any) => [
+            v.serialNumber || '',
+            v.name,
+            v.age,
+            v.gender === 'पुरुष' ? 'Male' : (v.gender === 'स्त्री' ? 'Female' : v.gender),
+            v.epicId
+          ]);
+
+          const options = {
+            head: [tableColumn],
+            body: tableRows,
+            startY: 40,
+            theme: 'grid',
+            headStyles: { 
+              fillColor: [41, 128, 185], 
+              textColor: 255,
+              font: 'helvetica' // Headers are in English
+            },
+            styles: { 
+              fontSize: 9,
+              font: 'NotoSansDevanagari' // Default to Marathi font for data
+            },
+            columnStyles: {
+              0: { font: 'helvetica' }, // Sr No (Numbers)
+              2: { font: 'helvetica' }, // Age (Numbers)
+              4: { font: 'helvetica' }  // EPIC (English + Numbers)
+            }
+          };
+
+          // Try different invocation methods
+          if (typeof autoTable === 'function') {
+             autoTable(doc, options);
+          } else if ((doc as any).autoTable) {
+             (doc as any).autoTable(options);
+          } else {
+             // Try assigning plugin manually if exposed
+             if (autoTableModule.applyPlugin) {
+                autoTableModule.applyPlugin(jsPDF);
+                if ((doc as any).autoTable) {
+                   (doc as any).autoTable(options);
+                } else {
+                   throw new Error('Failed to apply AutoTable plugin');
+                }
+             } else {
+                throw new Error('AutoTable function not found in module');
+             }
+          }
+          
+          doc.save(`Voters_${selectedVillageVoters.village}.pdf`);
+        } catch (err: any) {
+          console.error('PDF specific error:', err);
+          alert(`PDF Generation Error: ${err.message}`);
+        }
+      }
+      
+    } catch (error) {
+      console.error('Export error:', error);
+      alert('Export failed. Please try again.');
+    } finally {
+      setExportLoading(false);
     }
   };
   
@@ -1976,25 +2127,26 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                         <div className={styles.villageHeaderTop}>
                           <h3>🏘️ {selectedVillageVoters.village}</h3>
                           {hasAccess ? (
-                            <button 
-                              className={styles.exportButton}
-                              onClick={() => {
-                                const csv = [
-                                  ['Sr No', 'Name', 'Age', 'Gender', 'EPIC'].join(','),
-                                  ...selectedVillageVoters.voters.map(v => [
-                                    v.serialNumber || '', v.name, v.age, v.gender, v.epicId
-                                  ].join(','))
-                                ].join('\n');
-                                const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
-                                const url = URL.createObjectURL(blob);
-                                const a = document.createElement('a');
-                                a.href = url;
-                                a.download = `voters_${selectedVillageVoters.village}.csv`;
-                                a.click();
-                              }}
-                            >
-                              📥 Export CSV
-                            </button>
+                            <div className={styles.exportButtons} style={{ display: 'flex', gap: '8px' }}>
+                              <button 
+                                className={styles.exportButton}
+                                onClick={() => handleExportFullList('csv')}
+                                disabled={exportLoading}
+                              >
+                                {exportLoading ? '⏳...' : '📥 Full CSV'}
+                              </button>
+                              
+                              {/* PDF Export - Temporarily Disabled due to Font Issues */}
+                              <div title="PDF Export coming soon! Use CSV for now.">
+                                <button 
+                                  className={`${styles.exportButton} ${styles.exportButtonDisabled}`}
+                                  disabled
+                                  style={{ opacity: 0.6, cursor: 'not-allowed', backgroundColor: '#e53e3e' }}
+                                >
+                                  📄 Full PDF (Soon)
+                                </button>
+                              </div>
+                            </div>
                           ) : (
                             <button 
                               className={`${styles.exportButton} ${styles.exportButtonDisabled}`}
