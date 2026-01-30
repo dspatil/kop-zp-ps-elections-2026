@@ -316,22 +316,65 @@ export function ReligionPieChart({ data }: ReligionChartProps) {
   const chartData = data.map(item => ({
     name: `${item.nameMr} (${item.name})`,
     value: item.count,
-    percentage: item.percentage
+    percentage: item.percentage,
+    religionKey: item.name
   }));
 
+  // Create color mapping for each religion
+  const colorMap = new Map<string, string>();
+  chartData.forEach((item, index) => {
+    const religionName = data[index].name;
+    const color = RELIGION_COLORS[religionName] || COLORS.primary[index % COLORS.primary.length];
+    colorMap.set(item.name, color);
+  });
+
+  // Sort data for legend display - descending by value
+  const sortedForLegend = [...chartData].sort((a, b) => b.value - a.value);
+
+  // Custom legend component
+  const renderCustomLegend = () => {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        flexWrap: 'wrap', 
+        justifyContent: 'center', 
+        gap: '6px 12px',
+        marginTop: '12px',
+        padding: '0 10px'
+      }}>
+        {sortedForLegend.map((item, index) => (
+          <div key={index} style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '4px',
+            fontSize: '0.75rem'
+          }}>
+            <div style={{ 
+              width: '12px', 
+              height: '12px', 
+              backgroundColor: colorMap.get(item.name),
+              borderRadius: '2px'
+            }} />
+            <span style={{ color: '#4a5568', whiteSpace: 'nowrap' }}>{item.name}</span>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
-    <div style={{ width: '100%', height: 320 }}>
-      <ResponsiveContainer>
-        <PieChart margin={{ top: 20, right: 0, bottom: 0, left: 0 }}>
+    <div style={{ width: '100%', height: 320, display: 'flex', flexDirection: 'column' }}>
+      <ResponsiveContainer width="100%" height={250}>
+        <PieChart margin={{ top: 10, right: 0, bottom: 10, left: 0 }}>
           <Pie
             data={chartData}
             cx="50%"
-            cy="42%"
+            cy="50%"
             innerRadius={55}
             outerRadius={90}
             paddingAngle={2}
             dataKey="value"
-            label={(entry: any) => entry.percentage > 5 ? `${entry.percentage}%` : ''}
+            label={(entry: any) => entry.percentage > 2 ? `${entry.percentage}%` : ''}
             labelLine={false}
           >
             {chartData.map((entry, index) => {
@@ -346,13 +389,9 @@ export function ReligionPieChart({ data }: ReligionChartProps) {
               name
             ]}
           />
-          <Legend 
-            verticalAlign="bottom" 
-            height={60}
-            formatter={(value: any) => <span style={{ color: '#4a5568', fontSize: '0.75rem' }}>{value}</span>}
-          />
         </PieChart>
       </ResponsiveContainer>
+      {renderCustomLegend()}
     </div>
   );
 }
