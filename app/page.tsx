@@ -513,16 +513,16 @@ export default function Home() {
       { 
         event: 'Polling', 
         eventMr: 'मतदान', 
-        date: '5 Feb', 
-        dateMr: '५ फेब्रु', 
-        startDate: new Date(2026, 1, 5) 
+        date: '7 Feb', 
+        dateMr: '७ फेब्रु', 
+        startDate: new Date(2026, 1, 7) 
       },
       { 
         event: 'Counting', 
         eventMr: 'मतमोजणी', 
-        date: '7 Feb', 
-        dateMr: '७ फेब्रु', 
-        startDate: new Date(2026, 1, 7) 
+        date: '9 Feb', 
+        dateMr: '९ फेब्रु', 
+        startDate: new Date(2026, 1, 9) 
       },
     ];
     
