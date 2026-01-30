@@ -7,7 +7,7 @@ const COLORS = {
   male: '#3182ce',
   female: '#d53f8c', 
   other: '#718096',
-  primary: ['#FF9933', '#FF6600', '#e65c00', '#cc5200', '#b34700'],
+  primary: ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4', '#6366f1'],
   age: ['#48bb78', '#4299e1', '#ed8936', '#9f7aea', '#f56565', '#38b2ac']
 };
 
@@ -164,8 +164,8 @@ interface SurnameChartProps {
 }
 
 export function SurnameDonutChart({ surnames }: SurnameChartProps) {
-  const topSurnames = surnames.slice(0, 5);
-  const othersCount = surnames.slice(5).reduce((sum, s) => sum + s.count, 0);
+  const topSurnames = surnames.slice(0, 7);
+  const othersCount = surnames.slice(7).reduce((sum, s) => sum + s.count, 0);
   
   const data = topSurnames.map((s) => ({
     name: s.name,
@@ -176,38 +176,78 @@ export function SurnameDonutChart({ surnames }: SurnameChartProps) {
     data.push({ name: 'इतर (Others)', value: othersCount });
   }
 
+  // Create color mapping for each surname (based on original order)
+  const colorMap = new Map<string, string>();
+  data.forEach((item, index) => {
+    colorMap.set(item.name, index < 7 ? COLORS.primary[index] : '#a0aec0');
+  });
+
+  // Sort data for legend display - descending by value, "Others" at end
+  const sortedForLegend = [...data].sort((a, b) => {
+    if (a.name === 'इतर (Others)') return 1;
+    if (b.name === 'इतर (Others)') return -1;
+    return b.value - a.value;
+  });
+
+  // Custom legend component
+  const renderCustomLegend = () => {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        flexWrap: 'wrap', 
+        justifyContent: 'center', 
+        gap: '6px 10px',
+        marginTop: '8px',
+        padding: '0 10px'
+      }}>
+        {sortedForLegend.map((item, index) => (
+          <div key={index} style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '4px',
+            fontSize: '0.75rem'
+          }}>
+            <div style={{ 
+              width: '12px', 
+              height: '12px', 
+              backgroundColor: colorMap.get(item.name),
+              borderRadius: '2px'
+            }} />
+            <span style={{ color: '#4a5568', whiteSpace: 'nowrap' }}>{item.name}</span>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
-    <div style={{ width: '100%', height: 260 }}>
-      <ResponsiveContainer>
-        <PieChart margin={{ top: 20, right: 0, bottom: 0, left: 0 }}>
+    <div style={{ width: '100%', height: 260, display: 'flex', flexDirection: 'column' }}>
+      <ResponsiveContainer width="100%" height={210}>
+        <PieChart margin={{ top: 5, right: 0, bottom: 5, left: 0 }}>
           <Pie
             data={data}
             cx="50%"
-            cy="45%"
-            innerRadius={35}
-            outerRadius={65}
+            cy="50%"
+            innerRadius={40}
+            outerRadius={75}
             paddingAngle={2}
             dataKey="value"
-            label={({ percent }) => (percent ?? 0) > 0.05 ? `${((percent ?? 0) * 100).toFixed(0)}%` : ''}
+            label={({ percent }) => (percent ?? 0) > 0.03 ? `${((percent ?? 0) * 100).toFixed(0)}%` : ''}
             labelLine={false}
           >
             {data.map((entry, index) => (
               <Cell 
                 key={`cell-${index}`} 
-                fill={index < 5 ? COLORS.primary[index] : '#a0aec0'} 
+                fill={index < 7 ? COLORS.primary[index] : '#a0aec0'} 
               />
             ))}
           </Pie>
           <Tooltip 
             formatter={(value: any, name: any) => [Number(value).toLocaleString(), name]}
           />
-          <Legend 
-            verticalAlign="bottom" 
-            height={50}
-            formatter={(value: any) => <span style={{ color: '#4a5568', fontSize: '0.75rem' }}>{value}</span>}
-          />
         </PieChart>
       </ResponsiveContainer>
+      {renderCustomLegend()}
     </div>
   );
 }
@@ -521,3 +561,4 @@ export function FamilyPowerTable({ data }: FamilyPowerProps) {
     </div>
   );
 }
+
