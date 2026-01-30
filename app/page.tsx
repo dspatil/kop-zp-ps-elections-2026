@@ -445,7 +445,7 @@ export default function Home() {
           const options = {
             head: [tableColumn],
             body: tableRows,
-            startY: 40,
+            startY: 45,
             theme: 'grid',
             headStyles: { 
               fillColor: [41, 128, 185], 
@@ -461,7 +461,7 @@ export default function Home() {
               2: { font: 'helvetica' }, // Age (Numbers)
               4: { font: 'helvetica' }  // EPIC (English + Numbers)
             }
-          };
+          } as any; // Type assertion to avoid build errors with dynamic imports
 
           // Try different invocation methods
           if (typeof autoTable === 'function') {
