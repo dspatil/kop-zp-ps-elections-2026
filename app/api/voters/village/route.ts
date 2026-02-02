@@ -71,8 +71,9 @@ export async function GET(request: Request) {
       );
     }
 
-    // Build query with optional division/ward filters
+    // Build query with optional division/ward/age filters
     const ward = searchParams.get('ward');
+    const ageGroup = searchParams.get('ageGroup');
     let whereClause = 'WHERE village = $1';
     const countValues: any[] = [villageName];
     let paramIdx = 2;
@@ -86,6 +87,22 @@ export async function GET(request: Request) {
       whereClause += ` AND ps_ward_no = $${paramIdx}`;
       countValues.push(parseInt(ward));
       paramIdx++;
+    }
+    
+    // Add age filter - use numeric comparison with proper error handling
+    if (ageGroup && ageGroup !== 'all') {
+      console.log('Age filter applied:', ageGroup); // Debug log
+      if (ageGroup === '18-21') {
+        whereClause += ` AND age::integer >= 18 AND age::integer <= 21`;
+      } else if (ageGroup === '22-35') {
+        whereClause += ` AND age::integer >= 22 AND age::integer <= 35`;
+      } else if (ageGroup === '36-50') {
+        whereClause += ` AND age::integer >= 36 AND age::integer <= 50`;
+      } else if (ageGroup === '51-60') {
+        whereClause += ` AND age::integer >= 51 AND age::integer <= 60`;
+      } else if (ageGroup === '60+' || ageGroup === '60 ') {
+        whereClause += ` AND age::integer >= 61`;
+      }
     }
 
     // Get total count for village (with filters)

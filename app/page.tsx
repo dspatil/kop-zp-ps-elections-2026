@@ -65,6 +65,7 @@ export default function Home() {
   const [voterSearchError, setVoterSearchError] = useState<string | null>(null);
   const [villageList, setVillageList] = useState<any[]>([]);
   const [selectedVillageVoters, setSelectedVillageVoters] = useState<{village: string; stats: any; voters: any[]; page: number; totalPages: number; divisionNo?: number; wardNo?: number} | null>(null);
+  const [ageFilter, setAgeFilter] = useState<string>('all'); // Age filter state
   const [villageAnalytics, setVillageAnalytics] = useState<any>(null);
   const [villageAnalyticsLoading, setVillageAnalyticsLoading] = useState(false);
   const [villageDemographics, setVillageDemographics] = useState<any>(null);
@@ -312,7 +313,7 @@ export default function Home() {
     }
   };
 
-  const loadVillageVoters = async (villageName: string, page = 1, divisionNo?: number, wardNo?: number) => {
+  const loadVillageVoters = async (villageName: string, page = 1, divisionNo?: number, wardNo?: number, ageGroup = 'all') => {
     setVoterSearchLoading(true);
     setVillageAnalytics(null); // Reset analytics
     setVillageDemographics(null); // Reset demographics
@@ -321,6 +322,7 @@ export default function Home() {
       let url = `/api/voters/village?name=${encodeURIComponent(villageName)}&page=${page}&limit=${limit}`;
       if (divisionNo) url += `&division=${divisionNo}`;
       if (wardNo) url += `&ward=${wardNo}`;
+      if (ageGroup !== 'all') url += `&ageGroup=${encodeURIComponent(ageGroup)}`;
       const response = await fetch(url);
       const data = await response.json();
       if (response.ok) {
@@ -2098,7 +2100,10 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                             <div 
                               key={idx} 
                               className={styles.villageCard}
-                              onClick={() => loadVillageVoters(village.name, 1, village.divisionNo, village.wardNo)}
+                              onClick={() => {
+                                setAgeFilter('all'); // Reset age filter
+                                loadVillageVoters(village.name, 1, village.divisionNo, village.wardNo);
+                              }}
                             >
                               <div className={styles.villageName}>{village.name}</div>
                               <div className={styles.villageStats}>
@@ -2128,7 +2133,10 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                       
                       <button 
                         className={styles.backButton}
-                        onClick={() => setSelectedVillageVoters(null)}
+                        onClick={() => {
+                          setSelectedVillageVoters(null);
+                          setAgeFilter('all'); // Reset age filter
+                        }}
                       >
                         ← Back to villages
                       </button>
@@ -2200,6 +2208,58 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                           <p style={{ margin: '0.5rem 0 0', fontSize: '0.75rem', color: '#276749' }}>
                             Opens in new tab
                           </p>
+                        </div>
+                      )}
+
+                      {/* Age Filter Buttons - FREE FEATURE */}
+                      {selectedVillageVoters.voters.length > 0 && (
+                        <div style={{ margin: '1rem 0', padding: '1rem', background: '#f7fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                            <span style={{ fontSize: '1rem', fontWeight: 600, color: '#2d3748' }}>🎯 Age Filter / वय निवड:</span>
+                          </div>
+                          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                            {[
+                              { id: 'all', label: 'All / सर्व', emoji: '👥' },
+                              { id: '18-21', label: '18-21 (First-time)', emoji: '✨' },
+                              { id: '22-35', label: '22-35 (Youth)', emoji: '💪' },
+                              { id: '36-50', label: '36-50 (Mid-age)', emoji: '👔' },
+                              { id: '51-60', label: '51-60 (Mature)', emoji: '🧑' },
+                              { id: '60+', label: '61+ (Senior)', emoji: '👴' }
+                            ].map(filter => (
+                              <button
+                                key={filter.id}
+                                onClick={() => {
+                                  setAgeFilter(filter.id);
+                                  loadVillageVoters(
+                                    selectedVillageVoters.village, 
+                                    1, 
+                                    selectedVillageVoters.divisionNo, 
+                                    selectedVillageVoters.wardNo,
+                                    filter.id
+                                  );
+                                }}
+                                style={{
+                                  padding: '0.5rem 1rem',
+                                  background: ageFilter === filter.id ? 'linear-gradient(135deg, #4299e1 0%, #3182ce 100%)' : 'white',
+                                  color: ageFilter === filter.id ? 'white' : '#2d3748',
+                                  border: ageFilter === filter.id ? 'none' : '1px solid #cbd5e0',
+                                  borderRadius: '6px',
+                                  cursor: 'pointer',
+                                  fontSize: '0.875rem',
+                                  fontWeight: ageFilter === filter.id ? 600 : 500,
+                                  transition: 'all 0.2s',
+                                  boxShadow: ageFilter === filter.id ? '0 2px 8px rgba(66, 153, 225, 0.3)' : 'none'
+                                }}
+                              >
+                                {filter.emoji} {filter.label}
+                              </button>
+                            ))}
+                          </div>
+                          {ageFilter !== 'all' && (
+                            <p style={{ marginTop: '0.75rem', fontSize: '0.875rem', color: '#718096' }}>
+                              Showing {selectedVillageVoters.voters.length} voters (Page {selectedVillageVoters.page} of {selectedVillageVoters.totalPages})
+                            </p>
+                          )}
                         </div>
                       )}
 
@@ -2326,7 +2386,10 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                             className={styles.paginationBtn}
                             onClick={() => loadVillageVoters(
                               selectedVillageVoters.village, 
-                              selectedVillageVoters.page - 1
+                              selectedVillageVoters.page - 1,
+                              selectedVillageVoters.divisionNo,
+                              selectedVillageVoters.wardNo,
+                              ageFilter
                             )}
                             disabled={selectedVillageVoters.page === 1}
                           >
@@ -2339,7 +2402,10 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                             className={styles.paginationBtn}
                             onClick={() => loadVillageVoters(
                               selectedVillageVoters.village, 
-                              selectedVillageVoters.page + 1
+                              selectedVillageVoters.page + 1,
+                              selectedVillageVoters.divisionNo,
+                              selectedVillageVoters.wardNo,
+                              ageFilter
                             )}
                             disabled={selectedVillageVoters.page >= selectedVillageVoters.totalPages}
                           >

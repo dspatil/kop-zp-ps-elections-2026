@@ -1,6 +1,6 @@
 'use client';
 
-import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ScatterChart, Scatter, ZAxis } from 'recharts';
 
 // Colors for charts
 const COLORS = {
@@ -597,6 +597,121 @@ export function FamilyPowerTable({ data }: FamilyPowerProps) {
           ))}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+// Surname Network Graph - Bubble visualization
+interface SurnameNetworkProps {
+  families: Array<{
+    surname: string;
+    voterCount: number;
+    avgAge: number;
+    maleCount: number;
+    femaleCount: number;
+  }>;
+}
+
+export function SurnameNetworkGraph({ families }: SurnameNetworkProps) {
+  if (!families || families.length === 0) {
+    return (
+      <div style={{ padding: '20px', textAlign: 'center', color: '#718096' }}>
+        No family data available
+      </div>
+    );
+  }
+
+  // Transform data for scatter chart (bubble chart)
+  // Create a grid-like layout for better visualization
+  const data = families.slice(0, 10).map((family, idx) => {
+    const row = Math.floor(idx / 5); // 5 bubbles per row
+    const col = idx % 5;
+    
+    return {
+      surname: family.surname,
+      x: 10 + (col * 15), // Spread horizontally (10, 25, 40, 55, 70)
+      y: 10 + (row * 15), // Two rows (10, 25)
+      z: family.voterCount * 2, // Bubble size multiplier
+      voterCount: family.voterCount,
+      male: family.maleCount,
+      female: family.femaleCount,
+      avgAge: family.avgAge
+    };
+  });
+
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.95)',
+          padding: '10px',
+          border: '1px solid #cbd5e0',
+          borderRadius: '6px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+        }}>
+          <p style={{ margin: 0, fontWeight: 'bold', color: '#2d3748' }}>{data.surname}</p>
+          <p style={{ margin: '4px 0 0', fontSize: '0.875rem', color: '#718096' }}>
+            👥 {data.voterCount} voters · 👨 {data.male} · 👩 {data.female}
+          </p>
+          <p style={{ margin: '4px 0 0', fontSize: '0.875rem', color: '#718096' }}>
+            📊 Avg Age: {data.avgAge} yrs
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  const colors = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4', '#6366f1', '#f97316', '#14b8a6', '#a855f7'];
+
+  return (
+    <div style={{ width: '100%', height: 300 }}>
+      <ResponsiveContainer>
+        <ScatterChart margin={{ top: 20, right: 30, bottom: 30, left: 30 }}>
+          <XAxis 
+            type="number" 
+            dataKey="x" 
+            domain={[0, 85]}
+            hide
+          />
+          <YAxis 
+            type="number" 
+            dataKey="y" 
+            domain={[0, 35]}
+            hide
+          />
+          <ZAxis type="number" dataKey="z" range={[800, 3000]} name="Voter Count" />
+          <Tooltip content={<CustomTooltip />} />
+          <Scatter data={data} fill="#3b82f6">
+            {data.map((entry, index) => (
+              <Cell 
+                key={`cell-${index}`} 
+                fill={colors[index % colors.length]}
+              />
+            ))}
+          </Scatter>
+          {/* Add surname labels on bubbles */}
+          {data.map((entry, index) => (
+            <text
+              key={`label-${index}`}
+              x={entry.x}
+              y={entry.y}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fill="white"
+              fontSize="14"
+              fontWeight="bold"
+              pointerEvents="none"
+            >
+              {entry.surname}
+            </text>
+          ))}
+        </ScatterChart>
+      </ResponsiveContainer>
+      <div style={{ marginTop: '10px', fontSize: '0.875rem', color: '#718096', textAlign: 'center' }}>
+        💡 Bubble size represents number of voters · Hover to see details
+      </div>
     </div>
   );
 }
