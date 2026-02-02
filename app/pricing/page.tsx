@@ -40,12 +40,23 @@ export default function PricingPage() {
               <li>Export to CSV/Excel</li>
               <li>Analytics dashboard</li>
             </ul>
-            <a 
-              href="mailto:inbox.dpatil@gmail.com?subject=Village Pack Inquiry&body=Hi,%0D%0A%0D%0AI am interested in the Village Pack.%0D%0A%0D%0AVillage(s): %0D%0ADivision: %0D%0AContact Number: "
-              className={`${styles.pricingCardCta} ${styles.pricingCardCtaSecondary}`}
-            >
-              📩 Get Village Pack
-            </a>
+            <div style={{ display: 'flex', gap: '0.5rem', flexDirection: 'column' }}>
+              <a 
+                href="https://wa.me/919021284186?text=Hi%2C%0A%0AI'm interested in the Village Pack.%0A%0AVillage(s): %0ADivision: %0AContact Number: "
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${styles.pricingCardCta} ${styles.pricingCardCtaSecondary}`}
+                style={{ background: '#25D366' }}
+              >
+                📱 WhatsApp Inquiry
+              </a>
+              <a 
+                href="mailto:inbox.dpatil@gmail.com?subject=Village Pack Inquiry&body=Hi,%0D%0A%0D%0AI am interested in the Village Pack.%0D%0A%0D%0AVillage(s): %0D%0ADivision: %0D%0AContact Number: "
+                className={`${styles.pricingCardCta} ${styles.pricingCardCtaSecondary}`}
+              >
+                ✉️ Email Inquiry
+              </a>
+            </div>
           </div>
 
           {/* Ward Pack - Popular */}
@@ -69,12 +80,23 @@ export default function PricingPage() {
               <li>Senior citizen lists</li>
               <li>Export to CSV/Excel</li>
             </ul>
-            <a 
-              href="mailto:inbox.dpatil@gmail.com?subject=Ward Pack Inquiry&body=Hi,%0D%0A%0D%0AI am interested in the Ward Pack.%0D%0A%0D%0AWard/Gan: %0D%0ADivision: %0D%0AContact Number: "
-              className={`${styles.pricingCardCta} ${styles.pricingCardCtaPrimary}`}
-            >
-              📩 Get Ward Pack
-            </a>
+            <div style={{ display: 'flex', gap: '0.5rem', flexDirection: 'column' }}>
+              <a 
+                href="https://wa.me/919021284186?text=Hi%2C%0A%0AI'm interested in the Ward Pack.%0A%0AWard/Gan: %0ADivision: %0AContact Number: "
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${styles.pricingCardCta} ${styles.pricingCardCtaPrimary}`}
+                style={{ background: '#25D366' }}
+              >
+                📱 WhatsApp Inquiry
+              </a>
+              <a 
+                href="mailto:inbox.dpatil@gmail.com?subject=Ward Pack Inquiry&body=Hi,%0D%0A%0D%0AI am interested in the Ward Pack.%0D%0A%0D%0AWard/Gan: %0D%0ADivision: %0D%0AContact Number: "
+                className={`${styles.pricingCardCta} ${styles.pricingCardCtaPrimary}`}
+              >
+                ✉️ Email Inquiry
+              </a>
+            </div>
           </div>
 
           {/* Division Pack */}
@@ -98,12 +120,23 @@ export default function PricingPage() {
               <li>Age group targeting lists</li>
               <li>Priority support</li>
             </ul>
-            <a 
-              href="mailto:inbox.dpatil@gmail.com?subject=Division Pack Inquiry&body=Hi,%0D%0A%0D%0AI am interested in the Division Pack.%0D%0A%0D%0ADivision Number: %0D%0AContact Number: "
-              className={`${styles.pricingCardCta} ${styles.pricingCardCtaSecondary}`}
-            >
-              📩 Get Division Pack
-            </a>
+            <div style={{ display: 'flex', gap: '0.5rem', flexDirection: 'column' }}>
+              <a 
+                href="https://wa.me/919021284186?text=Hi%2C%0A%0AI'm interested in the Division Pack.%0A%0ADivision Number: %0AContact Number: "
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${styles.pricingCardCta} ${styles.pricingCardCtaSecondary}`}
+                style={{ background: '#25D366' }}
+              >
+                📱 WhatsApp Inquiry
+              </a>
+              <a 
+                href="mailto:inbox.dpatil@gmail.com?subject=Division Pack Inquiry&body=Hi,%0D%0A%0D%0AI am interested in the Division Pack.%0D%0A%0D%0ADivision Number: %0D%0AContact Number: "
+                className={`${styles.pricingCardCta} ${styles.pricingCardCtaSecondary}`}
+              >
+                ✉️ Email Inquiry
+              </a>
+            </div>
           </div>
 
           {/* Taluka Pack */}
@@ -127,12 +160,23 @@ export default function PricingPage() {
               <li>Priority WhatsApp support</li>
               <li>Free updates during election</li>
             </ul>
-            <a 
-              href="mailto:inbox.dpatil@gmail.com?subject=Taluka Pack Inquiry&body=Hi,%0D%0A%0D%0AI am interested in the Taluka Pack.%0D%0A%0D%0ATaluka Name: %0D%0AContact Number: "
-              className={`${styles.pricingCardCta} ${styles.pricingCardCtaPrimary}`}
-            >
-              📩 Get Taluka Pack
-            </a>
+            <div style={{ display: 'flex', gap: '0.5rem', flexDirection: 'column' }}>
+              <a 
+                href="https://wa.me/919021284186?text=Hi%2C%0A%0AI'm interested in the Taluka Pack.%0A%0ATaluka Name: %0AContact Number: "
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${styles.pricingCardCta} ${styles.pricingCardCtaPrimary}`}
+                style={{ background: '#25D366' }}
+              >
+                📱 WhatsApp Inquiry
+              </a>
+              <a 
+                href="mailto:inbox.dpatil@gmail.com?subject=Taluka Pack Inquiry&body=Hi,%0D%0A%0D%0AI am interested in the Taluka Pack.%0D%0A%0D%0ATaluka Name: %0D%0AContact Number: "
+                className={`${styles.pricingCardCta} ${styles.pricingCardCtaPrimary}`}
+              >
+                ✉️ Email Inquiry
+              </a>
+            </div>
           </div>
         </div>
 
@@ -181,9 +225,14 @@ export default function PricingPage() {
           <h3>🤝 Need Custom Package? / कस्टम पॅकेज हवे?</h3>
           <p>Contact us for bulk deals, multiple talukas, or special requirements</p>
           <div className={styles.pricingContactButtons}>
-            <span className={styles.pricingWhatsAppDisabled}>
-              📱 WhatsApp (Coming Soon)
-            </span>
+            <a 
+              href="https://wa.me/919021284186?text=Hi%2C%20I%27d%20like%20to%20inquire%20about%20custom%20packages%20for%20Kolhapur%20Elections"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.pricingWhatsApp}
+            >
+              📱 WhatsApp
+            </a>
             <a 
               href="mailto:inbox.dpatil@gmail.com?subject=Custom Package Inquiry - Kolhapur Elections"
               className={styles.pricingEmail}
