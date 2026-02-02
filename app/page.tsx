@@ -2116,6 +2116,16 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                     </>
                   ) : (
                     <div className={styles.villageVotersList}>
+                      {/* Print-only header showing list page number */}
+                      {hasAccess && selectedVillageVoters.totalPages > 1 && (
+                        <div className={styles.printOnlyHeader}>
+                          <h2>Voter List - Page {selectedVillageVoters.page} of {selectedVillageVoters.totalPages}</h2>
+                          <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.5rem' }}>
+                            मतदार यादी - पृष्ठ {selectedVillageVoters.page} / {selectedVillageVoters.totalPages}
+                          </p>
+                        </div>
+                      )}
+                      
                       <button 
                         className={styles.backButton}
                         onClick={() => setSelectedVillageVoters(null)}
@@ -2136,16 +2146,14 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                                 {exportLoading ? '⏳...' : '📥 Full CSV'}
                               </button>
                               
-                              {/* PDF Export - Temporarily Disabled due to Font Issues */}
-                              <div title="PDF Export coming soon! Use CSV for now.">
-                                <button 
-                                  className={`${styles.exportButton} ${styles.exportButtonDisabled}`}
-                                  disabled
-                                  style={{ opacity: 0.6, cursor: 'not-allowed', backgroundColor: '#e53e3e' }}
-                                >
-                                  📄 Full PDF (Soon)
-                                </button>
-                              </div>
+                              <button 
+                                className={styles.exportButton}
+                                onClick={() => window.print()}
+                                style={{ backgroundColor: '#7c3aed' }}
+                                title="Print current page voters"
+                              >
+                                🖨️ Print List
+                              </button>
                             </div>
                           ) : (
                             <button 
@@ -2617,12 +2625,24 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                           <li>📥 Export to CSV/Excel</li>
                           <li>🔢 Serial numbers & addresses</li>
                         </ul>
-                        <a 
-                          href={`mailto:inbox.dpatil@gmail.com?subject=Full Voter Data Request - ${selectedSeat.divisionName} (${selectedSeat.electionType})&body=Hi,%0D%0A%0D%0AI am interested in getting full voter data for:%0D%0A%0D%0ASeat: ${selectedSeat.divisionName} (${selectedSeat.seatNumber})%0D%0AElection: ${selectedSeat.electionType}%0D%0A%0D%0APurpose: %0D%0AContact Number: %0D%0A`}
-                          className={styles.premiumTeaserButton}
-                        >
-                          📩 Get Full Access
-                        </a>
+                        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                          <a 
+                            href={`mailto:inbox.dpatil@gmail.com?subject=Full Voter Data Request - ${selectedSeat.divisionName} (${selectedSeat.electionType})&body=Hi,%0D%0A%0D%0AI am interested in getting full voter data for:%0D%0A%0D%0ASeat: ${selectedSeat.divisionName} (${selectedSeat.seatNumber})%0D%0AElection: ${selectedSeat.electionType}%0D%0ACategory: ${selectedSeat.category}%0D%0AWomen Reserved: ${selectedSeat.isWomenReserved ? 'Yes' : 'No'}%0D%0A%0D%0APurpose: %0D%0AContact Number: %0D%0A`}
+                            className={styles.premiumTeaserButton}
+                            style={{ flex: 1 }}
+                          >
+                            ✉️ Email
+                          </a>
+                          <a 
+                            href={`https://wa.me/919021284186?text=Hi%2C%0A%0AI'm interested in full voter data for:%0A%0ASeat: ${selectedSeat.divisionName} (${selectedSeat.seatNumber})%0AElection: ${selectedSeat.electionType}%0ACategory: ${selectedSeat.category}%0AWomen Reserved: ${selectedSeat.isWomenReserved ? 'Yes' : 'No'}%0A%0APurpose: %0AContact Number: `}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={styles.premiumTeaserButton}
+                            style={{ flex: 1, background: '#25D366' }}
+                          >
+                            📱 WhatsApp
+                          </a>
+                        </div>
                       </div>
                     </div>
                   );
@@ -2693,7 +2713,45 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                 {accessLoading ? '⏳ Verifying...' : '🔓 Unlock Premium'}
               </button>
               <div className={styles.accessModalFooter}>
-                <p>Don&apos;t have a code? <a href="mailto:inbox.dpatil@gmail.com?subject=Premium Access Request - Kolhapur Elections">Get in touch</a></p>
+                <p style={{ marginBottom: '0.5rem' }}>Don&apos;t have a code? <strong>Get in touch:</strong></p>
+                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <a 
+                    href={`mailto:inbox.dpatil@gmail.com?subject=Premium Access Request - Kolhapur Elections&body=Hi%2C%0D%0A%0D%0AI'd like premium access to Kolhapur Elections App.%0D%0A%0D%0AContext:%0D%0A${selectedVillageVoters ? `Village: ${selectedVillageVoters.village}%0D%0A` : ''}${nameSearch ? `Searched for: ${encodeURIComponent(nameSearch)}%0D%0A` : ''}${selectedSeat ? `Seat: ${selectedSeat.divisionName} (${selectedSeat.seatNumber})%0D%0A` : ''}%0D%0AContact Number: `}
+                    style={{ 
+                      display: 'inline-flex', 
+                      alignItems: 'center', 
+                      gap: '0.5rem',
+                      padding: '0.5rem 1rem',
+                      background: '#2563eb',
+                      color: 'white',
+                      borderRadius: '6px',
+                      textDecoration: 'none',
+                      fontSize: '0.9rem',
+                      fontWeight: 500
+                    }}
+                  >
+                    ✉️ Email
+                  </a>
+                  <a 
+                    href={`https://wa.me/919021284186?text=Hi%2C%0A%0AI'd like premium access to Kolhapur Elections App.%0A%0AContext:%0A${selectedVillageVoters ? `Village: ${selectedVillageVoters.village}%0A` : ''}${nameSearch ? `Searched for: ${encodeURIComponent(nameSearch)}%0A` : ''}${selectedSeat ? `Seat: ${selectedSeat.divisionName} (${selectedSeat.seatNumber})%0A` : ''}%0AContact Number: `}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ 
+                      display: 'inline-flex', 
+                      alignItems: 'center', 
+                      gap: '0.5rem',
+                      padding: '0.5rem 1rem',
+                      background: '#25D366',
+                      color: 'white',
+                      borderRadius: '6px',
+                      textDecoration: 'none',
+                      fontSize: '0.9rem',
+                      fontWeight: 500
+                    }}
+                  >
+                    📱 WhatsApp
+                  </a>
+                </div>
               </div>
             </div>
           </div>
