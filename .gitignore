@@ -18,6 +18,17 @@ yarn-error.log*
 .env*.local
 .env
 
+# Temporary SQL/test scripts (DO NOT COMMIT)
+CREATE_TEST_CODE.sql
+create-test-code.js
+**/CREATE_*.sql
+**/*_TEST_*.sql
+**/create-*-code.js
+
+# Documentation (local only)
+WARD_ACCESS_IMPLEMENTATION.md
+*_IMPLEMENTATION.md
+
 # Vercel
 .vercel
 
@@ -39,6 +50,9 @@ jest.config.js
 # ===========================================
 # SOURCE DATA FILES (not needed in production)
 # ===========================================
+
+# One-time data processing scripts (not needed in production)
+scripts/
 
 # PDF files
 *.pdf

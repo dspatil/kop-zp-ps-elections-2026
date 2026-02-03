@@ -119,6 +119,8 @@ export default function Home() {
   const [accessCodeInput, setAccessCodeInput] = useState('');
   const [accessError, setAccessError] = useState('');
   const [accessLoading, setAccessLoading] = useState(false);
+  const [divisionAccess, setDivisionAccess] = useState<string[] | null>(null);
+  const [wardAccess, setWardAccess] = useState<string[] | null>(null);
   
   // Check localStorage on mount for existing access token
   useEffect(() => {
@@ -131,9 +133,16 @@ export default function Home() {
           if (data.valid) {
             setHasAccess(true);
             setAccessName(data.name || 'Premium');
+            // Store access restrictions (null = full access for backward compatibility)
+            setDivisionAccess(data.divisionAccess || null);
+            setWardAccess(data.wardAccess || null);
+            localStorage.setItem('election_division_access', JSON.stringify(data.divisionAccess || null));
+            localStorage.setItem('election_ward_access', JSON.stringify(data.wardAccess || null));
           } else {
             // Token invalid or expired, remove it
             localStorage.removeItem('election_access_token');
+            localStorage.removeItem('election_division_access');
+            localStorage.removeItem('election_ward_access');
           }
         } catch {
           // Network error, keep token but don't set access
@@ -162,8 +171,12 @@ export default function Home() {
       
       if (data.valid) {
         localStorage.setItem('election_access_token', data.token);
+        localStorage.setItem('election_division_access', JSON.stringify(data.divisionAccess || null));
+        localStorage.setItem('election_ward_access', JSON.stringify(data.wardAccess || null));
         setHasAccess(true);
         setAccessName(data.name || 'Premium');
+        setDivisionAccess(data.divisionAccess || null);
+        setWardAccess(data.wardAccess || null);
         setShowAccessModal(false);
         setAccessCodeInput('');
       } else {
@@ -179,8 +192,69 @@ export default function Home() {
   // Logout function
   const handleLogout = () => {
     localStorage.removeItem('election_access_token');
+    localStorage.removeItem('election_division_access');
+    localStorage.removeItem('election_ward_access');
     setHasAccess(false);
     setAccessName('');
+    setDivisionAccess(null);
+    setWardAccess(null);
+  };
+  
+  // Helper function to check if user has access to a specific ward
+  const hasWardAccess = (wardIdentifier: string): boolean => {
+    // No premium access = allow all (free tier can browse everything, just limited to 10 voters)
+    if (!hasAccess) return true;
+    
+    // Has premium access with NULL/empty wardAccess = full premium access (backward compatibility)
+    if (!wardAccess || wardAccess.length === 0) return true;
+    
+    // Has premium access with specific ward restrictions = check if allowed
+    return wardAccess.some(allowed => wardIdentifier.includes(allowed) || allowed.includes(wardIdentifier));
+  };
+  
+  // Helper function to check if user has access to a specific division
+  const hasDivisionAccess = (divisionIdentifier: string): boolean => {
+    // No premium access = allow all (free tier can browse everything)
+    if (!hasAccess) return true;
+    
+    // Has premium access with NULL/empty divisionAccess = full premium access (backward compatibility)
+    if (!divisionAccess || divisionAccess.length === 0) return true;
+    
+    // Has premium access with specific division restrictions = check if allowed
+    return divisionAccess.some(allowed => divisionIdentifier.includes(allowed) || allowed.includes(divisionIdentifier));
+  };
+  
+  // NEW: Check if user has PREMIUM access for a specific ward/division (not just browsing)
+  const hasPremiumAccessForWard = (wardNo?: number, divisionNo?: number): boolean => {
+    // No premium at all = no premium features
+    if (!hasAccess) return false;
+    
+    // Full premium access (NULL restrictions) = premium everywhere
+    if ((!wardAccess || wardAccess.length === 0) && (!divisionAccess || divisionAccess.length === 0)) {
+      return true;
+    }
+    
+    // Check ward-specific access first (more specific)
+    if (wardNo) {
+      const wardId = `${wardNo}`;
+      if (wardAccess && wardAccess.length > 0) {
+        return wardAccess.some(allowed => wardId.includes(allowed) || allowed.includes(wardId));
+      }
+    }
+    
+    // Fall back to division access
+    if (divisionNo) {
+      const divId = `${divisionNo}`;
+      if (divisionAccess && divisionAccess.length > 0) {
+        return divisionAccess.some(allowed => divId.includes(allowed) || allowed.includes(divId));
+      }
+    }
+    
+    // If no ward/division info available, grant access (data completeness)
+    if (!wardNo && !divisionNo) return true;
+    
+    // Has restricted access but this ward/division is not in the list
+    return false;
   };
   
   const [filters, setFilters] = useState<{
@@ -318,7 +392,10 @@ export default function Home() {
     setVillageAnalytics(null); // Reset analytics
     setVillageDemographics(null); // Reset demographics
     try {
-      const limit = hasAccess ? 100 : 10; // Premium users get more results per page
+      // Check if user has premium access for THIS specific ward/division
+      const hasPremiumForThisWard = hasPremiumAccessForWard(wardNo, divisionNo);
+      const limit = hasPremiumForThisWard ? 100 : 10; // Ward-specific premium or free tier
+      
       let url = `/api/voters/village?name=${encodeURIComponent(villageName)}&page=${page}&limit=${limit}`;
       if (divisionNo) url += `&division=${divisionNo}`;
       if (wardNo) url += `&ward=${wardNo}`;
@@ -336,8 +413,8 @@ export default function Home() {
           wardNo
         });
         
-        // Fetch detailed analytics for premium users
-        if (hasAccess) {
+        // Fetch detailed analytics ONLY if user has premium access for THIS ward
+        if (hasPremiumForThisWard) {
           loadVillageAnalytics(villageName, divisionNo, wardNo);
           loadVillageDemographics(villageName, divisionNo, wardNo);
         }
@@ -2096,7 +2173,9 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                         <div className={styles.loadingText}>⏳ Loading villages...</div>
                       ) : (
                         <div className={styles.villageGrid}>
-                          {villageList.slice(0, 60).map((village, idx) => (
+                          {villageList
+                            .slice(0, 60)
+                            .map((village, idx) => (
                             <div 
                               key={idx} 
                               className={styles.villageCard}
@@ -2144,7 +2223,7 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                       <div className={styles.villageHeader}>
                         <div className={styles.villageHeaderTop}>
                           <h3>🏘️ {selectedVillageVoters.village}</h3>
-                          {hasAccess ? (
+                          {hasPremiumAccessForWard(selectedVillageVoters.wardNo, selectedVillageVoters.divisionNo) ? (
                             <div className={styles.exportButtons} style={{ display: 'flex', gap: '8px' }}>
                               <button 
                                 className={styles.exportButton}
@@ -2181,7 +2260,7 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                       </div>
 
                       {/* Premium Analytics Link */}
-                      {hasAccess && (
+                      {hasPremiumAccessForWard(selectedVillageVoters.wardNo, selectedVillageVoters.divisionNo) && (
                         <div style={{ margin: '1rem 0', padding: '1rem', background: 'linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%)', borderRadius: '12px', border: '2px solid #48bb78', textAlign: 'center' }}>
                           <a 
                             href={`/village-analytics/${encodeURIComponent(selectedVillageVoters.village)}`}
@@ -2281,8 +2360,8 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                           </div>
                         ))}
                         
-                        {/* Blurred teaser rows - only for non-premium users */}
-                        {!hasAccess && selectedVillageVoters.stats.total > 10 && (
+                        {/* Blurred teaser rows - for users without premium access to THIS ward */}
+                        {!hasPremiumAccessForWard(selectedVillageVoters.wardNo, selectedVillageVoters.divisionNo) && selectedVillageVoters.stats.total > 10 && (
                           <div className={styles.blurredRows}>
                             <div className={styles.blurredRow}>
                               <span>██</span>
@@ -2314,15 +2393,15 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                                 onClick={() => setShowAccessModal(true)}
                                 className={styles.blurUnlock}
                               >
-                                🔐 Enter Access Code →
+                                🔐 {hasAccess && (wardAccess?.length || divisionAccess?.length) ? 'Upgrade for This Ward →' : 'Enter Access Code →'}
                               </button>
                             </div>
                           </div>
                         )}
                       </div>
 
-                      {/* Campaign Insights Premium Card - only for non-premium users */}
-                      {!hasAccess && (
+                      {/* Campaign Insights Premium Card - for users without premium access to THIS ward */}
+                      {!hasPremiumAccessForWard(selectedVillageVoters.wardNo, selectedVillageVoters.divisionNo) && (
                         <div className={styles.premiumCard}>
                           <div className={styles.premiumHeader}>
                             <span className={styles.premiumBadge}>🔒 Premium Analytics</span>
@@ -2379,8 +2458,8 @@ _Forward करा - प्रत्येक उमेदवाराला उ
                         </div>
                       )}
 
-                      {/* Pagination for premium users */}
-                      {hasAccess && selectedVillageVoters.totalPages > 1 && (
+                      {/* Pagination for premium users with access to THIS ward */}
+                      {hasPremiumAccessForWard(selectedVillageVoters.wardNo, selectedVillageVoters.divisionNo) && selectedVillageVoters.totalPages > 1 && (
                         <div className={styles.pagination}>
                           <button 
                             className={styles.paginationBtn}
@@ -2453,6 +2532,16 @@ _Forward करा - प्रत्येक उमेदवाराला उ
           <span className={styles.campaignIcon}>✅</span>
           <span className={styles.campaignText}>
             <span className={styles.campaignLine1}>{accessName || 'Premium'}</span>
+            {wardAccess && wardAccess.length > 0 && (
+              <span className={styles.campaignLine2} style={{ fontSize: '0.75rem', opacity: 0.8 }}>
+                🏘️ Ward: {wardAccess.join(', ')}
+              </span>
+            )}
+            {divisionAccess && divisionAccess.length > 0 && !wardAccess && (
+              <span className={styles.campaignLine2} style={{ fontSize: '0.75rem', opacity: 0.8 }}>
+                📍 Division: {divisionAccess.join(', ')}
+              </span>
+            )}
             <button onClick={handleLogout} className={styles.logoutLink}>Logout</button>
           </span>
         </div>
@@ -2474,7 +2563,11 @@ _Forward करा - प्रत्येक उमेदवाराला उ
       {hasAccess ? (
         <div className={`${styles.mobileBottomCta} ${styles.mobileAccessActive}`}>
           <span className={styles.mobileCtaIcon}>✅</span>
-          <span className={styles.mobileCtaText}>Premium Access Active</span>
+          <span className={styles.mobileCtaText}>
+            Premium Active
+            {wardAccess && wardAccess.length > 0 && ` - Ward: ${wardAccess[0]}`}
+            {divisionAccess && divisionAccess.length > 0 && !wardAccess && ` - Div: ${divisionAccess[0]}`}
+          </span>
           <button onClick={handleLogout} className={styles.mobileLogoutBtn}>Logout</button>
         </div>
       ) : (
